@@ -1,0 +1,40 @@
+{
+  "name": "netflex/pages",
+  "description": "Netflex Pages library",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [],
+  "config": {
+    "platform": {
+      "php": "7.3"
+    },
+    "sort-packages": true
+  },
+  "autoload": {
+    "psr-4": {
+      "Netflex\\Pages\\": "src/"
+    },
+    "files": [
+      "src/helpers.php"
+    ]
+  },
+  "require": {
+    "php": "^7.3",
+    "illuminate/auth": "^6.12",
+    "illuminate/contracts": "^6.12",
+    "illuminate/routing": "^6.12",
+    "netflex/foundation": "^1.0",
+    "netflex/query-builder": "^2.0",
+    "netflex/support": "^3.0"
+  },
+  "require-dev": {
+    "illuminate/cache": "^6.12",
+    "illuminate/container": "^6.12",
+    "illuminate/events": "^6.12",
+    "illuminate/filesystem": "^6.12",
+    "illuminate/support": "^6.12",
+    "illuminate/view": "^6.12",
+    "larapack/dd": "^1.1",
+    "vlucas/phpdotenv": "^3.6"
+  }
+}
