@@ -2,12 +2,20 @@
 
 use Netflex\Pages\Page;
 use Carbon\Carbon;
+use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Netflex\API\Facades\API;
-use Netflex\Foundation\Setting;
+use Netflex\Foundation\Variable;
 use Netflex\Pages\Types\File;
 use Netflex\Pages\Types\Image;
+
+if (!function_exists('route_hash')) {
+  function route_hash(Route $route)
+  {
+    return 'route.' . md5(spl_object_hash($route));
+  }
+}
 
 if (!function_exists('insert_content_if_not_exists')) {
   /**
@@ -500,8 +508,8 @@ if (!function_exists('media_url')) {
       $file = $file->path ?? null;
     }
 
-    $schema = Setting::get('site_cdn_protocol');
-    $cdn = Setting::get('site_cdn_url');
+    $schema = Variable::get('site_cdn_protocol');
+    $cdn = Variable::get('site_cdn_url');
 
     $size = (is_string($size) && !(strpos($size, 'x') > 0)) ? "{$size}x{$size}" : $size;
     $size = is_float($size) ? floor($size) : $size;
@@ -669,13 +677,16 @@ HTML;
 }
 
 if (!function_exists('image')) {
-  function image($path, $size, $type = 'rc', $class = null, $alt = null, $title = null, $color = '0,0,0')
+  function image(...$args)
   {
-    $alt = $alt ?? $title ?? '';
-    $title = $title ?? $alt ?? '';
-    $url = media_url($path, $size, $type, $color);
+    if (is_object($args[0])) {
+      $args[0] = (string) $args[0];
+    }
+
+    $url = media_url(...$args);
+
     return <<<HTML
-<img class="$class" src="$url" $title="$title" alt="$alt">
+<img src="$url">
 HTML;
   }
 }

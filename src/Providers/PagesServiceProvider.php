@@ -2,16 +2,24 @@
 
 namespace Netflex\Pages\Providers;
 
+use Throwable;
+
 use Netflex\Pages\Page;
 use Netflex\Pages\Controllers\Controller;
 use Netflex\Pages\Controllers\PageController;
 
+use Netflex\Foundation\Redirect;
+
 use Netflex\Pages\Middleware\BindPage;
 use Netflex\Pages\Middleware\GroupAuthentication;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
+
+use Illuminate\Support\Facades\Log;
+
+use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Illuminate\Support\Collection;
 
 class PagesServiceProvider extends ServiceProvider
 {
@@ -20,13 +28,14 @@ class PagesServiceProvider extends ServiceProvider
    */
   public function register()
   {
+    parent::register();
     $this->registerBladeDirectives();
   }
 
   public function boot()
   {
     $this->registerMiddlewareGroups();
-    $this->registerPageRoutes();
+    parent::boot();
   }
 
   protected function registerBladeDirectives()
@@ -72,35 +81,57 @@ class PagesServiceProvider extends ServiceProvider
     $router->aliasMiddleware('group_auth', GroupAuthentication::class);
 
     $router->middlewareGroup('netflex', [
+      'web',
       'bind_page',
       'group_auth'
     ]);
   }
 
-  protected function registerPageRoutes()
+  protected function mapRedirects()
   {
-    Route::group(['middleware' => 'netflex'], function () {
-      $pages = Page::all()->filter(function ($page) {
-        return $page->type === 'page' && $page->template;
+    Collection::make(Redirect::all())
+      ->each(function ($redirect) {
+        Route::redirect(
+          $redirect->source_url,
+          $redirect->target_url,
+          $redirect->type
+        );
       });
+  }
 
-      foreach ($pages as $page) {
-        tap(new PageController, function (Controller $controller) use ($page) {
-          $class = get_class($controller);
-          $routeDefintions = $controller->getRoutes();
+  protected function mapNetflexRoutes()
+  {
+    Route::middleware('netflex')
+      ->group(function () {
+        Page::all()->filter(function ($page) {
+          return $page->type === 'page' && $page->template;
+        })->each(function ($page) {
+          $controller = $page->template->controller ?? null;
+          $pageController = PageController::class;
+          $class = trim($controller ? ("\\{$this->namespace}\\{$controller}") : "\\{$pageController}", '\\');
 
-          foreach ($routeDefintions as $routeDefintion) {
-            $routeDefintion->url = trim($routeDefintion->url, '/');
-            $url = trim("{$page->url}/{$routeDefintion->url}", '/');
-            $action = "$class@{$routeDefintion->action}";
+          try {
+            tap(new $class, function (Controller $controller) use ($page) {
+              $class = get_class($controller);
+              $routeDefintions = $controller->getRoutes();
 
-            $route = Route::match($routeDefintion->methods, $url, $action)
-              ->name($page->id);
+              foreach ($routeDefintions as $routeDefintion) {
+                $routeDefintion->url = trim($routeDefintion->url, '/');
+                $url = trim("{$page->url}/{$routeDefintion->url}", '/');
+                $action = "$class@{$routeDefintion->action}";
 
-            $this->app->bind(spl_object_hash($route), $page);
+                $route = Route::match($routeDefintion->methods, $url, $action)
+                  ->name($page->name);
+
+                $this->app->bind(route_hash($route), function () use ($page) {
+                  return $page;
+                });
+              }
+            });
+          } catch (Throwable $e) {
+            Log::warning("Route {$page->url} could not be registered because {$e->getMessage()}");
           }
         });
-      }
-    });
+      });
   }
 }

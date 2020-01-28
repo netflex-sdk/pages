@@ -8,5 +8,6 @@ class Image extends ReactiveObject
 {
   public function __toString()
   {
+    return $this->path ?? '';
   }
 }

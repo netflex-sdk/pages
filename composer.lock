@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "ec68fa8aad47f7564e81d989a595df60",
+    "content-hash": "80ea299359e92d6402461a35e659aa03",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -1047,16 +1047,16 @@
         },
         {
             "name": "netflex/foundation",
-            "version": "v1.0.0",
+            "version": "v2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/netflex-sdk/foundation.git",
-                "reference": "6b8d19c506e1b03dbb323dd94059bde454180c55"
+                "reference": "ab5f35d36c9a08936eaeb8f09030732955b71df1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/netflex-sdk/foundation/zipball/6b8d19c506e1b03dbb323dd94059bde454180c55",
-                "reference": "6b8d19c506e1b03dbb323dd94059bde454180c55",
+                "url": "https://api.github.com/repos/netflex-sdk/foundation/zipball/ab5f35d36c9a08936eaeb8f09030732955b71df1",
+                "reference": "ab5f35d36c9a08936eaeb8f09030732955b71df1",
                 "shasum": ""
             },
             "require": {
@@ -1085,20 +1085,20 @@
                 "MIT"
             ],
             "description": "Netflex Foundation library",
-            "time": "2020-01-22T22:17:58+00:00"
+            "time": "2020-01-28T00:01:42+00:00"
         },
         {
             "name": "netflex/query-builder",
-            "version": "v2.1.1",
+            "version": "v2.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/netflex-sdk/query-builder.git",
-                "reference": "841d5fe0362d5ba9c6fe792ab0b7da11011d44de"
+                "reference": "7741f645eb52ace91da33ea98a3b12154307fb6d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/netflex-sdk/query-builder/zipball/841d5fe0362d5ba9c6fe792ab0b7da11011d44de",
-                "reference": "841d5fe0362d5ba9c6fe792ab0b7da11011d44de",
+                "url": "https://api.github.com/repos/netflex-sdk/query-builder/zipball/7741f645eb52ace91da33ea98a3b12154307fb6d",
+                "reference": "7741f645eb52ace91da33ea98a3b12154307fb6d",
                 "shasum": ""
             },
             "require": {
@@ -1149,7 +1149,7 @@
                 "netflex",
                 "query"
             ],
-            "time": "2020-01-24T15:25:34+00:00"
+            "time": "2020-01-27T22:04:39+00:00"
         },
         {
             "name": "netflex/support",

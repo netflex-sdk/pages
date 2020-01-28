@@ -8,5 +8,6 @@ class File extends ReactiveObject
 {
   public function __toString()
   {
+    return $this->path ?? '';
   }
 }

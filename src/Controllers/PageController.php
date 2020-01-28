@@ -3,12 +3,18 @@
 namespace Netflex\Pages\Controllers;
 
 use Netflex\Pages\Page;
-use Illuminate\Http\Request;
-use Netflex\Pages\Controllers\Controller as BaseController;
 use Netflex\Pages\Exceptions\PageNotBoundException;
+use Netflex\Pages\Controllers\Controller as BaseController;
+
+use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Validation\ValidatesRequests;
 
 class PageController extends BaseController
 {
+  use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+
   /**
    * Additional Netflex page routes
    *

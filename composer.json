@@ -23,7 +23,7 @@
     "illuminate/auth": "^6.12",
     "illuminate/contracts": "^6.12",
     "illuminate/routing": "^6.12",
-    "netflex/foundation": "^1.0",
+    "netflex/foundation": "^2.0",
     "netflex/query-builder": "^2.0",
     "netflex/support": "^3.0"
   },

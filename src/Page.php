@@ -9,7 +9,7 @@ use Netflex\API\Facades\API;
 use Netflex\Query\QueryableModel;
 
 use Netflex\Foundation\Template;
-use Netflex\Foundation\Setting;
+use Netflex\Foundation\Variable;
 
 use Netflex\Pages\Traits\CastsDefaultFields;
 use Netflex\Pages\Traits\HidesDefaultFields;
@@ -204,9 +204,20 @@ class Page extends QueryableModel implements Responsable
    */
   public function mapBlocks(string $area, Closure $mapper)
   {
-    return $this->content->filter(function ($content) use ($area) {
+    $blockhash = blockhash();
+
+    $mapped = $this->content->filter(function ($content) use ($area) {
       return $content->area === $area;
-    })->map($mapper);
+    })->map(function ($area) use ($mapper) {
+      blockhash($area->title);
+      $mapped = $mapper($area);
+      blockhash(null);
+      return $mapped;
+    });
+
+    blockhash($blockhash);
+
+    return $mapped;
   }
 
   /**
@@ -218,9 +229,7 @@ class Page extends QueryableModel implements Responsable
    */
   public function renderBlocks($area, $vars = [])
   {
-    $blocks = $this->mapBlocks($area, function ($section) use ($vars) {
-      blockhash($section->title);
-
+    $blocks = $this->mapBlocks($area, function ($block) use ($vars) {
       $blockVariables = array_merge(
         $vars,
         [
@@ -228,18 +237,15 @@ class Page extends QueryableModel implements Responsable
         ]
       );
 
-      $component = Template::retrieve((int) $section->text);
+      $component = Template::retrieve((int) $block->text);
       $view = 'components.' . $component->alias;
-      $rendered = View::exists($view)
+
+      return View::exists($view)
         ? trim(View::make($view, $blockVariables)->render())
         : null;
-
-      blockhash(null);
-
-      return $rendered;
     });
 
-    return $blocks->filter()->join(',');
+    return $blocks->filter()->join("\n");
   }
 
   /**
@@ -268,7 +274,7 @@ class Page extends QueryableModel implements Responsable
    */
   public function getTitleAttribute($title)
   {
-    return trim(($title ?? $this->name) . Setting::get('site_meta_title'), ' -');
+    return trim(($title ?? $this->name) . Variable::get('site_meta_title'), ' -');
   }
 
   /**

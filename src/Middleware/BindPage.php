@@ -2,10 +2,9 @@
 
 namespace Netflex\Pages\Middleware;
 
-use Closure;
+use Netflex\SDK\Application;
 
-use Netflex\Pages\Page;
-use Netflex\Routing\Route;
+use Closure;
 
 use Illuminate\Support\Facades\App;
 
@@ -20,11 +19,10 @@ class BindPage
    */
   public function handle($request, Closure $next)
   {
-    $routeHash = spl_object_hash($request->route());
-    dd($routeHash);
+    $route = route_hash($request->route());
 
-    if (App::has($routeHash)) {
-      current_page(App::get($routeHash));
+    if (App::has($route)) {
+      current_page(App::get($route));
     }
 
     return $next($request);
