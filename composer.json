@@ -20,20 +20,22 @@
   },
   "require": {
     "php": "^7.3",
-    "illuminate/auth": "^6.12",
-    "illuminate/contracts": "^6.12",
-    "illuminate/routing": "^6.12",
-    "netflex/foundation": "^2.0",
-    "netflex/query-builder": "^2.0",
-    "netflex/support": "^3.0"
+    "illuminate/auth": "^6.16",
+    "illuminate/contracts": "^6.16",
+    "illuminate/routing": "^6.16",
+    "netflex/foundation": "^2.0.0-RC1",
+    "netflex/query-builder": "^2.0.0-RC1",
+    "netflex/support": "^2.0.0-RC1"
   },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
   "require-dev": {
-    "illuminate/cache": "^6.12",
-    "illuminate/container": "^6.12",
-    "illuminate/events": "^6.12",
-    "illuminate/filesystem": "^6.12",
-    "illuminate/support": "^6.12",
-    "illuminate/view": "^6.12",
+    "illuminate/cache": "^6.16",
+    "illuminate/container": "^6.16",
+    "illuminate/events": "^6.16",
+    "illuminate/filesystem": "^6.16",
+    "illuminate/support": "^6.16",
+    "illuminate/view": "^6.16",
     "larapack/dd": "^1.1",
     "vlucas/phpdotenv": "^3.6"
   }

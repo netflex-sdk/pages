@@ -2,6 +2,8 @@
 
 namespace Netflex\Pages\Controllers;
 
+use App\Article;
+
 use Netflex\Pages\Page;
 use Netflex\Pages\Exceptions\PageNotBoundException;
 use Netflex\Pages\Controllers\Controller as BaseController;
@@ -39,5 +41,9 @@ class PageController extends BaseController
     }
 
     throw new PageNotBoundException;
+  }
+
+  public function showArticle (Article $article) {
+    dd($article->id, $article->name);
   }
 }

@@ -3,7 +3,7 @@
 namespace Netflex\Pages;
 
 use Closure;
-
+use Exception;
 use Netflex\API\Facades\API;
 
 use Netflex\Query\QueryableModel;
@@ -20,6 +20,7 @@ use Illuminate\Contracts\Support\Responsable;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\View;
+use Throwable;
 
 /**
  * @property int $id
@@ -167,7 +168,7 @@ class Page extends QueryableModel implements Responsable
   {
     $response = API::post('builder/pages', $attributes);
 
-    return $response->entry_id;
+    return $response->page_id;
   }
 
   /**
@@ -230,18 +231,11 @@ class Page extends QueryableModel implements Responsable
   public function renderBlocks($area, $vars = [])
   {
     $blocks = $this->mapBlocks($area, function ($block) use ($vars) {
-      $blockVariables = array_merge(
-        $vars,
-        [
-          'page' => $this,
-        ]
-      );
-
       $component = Template::retrieve((int) $block->text);
       $view = 'components.' . $component->alias;
 
       return View::exists($view)
-        ? trim(View::make($view, $blockVariables)->render())
+        ? trim(View::make($view, $vars)->render())
         : null;
     });
 
@@ -291,12 +285,7 @@ class Page extends QueryableModel implements Responsable
     current_page($this);
     blockhash(null);
 
-    $pageVariables = [
-      'page' => current_page(),
-      'request' => $request,
-    ];
-
-    $rendered = $this->template ? $this->template->toResponse($pageVariables) : null;
+    $rendered = $this->template ? $this->template->toResponse() : null;
 
     current_page($current_page);
     blockhash($blockhash);
@@ -412,6 +401,35 @@ class Page extends QueryableModel implements Responsable
     }
 
     return $model;
+  }
+
+  /**
+   * Loads the given revision
+   *
+   * @param int $revisionId
+   * @return static
+   */
+  public function loadRevision ($revisionId = null) {
+      if (!$revisionId) {
+        return $this;
+      }
+
+      try {
+        $content = API::get("builder/pages/{$this->getKey()}/content/{$revisionId}", true);
+        $this->attributes['revision'] = $revisionId;
+        $this->attributes['content'] = $content;
+        return $this;
+      } catch (Throwable $e) {
+          return null;
+      }
+  }
+
+  /**
+   * @param string $key
+   * @return bool
+   */
+  protected function relationLoaded(string $key) {
+    return false;
   }
 
   /**

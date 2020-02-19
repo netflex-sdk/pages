@@ -16,6 +16,7 @@ use Netflex\Pages\Middleware\GroupAuthentication;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Log;
 
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
@@ -40,6 +41,12 @@ class PagesServiceProvider extends ServiceProvider
 
   protected function registerBladeDirectives()
   {
+    View::addNamespace('netflex', __DIR__ . '/../views');
+
+    Blade::if('mode', function (...$modes) {
+      return if_mode(...$modes);
+    });
+
     Blade::directive('editable', function ($expression) {
       return "<?php page_editable_push($expression); ?>";
     });
@@ -56,12 +63,8 @@ class PagesServiceProvider extends ServiceProvider
       return "<?php echo blocks($expression); ?>";
     });
 
-    Blade::directive('inlineText', function ($expression) {
-      return "<?php echo inline_text($expression); ?>";
-    });
-
-    Blade::directive('inlinePicture', function ($expression) {
-      return "<?php echo inline_picture($expression); ?>";
+    Blade::directive('inline', function ($expression) {
+      return "<?php echo inline($expression); ?>";
     });
 
     Blade::directive('image', function ($expression) {
@@ -70,6 +73,10 @@ class PagesServiceProvider extends ServiceProvider
 
     Blade::directive('picture', function ($expression) {
       return "<?php echo picture($expression); ?>";
+    });
+
+    Blade::directive('editorTools', function () {
+        return "<?php echo editor_tools(); ?>";
     });
   }
 
