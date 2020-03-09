@@ -3,7 +3,8 @@
 namespace Netflex\Pages;
 
 use Closure;
-use Exception;
+use Throwable;
+
 use Netflex\API\Facades\API;
 
 use Netflex\Query\QueryableModel;
@@ -20,7 +21,8 @@ use Illuminate\Contracts\Support\Responsable;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\View;
-use Throwable;
+
+use Artesaos\SEOTools\Facades\SEOTools;
 
 /**
  * @property int $id
@@ -222,6 +224,21 @@ class Page extends QueryableModel implements Responsable
   }
 
   /**
+   * Renders this page's meta data
+   *
+   * @return void
+   */
+  public function renderMetaTags() {
+    SEOTools::setTitle('Home');
+    SEOTools::setDescription('This is my page description');
+    SEOTools::opengraph()->setUrl('http://current.url.com');
+    SEOTools::setCanonical('https://codecasts.com.br/lesson');
+    SEOTools::opengraph()->addProperty('type', 'articles');
+    SEOTools::twitter()->setSite('@LuizVinicius73');
+    SEOTools::jsonLd()->addImage('https://codecasts.com.br/img/logo.jpg');
+  }
+
+  /**
    * Renders the given blocks
    *
    * @param string $area
@@ -234,8 +251,11 @@ class Page extends QueryableModel implements Responsable
       $component = Template::retrieve((int) $block->text);
       $view = 'components.' . $component->alias;
 
-      return View::exists($view)
-        ? trim(View::make($view, $vars)->render())
+      /* if (app()->environment() !== 'master' && current_mode() !== 'live' && !$exists) {
+          throw new Exception('Component "components.' . $component->alias . '.blade.php" doesnt exist');
+      } */
+
+      return View::exists($view) ? trim(View::make($view, $vars)->render())
         : null;
     });
 
@@ -268,7 +288,11 @@ class Page extends QueryableModel implements Responsable
    */
   public function getTitleAttribute($title)
   {
-    return trim(($title ?? $this->name) . Variable::get('site_meta_title'), ' -');
+    if ($title) {
+        return $title;
+    }
+
+    return trim($this->name . Variable::get('site_meta_title'), ' -');
   }
 
   /**
@@ -422,14 +446,6 @@ class Page extends QueryableModel implements Responsable
       } catch (Throwable $e) {
           return null;
       }
-  }
-
-  /**
-   * @param string $key
-   * @return bool
-   */
-  protected function relationLoaded(string $key) {
-    return false;
   }
 
   /**
