@@ -1,5 +1,7 @@
 <?php
 
+use Artesaos\SEOTools\Facades\SEOMeta;
+use Artesaos\SEOTools\Facades\SEOTools;
 use Netflex\Pages\Page;
 use Carbon\Carbon;
 use Illuminate\Routing\Route;
@@ -14,6 +16,18 @@ use Netflex\Pages\Types\File;
 use Netflex\Pages\Types\Image;
 use Netflex\Pages\Types\Picture;
 use Netflex\Pages\Types\Text;
+
+if (!function_exists('seo')) {
+  function seo () {
+    if ($page = current_page()) {
+      return SEOTools::setTitle($page->title)
+        ->setDescription($page->description)
+        ->generate();
+    }
+
+    return SEOTools::generate();
+  }
+}
 
 if (!function_exists('if_mode')) {
   /**
@@ -155,44 +169,137 @@ if (!function_exists('map_content')) {
         }
 
         switch ($settings['type']) {
-            case 'entries':
             case 'contentlist':
+              return $content->mapWithKeys(function ($item) {
+                  return [$item->title => (object) [
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'description' => $item->description
+                  ]];
+              });
             case 'contentlist_advanced':
+              return $content->mapWithKeys(function ($item) {
+                $hash = $item->title;
+                unset($item->title);
+                return [$hash => $item];
+              });
+            case 'entries':
+              $page_editable = page_first_editable($settings['alias']);
+              $entries = $content->map(function ($item) {
+                return (int) $item->text;
+              });
+
+              if (isset($page_editable['config']['model'])) {
+                return call_user_func(array($page_editable['config']['model'], 'find'), $entries->toArray());
+              };
+
+              return $entries;
             case 'gallery':
-                dd('not implemented');
+              return $content->mapWithKeys(function ($item) {
+                $hash = $item->text;
+                unset($item->text);
+                return [$hash => (object) [
+                  'id' => $item->id,
+                  'title' => $item->title,
+                  'description' => $item->description,
+                  'path' => $item->image,
+                  'file' => (int) $item->file
+                ]];
+              });
             case 'editor_small':
             case 'editor_large':
             case 'textarea':
-                return $content->shift()->html ?? '';
+              if ($item = $content->shift()) {
+                return $item->html ?? '';
+              }
+
+              return null;
             case 'text':
-                return $content->shift()->text ?? '';
-            case 'checkbox':
-                return (bool) $content->shift()->text ?? false;
-            case 'checkbox_group':
             case 'select':
+            case 'color':
+              if ($item = $content->shift()) {
+                return $item->text ?? '';
+              }
+
+              return null;
+            case 'checkbox':
+              if ($item = $content->shift()) {
+                return (bool) $item->text ?? '';
+              }
+
+              return false;
+            case 'checkbox-group':
             case 'multiselect':
-                dd('not implemented');
             case 'tags':
-                return explode(',', ($content->shift()->text ?? ''));
+              if ($item = $content->shift()) {
+                return Collection::make(explode(',', $item->text ?? ''))
+                  ->filter()
+                  ->values();
+              }
+
+              return Collection::make();
             case 'integer':
-                return ($content->shift()->text ?? 0) + 0;
+              if ($item = $content->shift()) {
+                return (int) $item->text ?? '';
+              }
+
+              return null;
             case 'datetime':
-                return Carbon::parse($content->shift()->text ?? 0);
+              if ($item = $content->shift()) {
+                return Carbon::parse($item->text ?? 0);
+              }
+
+              return null;
             case 'image':
-                return null;
-                return (object) $content->shift() ?? [];
+              if ($item = $content->shift()) {
+                return (object) [
+                  'id' => $item->id ?? null,
+                  'path' => $item->image ?? null,
+                  'file' => $item->file ?? null,
+                  'title' => $item->name ?? null,
+                  'description' => $item->description ?? null
+                ];
+              }
+
+              return null;
             case 'file':
-                return null;
-                return (object) $content->shift() ?? [];
+              if ($item = $content->shift()) {
+                return (object) [
+                  'id' => $item->id ?? null,
+                  'path' => $item->file ?? null,
+                  'file' => $item->text ?? null,
+                  'title' => $item->name ?? null,
+                  'description' => $item->description ?? null
+                ];
+              }
+
+              return null;
             case 'nav':
+              if ($item = $content->shift()) {
+                return (object) [
+                  'parent' => Page::find($item->text),
+                  'levels' => (int) $item->title
+                ];
+              }
+
+              return null;
             case 'link':
-                dd('not implemented');
+              if ($item = $content->shift()) {
+                return (object) [
+                  'url' => $item->text,
+                  'target' => $item->description
+                ];
+              }
+
+              return null;
             default:
+              if ($item = $content->shift()) {
                 if ($field !== 'auto') {
-                    return $content->shift()->{$field} ?? null;
+                  return $item->{$field} ?? null;
                 }
 
-                return $content->shift()->{$settings['type']} ?? null;
+                return $item->{$settings['type']} ?? null;
+              }
         }
     }
 }
@@ -211,6 +318,10 @@ if (!function_exists('content')) {
         if ($page) {
             $content = $page->content->filter(function ($content) use ($settings) {
                 return $content->area === $settings['alias'];
+            });
+
+            $content = $content->filter(function ($item) {
+              return $item->published;
             });
 
             if ($field !== 'auto') {
@@ -257,14 +368,41 @@ if (!function_exists('edit_button')) {
         $description = $settings['description'] ?? null;
         $field = $settings['content_field'] ?? null;
         $page = current_page();
+        $model = $page_editable['config']['model'] ?? null;
+        $directory_id = null;
+
+        if ($model) {
+          $directory_id = (new $model)->getRelationId();
+        }
 
         $type = $settings['type'] ?? null;
-        $field = 'huh?';
+
+        if (!$field) {
+          switch ($type) {
+            case 'checkbox-group':
+            case 'checkbox':
+            case 'entries':
+            case 'color':
+            case 'select':
+            case 'multiselect':
+              $field = 'text';
+              break;
+            case 'image':
+              $field = 'image';
+              break;
+            default:
+              break;
+          }
+        }
 
         $config = null;
 
         if ($settings['config'] ?? false) {
+          if (in_array($type, ['checkbox-group', 'contentlist_advanced', 'multiselect', 'select'])) {
+            $config = base64_encode(serialize($settings['config']['options'] ?? []));
+          } else {
             $config = base64_encode(serialize($settings['config']));
+          }
         }
 
         return <<<HTML
@@ -279,6 +417,7 @@ if (!function_exists('edit_button')) {
    data-area-type="$type"
    data-area-alias="$alias"
    data-max-items="$maxItems"
+   data-directory-id="$directory_id"
 >$icon $title</a>
 HTML;
     }
@@ -351,7 +490,7 @@ if (!function_exists('page_editable_push')) {
      * @param array|string $editable
      * @return array
      */
-    function page_editable_push(string $alias, $editable = null)
+    function page_editable_push(string $alias, $editable = null, $config = [])
     {
         if (!$editable) {
             throw new Exception('Type or settings are required to bind editable');
@@ -366,6 +505,7 @@ if (!function_exists('page_editable_push')) {
         }
 
         $value = $editable ?? [];
+        $value['config'] = $config;
         $value['alias'] = blockhash_append($alias);
 
         page_editable(
@@ -627,7 +767,7 @@ if (!function_exists('picture')) {
             $src = $settings['placeholder'] ?? null;
         }
 
-        foreach (picture_raw([
+        foreach (picture_srcsets([
             'path' => $path,
             'dimensions' => $size,
             'compression' => $type,
