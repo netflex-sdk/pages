@@ -19,7 +19,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Log;
 
-use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
 class PagesServiceProvider extends ServiceProvider
@@ -29,14 +30,12 @@ class PagesServiceProvider extends ServiceProvider
    */
   public function register()
   {
-    parent::register();
     $this->registerBladeDirectives();
   }
 
   public function boot()
   {
-    $this->registerMiddlewareGroups();
-    parent::boot();
+    //
   }
 
   protected function registerBladeDirectives()
@@ -78,67 +77,9 @@ class PagesServiceProvider extends ServiceProvider
     Blade::directive('editorTools', function () {
         return "<?php echo editor_tools(); ?>";
     });
-  }
 
-  protected function registerMiddlewareGroups()
-  {
-    $router = $this->app->make('router');
-
-    $router->aliasMiddleware('bind_page', BindPage::class);
-    $router->aliasMiddleware('group_auth', GroupAuthentication::class);
-
-    $router->middlewareGroup('netflex', [
-      'web',
-      'bind_page',
-      'group_auth'
-    ]);
-  }
-
-  protected function mapRedirects()
-  {
-    Collection::make(Redirect::all())
-      ->each(function ($redirect) {
-        Route::redirect(
-          $redirect->source_url,
-          $redirect->target_url,
-          $redirect->type
-        );
-      });
-  }
-
-  protected function mapNetflexRoutes()
-  {
-    Route::middleware('netflex')
-      ->group(function () {
-        Page::all()->filter(function ($page) {
-          return $page->type === 'page' && $page->template;
-        })->each(function ($page) {
-          $controller = $page->template->controller ?? null;
-          $pageController = PageController::class;
-          $class = trim($controller ? ("\\{$this->namespace}\\{$controller}") : "\\{$pageController}", '\\');
-
-          try {
-            tap(new $class, function (Controller $controller) use ($page) {
-              $class = get_class($controller);
-              $routeDefintions = $controller->getRoutes();
-
-              foreach ($routeDefintions as $routeDefintion) {
-                $routeDefintion->url = trim($routeDefintion->url, '/');
-                $url = trim("{$page->url}/{$routeDefintion->url}", '/');
-                $action = "$class@{$routeDefintion->action}";
-
-                $route = Route::match($routeDefintion->methods, $url, $action)
-                  ->name($page->name);
-
-                $this->app->bind(route_hash($route), function () use ($page) {
-                  return $page;
-                });
-              }
-            });
-          } catch (Throwable $e) {
-            Log::warning("Route {$page->url} could not be registered because {$e->getMessage()}");
-          }
-        });
-      });
+    Blade::directive('seo', function () {
+        return "<?php echo seo(); ?>";
+    });
   }
 }
