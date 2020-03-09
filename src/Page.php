@@ -374,11 +374,12 @@ class Page extends QueryableModel implements Responsable
    * Resolves an instance
    *
    * @param mixed $resolveBy
+   * @param string|null $field
    * @return static|Collection|null
    * @throws NotQueryableException If object not queryable
    * @throws QueryException On invalid query
    */
-  public static function resolve($resolveBy)
+  public static function resolve($resolveBy, $field = null)
   {
     $resolveBy = Collection::make([$resolveBy])
       ->flatten()
@@ -393,8 +394,8 @@ class Page extends QueryableModel implements Responsable
 
     $resolveBy = array_map('strtolower', array_unique($resolveBy));
 
-    $resolved = static::all()->filter(function (self $page) use ($resolveBy) {
-      $key = strtolower($page->{$page->resolvableField});
+    $resolved = static::all()->filter(function (self $page) use ($resolveBy, $field) {
+      $key = strtolower($page->{$field ?? $page->resolvableField});
       return in_array($key, $resolveBy);
     });
 
