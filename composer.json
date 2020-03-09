@@ -20,6 +20,7 @@
   },
   "require": {
     "php": "^7.3",
+    "artesaos/seotools": "^0.16.0",
     "illuminate/auth": "^6.16",
     "illuminate/contracts": "^6.16",
     "illuminate/routing": "^6.16",
@@ -38,5 +39,20 @@
     "illuminate/view": "^6.16",
     "larapack/dd": "^1.1",
     "vlucas/phpdotenv": "^3.6"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Netflex\\Pages\\Providers\\PagesServiceProvider",
+        "Netflex\\Pages\\Providers\\RouteServiceProvider",
+        "Netflex\\Pages\\Providers\\SEOToolsServiceProvider"
+      ],
+      "aliases": {
+        "SEOMeta": "Artesaos\\SEOTools\\Facades\\SEOMeta",
+        "OpenGraph": "Artesaos\\SEOTools\\Facades\\OpenGraph",
+        "Twitter": "Artesaos\\SEOTools\\Facades\\TwitterCard",
+        "SEO": "Artesaos\\SEOTools\\Facades\\SEOTools"
+      }
+    }
   }
 }
