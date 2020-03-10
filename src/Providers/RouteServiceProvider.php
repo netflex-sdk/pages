@@ -74,7 +74,8 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapNetflexRoutes();
         $this->mapRedirects();
         $this->mapWebRoutes();
-
+        $this->mapRobots();
+        $this->mapSitemap();
         //
     }
 
@@ -115,13 +116,12 @@ class RouteServiceProvider extends ServiceProvider
             $redirect->source_url,
             $redirect->target_url,
             $redirect->type
-          );
+          )->name($redirect->id);
         });
     }
 
     protected function mapNetflexRoutes()
     {
-
       Route::middleware('jwt_proxy')
         ->group(function () {
 
@@ -136,7 +136,7 @@ class RouteServiceProvider extends ServiceProvider
                 ->loadRevision($payload->revision_id)
                 ->toResponse($request);
             }
-          });
+          })->name('Netflex Editor Proxy');
         });
 
     Route::middleware('netflex')
@@ -159,7 +159,7 @@ class RouteServiceProvider extends ServiceProvider
                   $action = "$class@{$routeDefintion->action}";
 
                   $route = Route::match($routeDefintion->methods, $url, $action)
-                    ->name($page->name);
+                    ->name($page->id);
 
                   $this->app->bind(route_hash($route), function () use ($page) {
                     return $page;
@@ -171,5 +171,27 @@ class RouteServiceProvider extends ServiceProvider
             }
           });
         });
+    }
+
+    protected function mapRobots () {
+        Route::get('robots.txt', function () {
+            $permission = env('APP_ENV') === 'master' ? 'Allow' : 'Disallow';
+            $robots = "User-Agent: *\n";
+            $robots .= "{$permission}: /";
+
+            return response($robots, 200, ['Content-Type' => 'text/plain']);
+        })->name('Robots Exclusion Protocol');
+    }
+
+    protected function mapSitemap () {
+        Route::get('/sitemap.xml', function () {
+            $entries = [];
+
+            return response(view('nf::sitemap-xml', ['entries' => $entries]), 200, ['Content-Type' => 'application/xml']);
+        })->name('Sitemap');
+
+        Route::get('/sitemap.xsl', function () {
+            return response(view('nf::sitemap-xsl'), 200, ['Content-Type' => 'text/xsl']);
+        })->name('Sitemap Stylsheet');
     }
 }
