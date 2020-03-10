@@ -2,26 +2,18 @@
 
 namespace Netflex\Pages\Providers;
 
-use Throwable;
-
-use Netflex\Pages\Page;
-use Netflex\Pages\Controllers\Controller;
-use Netflex\Pages\Controllers\PageController;
-
-use Netflex\Foundation\Redirect;
-
-use Netflex\Pages\Middleware\BindPage;
-use Netflex\Pages\Middleware\GroupAuthentication;
+use Netflex\Pages\Components\EditorButton;
+use Netflex\Pages\Components\Image;
+use Netflex\Pages\Components\Picture;
+use Netflex\Pages\Components\Blocks;
+use Netflex\Pages\Components\Inline;
+use Netflex\Pages\Components\EditorTools;
+use Netflex\Pages\Components\Seo;
 
 use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Route;
-
 use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\Log;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 
 class PagesServiceProvider extends ServiceProvider
 {
@@ -40,7 +32,15 @@ class PagesServiceProvider extends ServiceProvider
 
   protected function registerBladeDirectives()
   {
-    View::addNamespace('netflex', __DIR__ . '/../views');
+    View::addNamespace('nf', __DIR__ . '/../views');
+
+    Blade::component(EditorButton::class);
+    Blade::component(Image::class);
+    Blade::component(Picture::class);
+    Blade::component(Blocks::class);
+    Blade::component(Inline::class);
+    Blade::component(EditorTools::class);
+    Blade::component(Seo::class);
 
     Blade::if('mode', function (...$modes) {
       return if_mode(...$modes);

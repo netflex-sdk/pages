@@ -1,33 +1,13 @@
 <?php
 
-use Artesaos\SEOTools\Facades\SEOMeta;
-use Artesaos\SEOTools\Facades\SEOTools;
 use Netflex\Pages\Page;
 use Carbon\Carbon;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\View;
 use Netflex\API\Facades\API;
 use Netflex\Foundation\Variable;
 use Illuminate\Support\Collection;
-
-use Netflex\Pages\Types\File;
-use Netflex\Pages\Types\Image;
-use Netflex\Pages\Types\Picture;
-use Netflex\Pages\Types\Text;
-
-if (!function_exists('seo')) {
-  function seo () {
-    if ($page = current_page()) {
-      return SEOTools::setTitle($page->title)
-        ->setDescription($page->description)
-        ->generate();
-    }
-
-    return SEOTools::generate();
-  }
-}
 
 if (!function_exists('if_mode')) {
   /**
@@ -126,26 +106,6 @@ if (!function_exists('insert_content_if_not_exists')) {
     }
 }
 
-if (!function_exists('inline')) {
-    /**
-     * @param string $alias
-     * @param string $tag
-     * @param mixed[] ...$args
-     * @return void
-     */
-    function inline($alias, $tag = null, $settings = [])
-    {
-      switch ($tag) {
-        case 'img':
-          return new Image($alias, $settings);
-        case 'picture':
-          return new Picture($alias, $settings);
-        default:
-          return new Text($alias, array_merge($settings, ['tag' => $tag]));
-      }
-    }
-}
-
 if (!function_exists('blocks')) {
     function blocks($area, $variables = [])
     {
@@ -190,7 +150,11 @@ if (!function_exists('map_content')) {
               });
 
               if (isset($page_editable['config']['model'])) {
-                return call_user_func(array($page_editable['config']['model'], 'find'), $entries->toArray());
+                  return Collection::make($page_editable['config']['model'])->map(function ($model) use ($entries) {
+                    return call_user_func(array($model, 'find'), $entries->toArray());
+                  })
+                  ->flatten()
+                    ->filter();
               };
 
               return $entries;
@@ -331,95 +295,6 @@ if (!function_exists('content')) {
 
             return map_content($content, $settings);
         }
-    }
-}
-
-if (!function_exists('edit_button')) {
-    /**
-     * @param string $alias
-     * @param array $config
-     * @return string
-     */
-    function edit_button($alias, $settings = [])
-    {
-        if (current_mode() !== 'edit') {
-            return null;
-        }
-
-        $page_editable = page_first_editable($alias);
-
-        if (!$page_editable) {
-            page_editable_push($alias, ['type' => 'html']);
-            $page_editable = page_first_editable($alias);
-        }
-
-        $settings = array_merge($page_editable, $settings);
-
-        $position = $settings['position'] ?? 'topright';
-        $class = "netflex-content-settings-btn netflex-content-btn-pos-$position ";
-        $class = trim($class . ($settings['class'] ?? null));
-        $name = $settings['name'] ?? $alias ?? null;
-        $title = $settings['label'] ?? $name ?? $alias;
-        $alias = blockhash_append($alias);
-        $maxItems = $settings['max-items'] ?? 99999;
-        $style = $settings['style'] ?? null;
-        $icon = $settings['icon'] ?? null;
-        $icon = $icon ? "<span class=\"{$icon}\"></span>" : null;
-        $description = $settings['description'] ?? null;
-        $field = $settings['content_field'] ?? null;
-        $page = current_page();
-        $model = $page_editable['config']['model'] ?? null;
-        $directory_id = null;
-
-        if ($model) {
-          $directory_id = (new $model)->getRelationId();
-        }
-
-        $type = $settings['type'] ?? null;
-
-        if (!$field) {
-          switch ($type) {
-            case 'checkbox-group':
-            case 'checkbox':
-            case 'entries':
-            case 'color':
-            case 'select':
-            case 'multiselect':
-              $field = 'text';
-              break;
-            case 'image':
-              $field = 'image';
-              break;
-            default:
-              break;
-          }
-        }
-
-        $config = null;
-
-        if ($settings['config'] ?? false) {
-          if (in_array($type, ['checkbox-group', 'contentlist_advanced', 'multiselect', 'select'])) {
-            $config = base64_encode(serialize($settings['config']['options'] ?? []));
-          } else {
-            $config = base64_encode(serialize($settings['config']));
-          }
-        }
-
-        return <<<HTML
-<a href="#"
-   class="$class"
-   style="$style"
-   data-area-name="$name"
-   data-area-field="$field"
-   data-area-description="$description"
-   data-page-id="{$page->id}"
-   data-area-config="$config"
-   data-area-type="$type"
-   data-area-alias="$alias"
-   data-max-items="$maxItems"
-   data-directory-id="$directory_id"
->$icon $title</a>
-HTML;
     }
 }
 
@@ -726,163 +601,5 @@ if (!function_exists('picture_srcsets')) {
         }
 
         return $srcsets;
-    }
-}
-
-if (!function_exists('picture')) {
-    /**
-     * @param array|string $settings|$path
-     * @param string? $size
-     * @param string? $type
-     * @return string
-     */
-    function picture($settings = [], ...$args)
-    {
-        if (is_string($settings)) {
-            $settings = [
-                'path' => $settings,
-                'dimensions' => count($args) > 0 ? $args[0] : null,
-                'compression' => count($args) > 1 ? $args[1] : null
-            ];
-        }
-
-        $picture_class = $settings['picture_class'] ?? '';
-        $image_class = $settings['image_class'] ?? '';
-        $image_style = $settings['image_style'] ?? '';
-        $path = $settings['path'] ?? null;
-        $path = is_object($path) ? (property_exists($path, 'path') ? $path->path : (string) $path) : $path;
-        $size = $settings['size'] ?? null;
-        $type = $settings['crop'] ?? 'o';
-        $color = $settings['fill'] ?? '0,0,0';
-        $title = $settings['title'] ?? '';
-        $alt = $settings['alt'] ?? $title ?? '';
-        $title = $title ?? $alt ?? '';
-        $resolutions = $settings['resolutions'] ?? null;
-        $breakpoints = $settings['breakpoints'] ?? null;
-
-        $src = media_url($path, $size, $type, $color);
-        $srcsets = [];
-
-        if (!$path && !in_array(current_mode(), ['live', 'preview'])) {
-            $src = $settings['placeholder'] ?? null;
-        }
-
-        foreach (picture_srcsets([
-            'path' => $path,
-            'dimensions' => $size,
-            'compression' => $type,
-            'fill' => $color,
-            'resolutions' => $resolutions,
-            'breakpoints' => $breakpoints
-        ])->srcset as $srcset) {
-            $srcsets[] = <<<HTML
-<source srcset="{$srcset->url}" media="(max-width: {$srcset->maxwidth}px)">
-HTML;
-        }
-
-        $srcsets = implode("\n", $srcsets);
-
-        return <<<HTML
-<picture class="$picture_class">
-  {$srcsets}
-  <img class="$image_class" src="$src" alt="$alt" title="$title" style="$image_style" />
-</picture>
-HTML;
-    }
-}
-
-if (!function_exists('image')) {
-    function image(...$args)
-    {
-        if (is_object($args[0])) {
-            $args[0] = (string) $args[0];
-        }
-
-        $url = media_url(...$args);
-
-        return <<<HTML
-<img src="$url">
-HTML;
-    }
-}
-
-if (!function_exists('nav')) {
-    /**
-     * Generates a nav
-     *
-     * @param int $parent
-     * @param int $levels
-     * @param string $class
-     * @param string $type
-     * @param string $root
-     * @param string $li
-     * @param string $a
-     * @return string
-     */
-    function nav($parent = null, $levels = 1, $class = null, $type = 'nav', $root = null, $li = null, $a = null)
-    {
-        $parent = $parent ? Page::find($parent) : current_page();
-        $children = [];
-        $route = request()->route();
-
-        if ($parent && $levels > 0) {
-            foreach ($parent->children as $child) {
-                $children[] = (function ($child) use ($route, $levels, $type, $root, $li, $a) {
-                    if ($child->{"visible_$type"}) {
-                        $url = null;
-                        $target = '_self';
-                        $title = $child->navtitle ? $child->navtitle : $child->name;
-                        $classList = [$a];
-
-                        if (get_class($route) === Route::class && $route->data('page')->id === $child->id) {
-                            $classList[] = 'active';
-                        }
-
-                        $url = $child->url;
-
-                        if ($child->type === 'folder') {
-                            $class[] = 'navfolder';
-                        }
-
-                        foreach (['xs', 'sm', 'md', 'lg'] as $breakpoint) {
-                            if ($child->{"nav_hidden_$breakpoint"}) {
-                                $classList[] = "hidden-$breakpoint";
-                            }
-                        }
-
-                        $class = implode(' ', array_filter($classList));
-
-                        $childItems = ($levels >= 2)
-                            ? nav(
-                                $child->id,
-                                $levels - 1,
-                                'dropdown-container',
-                                $type,
-                                $root,
-                                $li,
-                                $a
-                            )
-                            : null;
-
-                        return <<<HTML
-<li class="$li $class">
-  <a href="$url" class="$class" target="$target" role="menuitem">
-    $title
-  </a>
-  $childItems
-</li>
-HTML;
-                    }
-                })($child);
-            }
-        }
-
-        $children = implode("\n", array_filter($children));
-
-        return <<<HTML
-<ul class="$class" role="menu">
-  $children
-</ul>
-HTML;
     }
 }

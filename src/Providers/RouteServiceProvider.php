@@ -2,11 +2,14 @@
 
 namespace Netflex\Pages\Providers;
 
+use Throwable;
+
 use Netflex\Pages\Page;
 use Netflex\Pages\Middleware\BindPage;
 use Netflex\Pages\Middleware\GroupAuthentication;
 use Netflex\Pages\Controllers\PageController;
 use Netflex\Pages\Controllers\Controller;
+use Netflex\Pages\Middleware\JwtProxy;
 
 use Netflex\Foundation\Redirect;
 
@@ -15,7 +18,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Collection;
-use Netflex\Pages\Middleware\JwtProxy;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -119,6 +121,7 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function mapNetflexRoutes()
     {
+
       Route::middleware('jwt_proxy')
         ->group(function () {
 
@@ -136,10 +139,10 @@ class RouteServiceProvider extends ServiceProvider
           });
         });
 
-      Route::middleware('netflex')
+    Route::middleware('netflex')
         ->group(function () {
           Page::all()->filter(function ($page) {
-            return $page->type === 'page' && $page->template;
+            return $page->type === 'page' && $page->template && $page->published;
           })->each(function ($page) {
             $controller = $page->template->controller ?? null;
             $pageController = PageController::class;
