@@ -14,7 +14,7 @@
     @isset($style)
         style="{{ $style }}"
     @endisset
-@stop
+@overwrite
 
 @isset($tag)
     <{{ $tag }} @yield('attributes')>

@@ -42,7 +42,7 @@
     @isset($style)
         style="{{ $style ?? null }}"
     @endisset
-@stop
+@overwrite
 
 @section('image_attributes')
     @parent
