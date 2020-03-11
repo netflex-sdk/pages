@@ -9,6 +9,7 @@ use Netflex\Pages\Components\Blocks;
 use Netflex\Pages\Components\Inline;
 use Netflex\Pages\Components\EditorTools;
 use Netflex\Pages\Components\Seo;
+use Netflex\Pages\Components\GlobalValue;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
@@ -41,45 +42,14 @@ class PagesServiceProvider extends ServiceProvider
     Blade::component(Inline::class);
     Blade::component(EditorTools::class);
     Blade::component(Seo::class);
+    Blade::component(GlobalValue::class, 'static-content');
 
     Blade::if('mode', function (...$modes) {
       return if_mode(...$modes);
     });
 
-    Blade::directive('editable', function ($expression) {
-      return "<?php page_editable_push($expression); ?>";
-    });
-
-    Blade::directive('editButton', function ($expression) {
-      return "<?php echo edit_button($expression); ?>";
-    });
-
     Blade::directive('content', function ($expression) {
       return "<?php echo content($expression); ?>";
-    });
-
-    Blade::directive('blocks', function ($expression) {
-      return "<?php echo blocks($expression); ?>";
-    });
-
-    Blade::directive('inline', function ($expression) {
-      return "<?php echo inline($expression); ?>";
-    });
-
-    Blade::directive('image', function ($expression) {
-      return "<?php echo image($expression); ?>";
-    });
-
-    Blade::directive('picture', function ($expression) {
-      return "<?php echo picture($expression); ?>";
-    });
-
-    Blade::directive('editorTools', function () {
-        return "<?php echo editor_tools(); ?>";
-    });
-
-    Blade::directive('seo', function () {
-        return "<?php echo seo(); ?>";
     });
   }
 }
