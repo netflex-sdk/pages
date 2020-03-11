@@ -36,10 +36,11 @@ class JwtProxy
     protected function authenticate($request)
     {
         if ($token = $request->get('token')) {
-            $payload = JWT::decodeAndVerify($token, Variable::get('netflex_api'));
-            $request->offsetUnset('token');
-            $request->offsetSet('payload', $payload);
-            return;
+            if ($payload = JWT::decodeAndVerify($token, Variable::get('netflex_api'))) {
+                $request->offsetUnset('token');
+                $request->offsetSet('payload', $payload);
+                return;
+            }
         }
 
         $this->unauthenticated($request);
