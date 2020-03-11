@@ -127,22 +127,23 @@ class RouteServiceProvider extends ServiceProvider
 
           Route::any('.well-known/netflex', function (Request $request) {
             $payload = $request->get('payload');
+            current_mode($payload->mode ?? 'live');
+            editor_tools($payload->edit_tools ?? null);
 
             if ($payload->relation === 'page') {
-              current_mode($payload->mode);
-              current_page($payload->page_id);
-              editor_tools($payload->edit_tools);
-
               if ($page = Page::findOrFail($payload->page_id)) {
+                if ($payload->revision_id ?? false) {
+                    $page->loadRevision($payload->revision_id);
+                }
+
+                current_page($page);
+
                 $controller = $page->template->controller ?? null;
                 $pageController = PageController::class;
                 $class = trim($controller ? ("\\{$this->namespace}\\{$controller}") : "\\{$pageController}", '\\');
 
-
                 if (!$class) {
-                  return Page::findOrFail($payload->page_id)
-                    ->loadRevision($payload->revision_id)
-                    ->toResponse($request);
+                  $page->toResponse($request);
                 }
 
                 return app($class)->index($request);
