@@ -105,6 +105,11 @@ class EditorButton extends Component
         ]);
     }
 
+    public function shouldRender()
+    {
+        return current_mode() === 'edit';
+    }
+
     /**
      * Get the view / contents that represent the component.
      *

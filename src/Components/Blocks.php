@@ -21,6 +21,11 @@ class Blocks extends Component
         $this->blocks = blocks($this->area, $this->variables);
     }
 
+    public function shouldRender()
+    {
+        return current_mode() === 'live' && !$this->blocks ? false : true;
+    }
+
     /**
      * Get the view / contents that represent the component.
      *

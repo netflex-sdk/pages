@@ -200,6 +200,11 @@ class Picture extends Component
         return $this->settings->imageStyle ?? null;
     }
 
+    public function shouldRender()
+    {
+        return current_mode() === 'live' && !$this->path() ? false : true;
+    }
+
     /**
      * Get the view / contents that represent the component.
      *

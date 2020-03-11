@@ -1,6 +1,6 @@
 @section('attributes')
     @if(current_mode() === 'edit')
-        id="e-{{ $id ?? null }}-inline-{{ uniqid() }}"
+        id="e-{{ $id ?? null }}-{{ $tag ?? 'inline' }}-{{ uniqid() }}"
         data-content-area="{{ $area ?? null }}"
         data-content-type="html"
         data-content-id="{{ $id ?? null }}"

@@ -10,6 +10,11 @@ class EditorTools extends Component
         return editor_tools();
     }
 
+    public function shouldRender()
+    {
+        return current_mode() === 'edit';
+    }
+
     /**
      * Get the view / contents that represent the component.
      *

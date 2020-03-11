@@ -46,6 +46,11 @@ class Inline extends Component
         return $this->content ? ($this->content->html ?? null) : null;
     }
 
+    public function shouldRender()
+    {
+        return current_mode() === 'live' && !$this->value() ? false : true;
+    }
+
     /**
      * Get the view / contents that represent the component.
      *

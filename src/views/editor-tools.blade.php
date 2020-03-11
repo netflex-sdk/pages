@@ -1,4 +1,2 @@
-@mode('edit')
-    {!! $editorTools !!}
-    {{ $slot }}
-@endmode
+{!! $editorTools !!}
+{{ $slot }}
