@@ -25,9 +25,9 @@
     "illuminate/contracts": "^7.0",
     "illuminate/view": "^7.0",
     "illuminate/routing": "^7.0",
-    "netflex/foundation": "^2.0.0-RC2",
-    "netflex/query-builder": "^2.0.0-RC6",
-    "netflex/support": "^2.0.0-RC2"
+    "netflex/foundation": "^2.0",
+    "netflex/query-builder": "^2.0.0",
+    "netflex/support": "^2.0"
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
