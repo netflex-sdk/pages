@@ -101,7 +101,8 @@ class EditorButton extends Component
             'model' => $model,
             'relationId' => $this->relationId,
             'field' => $this->field,
-            'alias' => $this->area
+            'alias' => $this->area,
+            'items' => $this->items
         ]);
     }
 

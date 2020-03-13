@@ -145,17 +145,22 @@ if (!function_exists('map_content')) {
               });
             case 'entries':
               $page_editable = page_first_editable($settings['alias']);
+              $items = $page_editable['config']['items'];
               $entries = $content->map(function ($item) {
                 return (int) $item->text;
               });
 
               if (isset($page_editable['config']['model'])) {
-                  return Collection::make($page_editable['config']['model'])->map(function ($model) use ($entries) {
+                  $entries = Collection::make($page_editable['config']['model'])->map(function ($model) use ($entries) {
                     return call_user_func(array($model, 'find'), $entries->toArray());
                   })
                   ->flatten()
                     ->filter();
               };
+
+              if ($items === 1) {
+                  return $entries->first();
+              }
 
               return $entries;
             case 'gallery':
