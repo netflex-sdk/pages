@@ -188,11 +188,9 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function mapRobots () {
         Route::get('robots.txt', function () {
-            $permission = env('APP_ENV') === 'master' ? 'Allow' : 'Disallow';
-            $robots = "User-Agent: *\n";
-            $robots .= "{$permission}: /";
+            $production = app()->env === 'master';
 
-            return response($robots, 200, ['Content-Type' => 'text/plain']);
+            return response(view('nf::robots', ['production' => $production]), 200, ['Content-Type' => 'text/plain']);
         })->name('Robots Exclusion Protocol');
     }
 
