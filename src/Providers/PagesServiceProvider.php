@@ -10,6 +10,8 @@ use Netflex\Pages\Components\Inline;
 use Netflex\Pages\Components\EditorTools;
 use Netflex\Pages\Components\Seo;
 use Netflex\Pages\Components\GlobalValue;
+use Netflex\Pages\Components\Content;
+use Netflex\Pages\Components\BackgroundImage;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
@@ -42,6 +44,8 @@ class PagesServiceProvider extends ServiceProvider
     Blade::component(Inline::class);
     Blade::component(EditorTools::class);
     Blade::component(Seo::class);
+    Blade::component(Content::class);
+    Blade::component(BackgroundImage::class);
     Blade::component(GlobalValue::class, 'static-content');
 
     Blade::if('mode', function (...$modes) {
