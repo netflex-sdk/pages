@@ -1,12 +1,12 @@
 <style scoped>
-	{{ $selector }} {
-    background-image: url({{ $src }});
+	{!! $selector !!} {
+    background-image: url({!! $src !!});
   }
 
   @foreach ($srcSets as $set)
     @media (max-width: {{ $set->width }}px) {
       {{ $selector }} {
-        background-image: url({{ $set->url }}?src={{ $set->width }}w);
+        background-image: url({!! $set->url !!}?src={{ $set->width }}w);
       }
     }
 
@@ -17,7 +17,7 @@
 	         (min-resolution: 1.5dppx) {
       @media (max-width: {{ $set->width }}px) {
         {{ $selector }} {
-          background-image: url({{ $set->url }}?src={{ $set->width }}w);
+          background-image: url({!! $set->url !!}?src={{ $set->width }}w);
         }
       }
     }

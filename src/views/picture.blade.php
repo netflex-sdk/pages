@@ -24,7 +24,7 @@
     @parent
 
     @foreach($srcSets ?? [] as $set)
-        <source srcset="{{ $set->url }}" media="(max-width: {{ $set->width }}px)">
+        <source srcset="{!! $set->url !!}" media="(max-width: {{ $set->width }}px)">
     @endforeach
 @overwrite
 
@@ -52,7 +52,7 @@
     @endisset
 
     @isset($src)
-        src="{{ $src ?? null }}"
+        src="{!! $src??null !!}"
     @endisset
 
     @isset($imageStyle)

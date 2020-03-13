@@ -16,7 +16,7 @@
     @endif
 
     @isset($src)
-        src="{{ $src ?? null }}"
+        src="{!! $src ?? null !!}"
     @endisset
 
     @isset($alt)
