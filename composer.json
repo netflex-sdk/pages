@@ -20,7 +20,7 @@
   },
   "require": {
     "php": "^7.3",
-    "artesaos/seotools": "dev-master",
+    "artesaos/seotools": "^0.17",
     "illuminate/auth": "^7.0",
     "illuminate/contracts": "^7.0",
     "illuminate/view": "^7.0",
