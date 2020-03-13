@@ -7,6 +7,7 @@ use Throwable;
 
 use Netflex\API\Facades\API;
 
+use Netflex\Query\Builder;
 use Netflex\Query\QueryableModel;
 
 use Netflex\Foundation\Template;
@@ -77,7 +78,14 @@ class Page extends QueryableModel implements Responsable
    *
    * @var string
    */
-  protected $defaultOrderByField = 'id';
+  protected $defaultOrderByField = 'sorting';
+
+  /**
+   * Determines the default direction to order the query by
+   *
+   * @var string
+   */
+  protected $defaultSortDirection = Builder::DIR_ASC;
 
   /**
    * Indicates if we should automatically publish the model on save.
@@ -324,9 +332,7 @@ class Page extends QueryableModel implements Responsable
    */
   public function getParentAttribute()
   {
-    if ($this->parent_id) {
-      return static::retrieve($this->parent_id);
-    }
+    return static::find($this->parent_id);
   }
 
   /**
@@ -336,9 +342,11 @@ class Page extends QueryableModel implements Responsable
    */
   public function getChildrenAttribute()
   {
-    return static::all()->filter(function ($page) {
-      return (int) $page->parent_id === (int) $this->id;
-    })->values();
+    return static::all()
+        ->filter(function ($page) {
+        return (int) $page->parent_id === (int) $this->id;
+        })
+        ->values();
   }
 
   /**
