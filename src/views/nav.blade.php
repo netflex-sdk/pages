@@ -10,7 +10,7 @@
       </a>
       @if($child->children->count())
         <x-nav
-          class="dropdown-container"
+          :class="trim($attributes->get('class') . ' dropdown-container')"
           :parent="$child->id"
           :levels="$levels - 1"
           :type="$type"
