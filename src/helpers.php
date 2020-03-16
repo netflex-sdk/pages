@@ -145,7 +145,6 @@ if (!function_exists('map_content')) {
               });
             case 'entries':
               $page_editable = page_first_editable($settings['alias']);
-              $items = $page_editable['config']['items'];
               $entries = $content->map(function ($item) {
                 return (int) $item->text;
               });
@@ -157,10 +156,6 @@ if (!function_exists('map_content')) {
                   ->flatten()
                     ->filter();
               };
-
-              if ($items === 1) {
-                  return $entries->first();
-              }
 
               return $entries;
             case 'gallery':
