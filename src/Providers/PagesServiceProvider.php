@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 
 use Illuminate\Support\ServiceProvider;
+use Netflex\Pages\Components\Nav;
 
 class PagesServiceProvider extends ServiceProvider
 {
@@ -44,8 +45,8 @@ class PagesServiceProvider extends ServiceProvider
     Blade::component(Inline::class);
     Blade::component(EditorTools::class);
     Blade::component(Seo::class);
-    Blade::component(Content::class);
     Blade::component(BackgroundImage::class);
+    Blade::component(Nav::class);
     Blade::component(GlobalValue::class, 'static-content');
 
     Blade::if('mode', function (...$modes) {
