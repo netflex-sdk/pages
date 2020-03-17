@@ -44,6 +44,7 @@ use Artesaos\SEOTools\Facades\SEOTools;
  * @property bool $public
  * @property mixed $authgroups
  * @property array $variants
+ * @property Page|null $master
  */
 class Page extends QueryableModel implements Responsable
 {
@@ -236,7 +237,8 @@ class Page extends QueryableModel implements Responsable
    *
    * @return void
    */
-  public function renderMetaTags() {
+  public function renderMetaTags()
+  {
     SEOTools::setTitle('Home');
     SEOTools::setDescription('This is my page description');
     SEOTools::opengraph()->setUrl('http://current.url.com');
@@ -259,10 +261,6 @@ class Page extends QueryableModel implements Responsable
       $component = Template::retrieve((int) $block->text);
       $view = 'components.' . $component->alias;
 
-      /* if (app()->environment() !== 'master' && current_mode() !== 'live' && !$exists) {
-          throw new Exception('Component "components.' . $component->alias . '.blade.php" doesnt exist');
-      } */
-
       return View::exists($view) ? trim(View::make($view, $vars)->render())
         : null;
     });
@@ -277,6 +275,15 @@ class Page extends QueryableModel implements Responsable
   {
     return (bool) ($this->attributes['template'] ?? null)
       && is_numeric($this->attributes['template']);
+  }
+
+  public function getMasterAttribute()
+  {
+    if (!$this->parent) {
+      return $this;
+    }
+
+    return $this->parent->master;
   }
 
   /**
@@ -297,7 +304,7 @@ class Page extends QueryableModel implements Responsable
   public function getTitleAttribute($title)
   {
     if ($title) {
-        return $title;
+      return $title;
     }
 
     return trim($this->name . Variable::get('site_meta_title'), ' -');
@@ -343,10 +350,10 @@ class Page extends QueryableModel implements Responsable
   public function getChildrenAttribute()
   {
     return static::all()
-        ->filter(function ($page) {
+      ->filter(function ($page) {
         return (int) $page->parent_id === (int) $this->id;
-        })
-        ->values();
+      })
+      ->values();
   }
 
   /**
@@ -442,19 +449,20 @@ class Page extends QueryableModel implements Responsable
    * @param int $revisionId
    * @return static
    */
-  public function loadRevision ($revisionId = null) {
-      if (!$revisionId) {
-        return $this;
-      }
+  public function loadRevision($revisionId = null)
+  {
+    if (!$revisionId) {
+      return $this;
+    }
 
-      try {
-        $content = API::get("builder/pages/{$this->getKey()}/content/{$revisionId}", true);
-        $this->attributes['revision'] = $revisionId;
-        $this->attributes['content'] = $content;
-        return $this;
-      } catch (Throwable $e) {
-          return null;
-      }
+    try {
+      $content = API::get("builder/pages/{$this->getKey()}/content/{$revisionId}", true);
+      $this->attributes['revision'] = $revisionId;
+      $this->attributes['content'] = $content;
+      return $this;
+    } catch (Throwable $e) {
+      return null;
+    }
   }
 
   /**
