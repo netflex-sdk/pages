@@ -40,6 +40,7 @@ class PagesServiceProvider extends ServiceProvider
 
     Blade::component(EditorButton::class);
     Blade::component(Image::class);
+    Blade::component(Image::class, 'img');
     Blade::component(Picture::class);
     Blade::component(Blocks::class);
     Blade::component(Inline::class);
