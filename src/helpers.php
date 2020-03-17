@@ -3,6 +3,7 @@
 use Netflex\Pages\Page;
 use Netflex\API\Facades\API;
 use Netflex\Foundation\Variable;
+use Netflex\Foundation\GlobalContent;
 
 use Carbon\Carbon;
 
@@ -10,6 +11,30 @@ use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Collection;
+
+if (!function_exists('static_content')) {
+  function static_content($area, $block = null, $column = null)
+  {
+    if ($content = GlobalContent::retrieve($area)) {
+      return $content->globals
+        ->filter(function ($item) use ($block) {
+          if ($block) {
+            return $item->alias === $block;
+          }
+
+          return true;
+        })
+        ->map(function ($item) use ($column) {
+          $column = $column ?? $item->content_type;
+          return $item->content->{$column} ?? null;
+        })
+        ->filter()
+        ->reduce(function ($value, $item) {
+          return $item . $value;
+        }, '');
+    }
+  }
+}
 
 if (!function_exists('navigation_data')) {
   function navigation_data($parent = null, $type = 'nav', $root = null)
