@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\View;
 
 use Artesaos\SEOTools\Facades\SEOTools;
+use Illuminate\Support\Facades\App;
 
 /**
  * @property int $id
@@ -45,6 +46,7 @@ use Artesaos\SEOTools\Facades\SEOTools;
  * @property mixed $authgroups
  * @property array $variants
  * @property Page|null $master
+ * @property string|null $lang
  */
 class Page extends QueryableModel implements Responsable
 {
@@ -284,6 +286,24 @@ class Page extends QueryableModel implements Responsable
     }
 
     return $this->parent->master;
+  }
+
+  public function getLangAttribute()
+  {
+    if (!$this->attributes['lang']) {
+      $parent = $this->parent;
+      while ($parent && !$parent->lang) {
+        $parent = $parent->parent;
+      }
+
+      if ($parent) {
+        return $parent->lang;
+      }
+
+      return App::getLocale();
+    }
+
+    return $this->attributes['lang'];
   }
 
   /**

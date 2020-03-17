@@ -23,6 +23,17 @@ class BindPage
 
     if (App::has($route)) {
       current_page(App::get($route));
+
+      if ($page = current_page()) {
+        if ($page->lang) {
+          App::setLocale($page->lang);
+        } else {
+          $master = $page->master;
+          if ($master->lang) {
+            App::setLocale($master->lang);
+          }
+        }
+      }
     }
 
     return $next($request);
