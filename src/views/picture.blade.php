@@ -9,15 +9,7 @@
         data-content-compressiontype="{{ $mode ?? null }}"
         data-content-id="{{ $id ?? null }}"
         class="{{ $class ?? null}} find-image"
-    @else
-        @isset($class)
-            class="{{ $class }}"
-        @endisset
     @endif
-
-    @isset($style)
-        style="{{ $style ?? null }}"
-    @endisset
 @overwrite
 
 @section('picture')
@@ -37,6 +29,10 @@
 
     @isset($title)
         title="{{ $title ?? null }}"
+    @endisset
+
+    @isset($imageClass)
+        class="{{ $imageClass ?? null }}"
     @endisset
 
     @isset($style)
