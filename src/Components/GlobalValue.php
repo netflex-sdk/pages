@@ -23,33 +23,12 @@ class GlobalValue extends Component
         $this->area = $area ? $area : null;
         $this->block = $block ? $block : null;
         $this->column = $column ? $area : null;
-        $this->content = GlobalContent::retrieve($area);
-    }
-
-    public function value () {
-        if ($this->content) {
-            return $this->content->globals
-                ->filter(function ($item) {
-                    if ($this->block) {
-                        return $item->alias === $this->block;
-                    }
-
-                    return true;
-                })
-                ->map(function ($item) {
-                    $column = $this->column ?? $item->content_type;
-                    return $item->content->{$column} ?? null;
-                })
-                ->filter()
-                ->reduce(function ($value, $item) {
-                    return $item . $value;
-                }, '');
-        }
+        $this->value = static_content($area, $block, $column);
     }
 
     public function shouldRender()
     {
-        return $this->value();
+        return $this->value;
     }
 
     /**
