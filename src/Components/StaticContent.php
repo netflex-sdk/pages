@@ -2,15 +2,10 @@
 
 namespace Netflex\Pages\Components;
 
-use Illuminate\Support\Collection;
 use Illuminate\View\Component;
-use Netflex\Foundation\GlobalContent;
 
-class GlobalValue extends Component
+class StaticContent extends Component
 {
-    public $area;
-    public $block;
-    public $column;
     public $content;
 
     /**
@@ -20,15 +15,12 @@ class GlobalValue extends Component
      */
     public function __construct($area, $block = null, $column = null)
     {
-        $this->area = $area ? $area : null;
-        $this->block = $block ? $block : null;
-        $this->column = $column ? $area : null;
-        $this->value = static_content($area, $block, $column);
+        $this->content = static_content($area, $block, $column);
     }
 
     public function shouldRender()
     {
-        return $this->value;
+        return $this->content !== null && trim($this->content) !== '';
     }
 
     /**
