@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -180,6 +181,10 @@ class RouteServiceProvider extends ServiceProvider
                 }
               });
             } catch (Throwable $e) {
+              if (App::environment() !== 'master') {
+                throw $e;
+              }
+
               Log::warning("Route {$page->url} could not be registered because {$e->getMessage()}");
             }
           });
