@@ -123,6 +123,50 @@ class RouteServiceProvider extends ServiceProvider
       });
   }
 
+  protected function handlePage($request, $payload)
+  {
+    if ($page = Page::findOrFail($payload->page_id)) {
+      if ($payload->revision_id ?? false) {
+        $page->loadRevision($payload->revision_id);
+      }
+
+      current_page($page);
+
+      $controller = $page->template->controller ?? null;
+      $pageController = PageController::class;
+      $class = trim($controller ? ("\\{$this->namespace}\\{$controller}") : "\\{$pageController}", '\\');
+
+      if (!$class) {
+        $page->toResponse($request);
+      }
+
+      return app($class)->index($request);
+    }
+  }
+
+  protected function handleEntry($payload)
+  {
+    if ($payload->structure_id) {
+      $structure = Cache::rememberForever('structure/' . $payload->structure_id, function () use ($payload) {
+        return API::get('builder/structures/' . $payload->structure_id);
+      });
+    }
+
+    if (!$structure) {
+      abort(404, 'Structure not found or not set in payload.');
+    }
+
+    list($controller, $action) = explode('@', $structure->config->previewController->value);
+
+    $controller = trim("\\{$this->namespace}\\{$controller}", '\\');
+
+    if (!$controller || !$action) {
+      abort(404, 'previewController setting missing or misformed in structure config.');
+    }
+
+    return app($controller)->{$action}($payload->structure_id, $payload->entry_id, $payload->revision_id);
+  }
+
   protected function mapNetflexRoutes()
   {
     Route::middleware('jwt_proxy')
@@ -133,44 +177,13 @@ class RouteServiceProvider extends ServiceProvider
           current_mode($payload->mode ?? 'live');
           editor_tools($payload->edit_tools ?? null);
 
-          if ($payload->relation === 'page') {
-            if ($page = Page::findOrFail($payload->page_id)) {
-              if ($payload->revision_id ?? false) {
-                $page->loadRevision($payload->revision_id);
-              }
-
-              current_page($page);
-
-              $controller = $page->template->controller ?? null;
-              $pageController = PageController::class;
-              $class = trim($controller ? ("\\{$this->namespace}\\{$controller}") : "\\{$pageController}", '\\');
-
-              if (!$class) {
-                $page->toResponse($request);
-              }
-
-              return app($class)->index($request);
-            }
-          } elseif ($payload->relation === 'entry') {
-            if ($payload->structure_id) {
-              $structure_id = $payload->structure_id;
-              $structure = Cache::rememberForever('structure/' . $payload->structure_id, function () use ($structure_id) {
-                return API::get('builder/structures/' . $structure_id);
-              });
-            }
-
-            if (!$structure) {
-              abort(404, 'Structure not found or not set in payload.');
-            }
-
-            list($controller, $action) = explode('@', $structure->config->previewController->value);
-            $class = trim("\\{$this->namespace}\\{$controller[0]}", '\\');
-
-            if (!$controller || !$action) {
-              abort(404, 'previewController setting missing or misformed in structure config.');
-            }
-
-            return app($class)->{$action}($payload->structure_id, $payload->entry_id, $payload->revision_id);
+          switch ($payload->relation) {
+            case 'page':
+              return $this->handlePage($request, $payload);
+            case 'entry':
+              return $this->handleEntry($payload);
+            default:
+              break;
           }
         })->name('Netflex Editor Proxy');
       });
