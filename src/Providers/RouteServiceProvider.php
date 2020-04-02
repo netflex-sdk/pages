@@ -5,7 +5,7 @@ namespace Netflex\Pages\Providers;
 use Throwable;
 use API;
 use Cache;
-
+use Exception;
 use Netflex\Pages\Page;
 use Netflex\Pages\Middleware\BindPage;
 use Netflex\Pages\Middleware\GroupAuthentication;
@@ -160,14 +160,14 @@ class RouteServiceProvider extends ServiceProvider
             }
 
             if (!$structure) {
-              die('Structure not found');
+              abort(404, 'Structure not found or not set in payload.');
             }
-            $controller = explode('@', $structure->config->previewController->value);
-            $action = $controller[1];
+
+            list($controller, $action) = explode('@', $structure->config->previewController->value);
             $class = trim("\\{$this->namespace}\\{$controller[0]}", '\\');
 
-            if (!$class) {
-              die('Some error');
+            if (!$controller || !$action) {
+              abort(404, 'previewController setting missing or misformed in structure config.');
             }
 
             return app($class)->{$action}($payload->structure_id, $payload->entry_id, $payload->revision_id);
