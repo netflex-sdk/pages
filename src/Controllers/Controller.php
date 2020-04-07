@@ -29,14 +29,14 @@ abstract class Controller extends BaseController
     $routes = Collection::make($this->routes);
 
     $hasIndexRoute = $routes->first(function ($route) {
-      return $route['url'] === '/' && in_array('GET', $route->actions);
+      return $route['url'] === '/' && in_array('GET', $route['methods']);
     });
 
     if (!$hasIndexRoute) {
       $routes->push([
-          'url' => '/',
-          'methods' => ['GET'],
-          'action' => 'index'
+        'url' => '/',
+        'methods' => ['GET'],
+        'action' => 'index'
       ]);
     }
 
