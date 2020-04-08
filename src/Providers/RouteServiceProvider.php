@@ -15,6 +15,7 @@ use Netflex\Pages\Middleware\JwtProxy;
 
 use Netflex\Foundation\Redirect;
 
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
@@ -176,7 +177,7 @@ class RouteServiceProvider extends ServiceProvider
           $payload = $request->get('payload');
           current_mode($payload->mode ?? 'live');
           editor_tools($payload->edit_tools ?? null);
-          development_domain($payload->domain ?? null);
+          URL::forceRootUrl($payload->domain);
 
           switch ($payload->relation) {
             case 'page':

@@ -19,12 +19,6 @@ class Mix extends ServiceProvider
    */
   public function __invoke($path, $manifestDirectory = '')
   {
-    $path = parent::__invoke($path, $manifestDirectory);
-
-    if (Str::contains($_SERVER['HTTP_REFERER'] ?? '', 'netflexapp.no')) {
-      return new HtmlString(development_domain() . $path);
-    }
-
-    return $path;
+    return parent::__invoke($path, $manifestDirectory);
   }
 }
