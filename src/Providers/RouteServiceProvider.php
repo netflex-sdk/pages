@@ -176,7 +176,7 @@ class RouteServiceProvider extends ServiceProvider
           $payload = $request->get('payload');
           current_mode($payload->mode ?? 'live');
           editor_tools($payload->edit_tools ?? null);
-          development_domain($payload->domain ?? null)
+          development_domain($payload->domain ?? null);
 
           switch ($payload->relation) {
             case 'page':
