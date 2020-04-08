@@ -676,3 +676,19 @@ if (!function_exists('picture_srcsets')) {
     return $srcsets;
   }
 }
+
+if (!function_exists('development_domain')) {
+  function development_domain($domain = null)
+  {
+    if ($domain) {
+      App::bind('__development_domain__', function () use ($domain) {
+        return $domain;
+      });
+      return $domain;
+    }
+    if (App::has('__development_domain__')) {
+      return App::get('__development_domain__');
+    }
+    return null;
+  }
+}
