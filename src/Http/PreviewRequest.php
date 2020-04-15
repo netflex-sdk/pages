@@ -31,7 +31,7 @@ class PreviewRequest
    *
    * @return \App\User|null
    */
-  public function user ()
+  public function user()
   {
     return null;
   }

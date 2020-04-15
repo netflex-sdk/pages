@@ -15,14 +15,15 @@ use Netflex\Pages\Extension;
 use Netflex\Pages\JwtPayload;
 
 if (!function_exists('jwt_payload')) {
-    /**
-     * @return JwtPayload|null
-     */
-    function jwt_payload () {
-        if (App::has('JwtPayload')) {
-            return App::get('JwtPayload');
-        }
+  /**
+   * @return JwtPayload|null
+   */
+  function jwt_payload()
+  {
+    if (App::has('JwtPayload')) {
+      return App::get('JwtPayload');
     }
+  }
 }
 
 if (!function_exists('register_extension')) {
@@ -31,7 +32,8 @@ if (!function_exists('register_extension')) {
    * @param string $extension
    * @return void
    */
-  function register_extension($alias, $extension) {
+  function register_extension($alias, $extension)
+  {
     return Extension::register($alias, $extension);
   }
 }
@@ -42,7 +44,8 @@ if (!function_exists('resolve_extension')) {
    * @param array $data
    * @return Extension|null
    */
-  function resolve_extension($alias, $data = []) {
+  function resolve_extension($alias, $data = [])
+  {
     return Extension::resolve($alias, $data);
   }
 }
