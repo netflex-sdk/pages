@@ -11,6 +11,29 @@ use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Collection;
+use Netflex\Pages\Extension;
+
+if (!function_exists('register_extension')) {
+  /**
+   * @param string $alias
+   * @param string $extension
+   * @return void
+   */
+  function register_extension($alias, $extension) {
+    return Extension::register($alias, $extension);
+  }
+}
+
+if (!function_exists('resolve_extension')) {
+  /**
+   * @param string $alias
+   * @param array $data
+   * @return Extension|null
+   */
+  function resolve_extension($alias, $data = []) {
+    return Extension::resolve($alias, $data);
+  }
+}
 
 if (!function_exists('static_content')) {
   function static_content($area, $block = null, $column = null)

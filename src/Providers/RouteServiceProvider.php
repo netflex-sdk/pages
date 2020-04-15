@@ -171,6 +171,12 @@ class RouteServiceProvider extends ServiceProvider
     return app($controller)->{$action}($previewRequest);
   }
 
+  protected function handleExtension($payload) {
+    if ($alias = $payload->alias ?? null) {
+      return resolve_extension($alias, json_decode(json_encode($payload), true));
+    }
+  }
+
   protected function mapNetflexRoutes()
   {
     Route::middleware('jwt_proxy')
@@ -187,6 +193,8 @@ class RouteServiceProvider extends ServiceProvider
               return $this->handlePage($request, $payload);
             case 'entry':
               return $this->handleEntry($payload);
+            case 'extension':
+              return $this->handleExtension($payload);
             default:
               break;
           }
