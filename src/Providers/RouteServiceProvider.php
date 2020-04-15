@@ -22,6 +22,7 @@ use Illuminate\Http\Request;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
+use Netflex\Pages\PreviewRequest;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -162,10 +163,12 @@ class RouteServiceProvider extends ServiceProvider
     $controller = trim("\\{$this->namespace}\\{$controller}", '\\');
 
     if (!$controller || !$action) {
-      abort(404, 'previewController setting missing or misformed in structure config.');
+      abort(400, 'previewController setting missing or misformed in structure config.');
     }
 
-    return app($controller)->{$action}($payload->structure_id, $payload->entry_id, $payload->revision_id);
+    $previewRequest = new PreviewRequest((array) $payload);
+
+    return app($controller)->{$action}($previewRequest);
   }
 
   protected function mapNetflexRoutes()
