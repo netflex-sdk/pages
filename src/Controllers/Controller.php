@@ -36,7 +36,7 @@ abstract class Controller extends BaseController
       $routes->push([
         'url' => '/',
         'methods' => ['GET'],
-        'action' => 'index'
+        'action' => 'fallbackIndex'
       ]);
     }
 
@@ -51,13 +51,12 @@ abstract class Controller extends BaseController
   }
 
   /**
-   * @param Request $request
    * @return Response
    */
-  public function index(Request $request)
+  public function fallbackIndex()
   {
     if ($page = Page::current()) {
-      return $page->toResponse($request);
+      return $page->toResponse(app('request'));
     }
 
     throw new PageNotBoundException;

@@ -22,7 +22,9 @@ use Illuminate\Http\Request;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
+use Netflex\Pages\Facades\JwtPayload;
 use Netflex\Pages\PreviewRequest;
+use ReflectionClass;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -142,7 +144,13 @@ class RouteServiceProvider extends ServiceProvider
         $page->toResponse($request);
       }
 
-      return app($class)->index($request);
+      $controller = app($class);
+
+      if (method_exists($controller, 'index')) {
+        return $this->callWithInjectedDependencies($controller, 'index');
+      }
+
+      return $controller->fallbackIndex();
     }
   }
 
@@ -180,6 +188,26 @@ class RouteServiceProvider extends ServiceProvider
     }
 
     return abort(404);
+  }
+
+  protected function callWithInjectedDependencies($controller, $method = 'index', $arguments = [])
+  {
+    return $controller->$method(...$this->injectDependencies($controller, $method, $arguments));
+  }
+
+  protected function injectDependencies(\Illuminate\Routing\Controller $class, $method = 'index', $arguments = [])
+  {
+    $reflector = new ReflectionClass($class);
+    if ($reflector->hasMethod($method)) {
+      $params = $reflector->getMethod($method)->getParameters();
+      if ($param = array_shift($params)) {
+        if ($param && $param->hasType() && !$param->isDefaultValueAvailable() && !$param->isOptional() && $param->getType()->getName() === \Illuminate\Http\Request::class) {
+          array_unshift($arguments, app('request'));
+        }
+
+        return $arguments;
+      }
+    }
   }
 
   protected function mapNetflexRoutes()
