@@ -3,9 +3,10 @@
 namespace Netflex\Pages\Middleware;
 
 use Closure;
-
+use Illuminate\Support\Facades\App;
 use Netflex\Support\JWT;
 use Netflex\Foundation\Variable;
+use Netflex\Pages\JwtPayload;
 
 class JwtProxy
 {
@@ -38,7 +39,10 @@ class JwtProxy
         if ($token = $request->get('token')) {
             if ($payload = JWT::decodeAndVerify($token, Variable::get('netflex_api'))) {
                 $request->offsetUnset('token');
-                $request->offsetSet('payload', $payload);
+                App::bind('JwtPayload', function () use ($payload) {
+                    return new JwtPayload(json_decode(json_encode($payload), true));
+                });
+
                 return;
             }
         }

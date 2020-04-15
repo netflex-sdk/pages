@@ -183,10 +183,10 @@ class RouteServiceProvider extends ServiceProvider
       ->group(function () {
 
         Route::any('.well-known/netflex', function (Request $request) {
-          $payload = $request->get('payload');
-          current_mode($payload->mode ?? 'live');
-          editor_tools($payload->edit_tools ?? null);
-          URL::forceRootUrl($payload->domain);
+          if ($payload = jwt_payload()) {
+            current_mode($payload->mode);
+            editor_tools($payload->edit_tools);
+            URL::forceRootUrl($payload->domain);
 
           switch ($payload->relation) {
             case 'page':

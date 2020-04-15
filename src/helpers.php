@@ -12,6 +12,18 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Collection;
 use Netflex\Pages\Extension;
+use Netflex\Pages\JwtPayload;
+
+if (!function_exists('jwt_payload')) {
+    /**
+     * @return JwtPayload|null
+     */
+    function jwt_payload () {
+        if (App::has('JwtPayload')) {
+            return App::get('JwtPayload');
+        }
+    }
+}
 
 if (!function_exists('register_extension')) {
   /**
