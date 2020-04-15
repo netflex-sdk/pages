@@ -146,7 +146,7 @@ class RouteServiceProvider extends ServiceProvider
     }
   }
 
-  protected function handleEntry($payload)
+  protected function handleEntry(Request $request, $payload)
   {
     if ($payload->structure_id) {
       $structure = Cache::rememberForever('structure/' . $payload->structure_id, function () use ($payload) {
@@ -171,10 +171,15 @@ class RouteServiceProvider extends ServiceProvider
     return app($controller)->{$action}($previewRequest);
   }
 
-  protected function handleExtension($payload) {
-    if ($alias = $payload->alias ?? null) {
-      return resolve_extension($alias, json_decode(json_encode($payload), true));
+  protected function handleExtension(Request $request, $payload)
+  {
+    if ($alias = $payload->view) {
+      if ($extension = resolve_extension($alias, json_decode(json_encode($payload), true))) {
+        return $extension->handle($request);
+      }
     }
+
+    return abort(404);
   }
 
   protected function mapNetflexRoutes()
@@ -188,16 +193,18 @@ class RouteServiceProvider extends ServiceProvider
             editor_tools($payload->edit_tools);
             URL::forceRootUrl($payload->domain);
 
-          switch ($payload->relation) {
-            case 'page':
-              return $this->handlePage($request, $payload);
-            case 'entry':
-              return $this->handleEntry($payload);
-            case 'extension':
-              return $this->handleExtension($payload);
-            default:
-              break;
+            switch ($payload->relation) {
+              case 'page':
+                return $this->handlePage($request, $payload);
+              case 'entry':
+                return $this->handleEntry($request, $payload);
+              case 'extension':
+                return $this->handleExtension($request, $payload);
+              default:
+                break;
+            }
           }
+          abort(400);
         })->name('Netflex Editor Proxy');
       });
 
