@@ -359,7 +359,7 @@ class Page extends QueryableModel implements Responsable
    */
   public function getParentAttribute()
   {
-    return static::find($this->parent_id);
+    return static::find((int) $this->parent_id);
   }
 
   /**
