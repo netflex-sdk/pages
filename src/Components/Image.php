@@ -34,7 +34,7 @@ class Image extends Component
         $width = !$width && $height ? $height : $width;
 
         $this->settings = (object) [
-            'area' => $area ? blockhash_append($area) : null,
+            'area' => $area ?? null,
             'size' => $size ?? (($width && $height) ? "{$width}x{$height}" : null),
             'mode' => $mode,
             'color' => $color,
@@ -50,6 +50,8 @@ class Image extends Component
         if ($this->settings->inline) {
             $area = $this->settings->area;
             if (current_mode() === 'edit') {
+                $this->settings->area = blockhash_append($area);
+                $area = $this->settings->area;
                 $this->settings->content = insert_content_if_not_exists($area, 'image');
             } else {
                 $this->settings->content = content($area, null);
