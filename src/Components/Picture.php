@@ -30,6 +30,11 @@ class Picture extends Component
         $imageClass = null,
         $imageStyle = null
     ) {
+        $mode = $width && !$height ? self::MODE_LANDSCAPE : $mode;
+        $mode = $height && !$width ? self::MODE_PORTRAIT : $mode;
+        $height = !$height && $width ? $width : $height;
+        $width = !$width && $height ? $height : $width;
+
         $this->settings = (object) [
             'alias' => $area ? blockhash_append($area) : null,
             'size' => $size ?? (($width && $height) ? "{$width}x{$height}" : null),
