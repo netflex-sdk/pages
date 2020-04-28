@@ -65,6 +65,7 @@ class EditorButton extends Component
             case 'color':
             case 'select':
             case 'multiselect':
+            case 'text':
               $this->field = 'text';
               break;
             case 'image':
