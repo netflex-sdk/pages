@@ -393,15 +393,15 @@ class Page extends QueryableModel implements Responsable
   /**
    * Finds an instance by its primary field
    *
-   * @param mixed|array $findBy
-   * @return static|Collection|null
+   * @param int|string $id
+   * @return static|null
    * @throws NotQueryableException If object not queryable
    * @throws QueryException On invalid query
    */
-  public static function find($findBy)
+  public static function find($id)
   {
-    return static::all()->first(function (self $page) use ($findBy) {
-      return $page->getKey() === $findBy;
+    return static::all()->first(function (self $page) use ($id) {
+      return $page->getKey() === (int) $id;
     });
   }
 
