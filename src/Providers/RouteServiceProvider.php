@@ -22,7 +22,7 @@ use Illuminate\Http\Request;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
-use Netflex\Pages\Facades\JwtPayload;
+use Netflex\Pages\JwtPayload;
 use Netflex\Pages\PreviewRequest;
 use ReflectionClass;
 
@@ -127,7 +127,7 @@ class RouteServiceProvider extends ServiceProvider
       });
   }
 
-  protected function handlePage($request, $payload)
+  protected function handlePage(Request $request, JwtPayload $payload)
   {
     if ($page = Page::findOrFail($payload->page_id)) {
       if ($payload->revision_id ?? false) {
@@ -154,7 +154,7 @@ class RouteServiceProvider extends ServiceProvider
     }
   }
 
-  protected function handleEntry(Request $request, $payload)
+  protected function handleEntry(Request $request, JwtPayload $payload)
   {
     if ($payload->structure_id) {
       $structure = Cache::rememberForever('structure/' . $payload->structure_id, function () use ($payload) {
@@ -174,7 +174,7 @@ class RouteServiceProvider extends ServiceProvider
       abort(400, 'previewController setting missing or misformed in structure config.');
     }
 
-    $previewRequest = new PreviewRequest((array) $payload);
+    $previewRequest = new PreviewRequest($payload);
 
     return app($controller)->{$action}($previewRequest);
   }
