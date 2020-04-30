@@ -2,6 +2,7 @@
 
 namespace Netflex\Pages;
 
+use Netflex\Pages\JwtPayload;
 use Netflex\Support\Accessors;
 
 /**
@@ -16,9 +17,9 @@ class PreviewRequest
   /** @var array */
   protected $attributes = [];
 
-  public function __construct($attributes = [])
+  public function __construct(JwtPayload $payload)
   {
-    $this->attributes = $attributes;
+    $this->attributes = $payload->toArray();
   }
 
   public function get($attribute, $default = null)
