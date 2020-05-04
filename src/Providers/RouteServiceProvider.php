@@ -195,6 +195,12 @@ class RouteServiceProvider extends ServiceProvider
     return $controller->$method(...$this->injectDependencies($controller, $method, $arguments));
   }
 
+  /**
+   * @param \Illuminate\Routing\Controller $class
+   * @param string $method
+   * @param array $arguments
+   * @return array
+   */
   protected function injectDependencies(\Illuminate\Routing\Controller $class, $method = 'index', $arguments = [])
   {
     $reflector = new ReflectionClass($class);
@@ -208,6 +214,8 @@ class RouteServiceProvider extends ServiceProvider
         return $arguments;
       }
     }
+
+    return [];
   }
 
   protected function mapNetflexRoutes()
