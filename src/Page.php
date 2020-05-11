@@ -55,6 +55,9 @@ class Page extends QueryableModel implements Responsable
   use HidesDefaultFields;
 
   /** @var string */
+  const TEMPLATE_DOMAIN = 'd';
+
+  /** @var string */
   const TEMPLATE_EXTERNAL = 'e';
 
   /** @var string */
@@ -297,8 +300,10 @@ class Page extends QueryableModel implements Responsable
   public function getDomainAttribute()
   {
     $master = $this->master;
-    if (preg_match('/^(?!:\/\/)(?=.{1,255}$)((.{1,63}\.){1,127}(?![0-9]*$)[a-z0-9-]+\.?)$/', $master->name) !== false) {
-      return $master->name;
+    if ($master && $master !== $this) {
+        if ($master->type === 'domain' && preg_match('/^(?!:\/\/)(?=.{1,255}$)((.{1,63}\.){1,127}(?![0-9]*$)[a-z0-9-]+\.?)$/', $master->name) !== false) {
+            return $master->name;
+        }
     }
   }
 
