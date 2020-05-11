@@ -47,6 +47,7 @@ use Illuminate\Support\Facades\App;
  * @property array $variants
  * @property Page|null $master
  * @property string|null $lang
+ * @property-read string|null $domain
  */
 class Page extends QueryableModel implements Responsable
 {
@@ -286,6 +287,19 @@ class Page extends QueryableModel implements Responsable
     }
 
     return $this->parent->master;
+  }
+
+  /**
+   * Gets the domain name of the page, using its master page as the base
+   *
+   * @return string|null
+   */
+  public function getDomainAttribute()
+  {
+    $master = $this->master;
+    if (preg_match('/^(?!:\/\/)(?=.{1,255}$)((.{1,63}\.){1,127}(?![0-9]*$)[a-z0-9-]+\.?)$/', $master->name) !== false) {
+      return $master->name;
+    }
   }
 
   public function getLangAttribute()

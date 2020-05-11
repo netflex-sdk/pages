@@ -263,12 +263,25 @@ class RouteServiceProvider extends ServiceProvider
                 $url = trim("{$page->url}/{$routeDefintion->url}", '/');
                 $action = "$class@{$routeDefintion->action}";
 
-                $route = Route::match($routeDefintion->methods, $url, $action)
-                  ->name($page->id);
+                $domain = $page->domain;
 
-                $this->app->bind(route_hash($route), function () use ($page) {
-                  return $page;
-                });
+                if ($domain) {
+                  Route::domain($domain)->group(function () use ($page) {
+                    $route = Route::match($routeDefintion->methods, $url, $action)
+                      ->name($page->id);
+
+                    $this->app->bind(route_hash($route), function () use ($page) {
+                      return $page;
+                    });
+                  });
+                } else {
+                  $route = Route::match($routeDefintion->methods, $url, $action)
+                    ->name($page->id);
+
+                  $this->app->bind(route_hash($route), function () use ($page) {
+                    return $page;
+                  });
+                }
               }
             });
           } catch (Throwable $e) {
