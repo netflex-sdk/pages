@@ -47,11 +47,15 @@ use Illuminate\Support\Facades\App;
  * @property array $variants
  * @property Page|null $master
  * @property string|null $lang
+ * @property-read string|null $domain
  */
 class Page extends QueryableModel implements Responsable
 {
   use CastsDefaultFields;
   use HidesDefaultFields;
+
+  /** @var string */
+  const TEMPLATE_DOMAIN = 'd';
 
   /** @var string */
   const TEMPLATE_EXTERNAL = 'e';
@@ -286,6 +290,21 @@ class Page extends QueryableModel implements Responsable
     }
 
     return $this->parent->master;
+  }
+
+  /**
+   * Gets the domain name of the page, using its master page as the base
+   *
+   * @return string|null
+   */
+  public function getDomainAttribute()
+  {
+    $master = $this->master;
+    if ($master && $master !== $this) {
+        if ($master->type === 'domain' && preg_match('/^(?!:\/\/)(?=.{1,255}$)((.{1,63}\.){1,127}(?![0-9]*$)[a-z0-9-]+\.?)$/', $master->name) !== false) {
+            return $master->name;
+        }
+    }
   }
 
   public function getLangAttribute()

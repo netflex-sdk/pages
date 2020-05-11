@@ -65,7 +65,13 @@ trait CastsDefaultFields
    */
   public function getTypeAttribute()
   {
+    if (!isset($this->attributes['template'])) {
+        return 'page';
+    }
+
     switch ($this->attributes['template']) {
+      case PAGE::TEMPLATE_DOMAIN:
+        return 'domain';
       case Page::TEMPLATE_EXTERNAL:
         return 'external';
       case Page::TEMPLATE_INTERAL:

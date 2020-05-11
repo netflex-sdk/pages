@@ -263,7 +263,13 @@ class RouteServiceProvider extends ServiceProvider
                 $url = trim("{$page->url}/{$routeDefintion->url}", '/');
                 $action = "$class@{$routeDefintion->action}";
 
-                $route = Route::match($routeDefintion->methods, $url, $action)
+                $route = Route::domain('');
+
+                if ($domain = $page->domain) {
+                  $route = $route->domain($domain);
+                }
+
+                $route = $route->match($routeDefintion->methods, $url, $action)
                   ->name($page->id);
 
                 $this->app->bind(route_hash($route), function () use ($page) {
