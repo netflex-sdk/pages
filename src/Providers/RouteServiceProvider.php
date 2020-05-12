@@ -166,6 +166,10 @@ class RouteServiceProvider extends ServiceProvider
       abort(404, 'Structure not found or not set in payload.');
     }
 
+    if (!isset($structure->config->previewController)) {
+      abort(400, 'previewController setting missing or misformed in structure config.');
+    }
+
     list($controller, $action) = explode('@', $structure->config->previewController->value);
 
     $controller = trim("\\{$this->namespace}\\{$controller}", '\\');
