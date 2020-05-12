@@ -545,6 +545,49 @@ if (!function_exists('blockhash')) {
   }
 }
 
+if (!function_exists('is_valid_domain_name')) {
+  /**
+   * Checks if the given parameter is a valid domain name
+   *
+   * @param string $domain_name
+   * @return bool
+   */
+  function is_valid_domain_name($domain_name)
+  {
+    return (preg_match('/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i', $domain_name)
+      && preg_match('/^.{1,253}$/', $domain_name)
+      && preg_match('/^[^\.]{1,63}(\.[^\.]{1,63})*$/', $domain_name));
+  }
+}
+
+if (!function_exists('current_domain')) {
+  /**
+   * Gets or sets the current domain
+   *
+   * @param string $domain
+   * @return string|null
+   */
+  function current_domain(...$args)
+  {
+    if (!count($args)) {
+      $domain = current_page() ? current_page()->domain : null;
+      if (App::has('__current_domain__')) {
+        $domain = App::get('__current_domain__');
+      }
+
+      return $domain && is_valid_domain_name($domain) ? $domain : null;
+    }
+
+    $value = array_shift($args) ?? current_page()->domain;
+
+    App::bind('__current_domain__', function () use ($value) {
+      return $value;
+    });
+
+    return $value;
+  }
+}
+
 if (!function_exists('current_page')) {
   /**
    * Gets or sets the current page
