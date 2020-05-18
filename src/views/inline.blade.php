@@ -16,10 +16,10 @@
     @endisset
 @overwrite
 
-@isset($tag)
-    <{{ $tag }} @yield('attributes')>
+@if($tag() !== null)
+    <{{ $tag() }} @yield('attributes')>
 @endif
     {!! $value ?? null !!}
-@isset($tag)
-    </{{ $tag }}>
+@if($tag() !== null)
+    </{{ $tag() }}>
 @endif
