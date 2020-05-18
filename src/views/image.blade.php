@@ -1,7 +1,7 @@
 @section('attributes')
     @parent
 
-    @if($inline && current_mode() === 'edit')
+    @if($inline() && current_mode() === 'edit')
         id="e-{{ $id ?? null }}-image-{{ uniqid() }}"
         class="{{ $class ?? null }} find-image"
         data-content-type="image"
