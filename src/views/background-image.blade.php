@@ -1,4 +1,4 @@
-{{-- @if($attributes->get('class')) --}}
+@if($attributes->get('class'))
 <style>
   .{{ $attributes->get('class') }} {
     background-image: url({!! $defaultSrc !!});
@@ -25,11 +25,5 @@
       @endif
     @endforeach
   @endforeach
-
-  }
-  </style>
-
-  <section class="{{ $attributes->get('class') }}">
-
-  </section>
-  {{-- @endif --}}
+</style>
+@endif
