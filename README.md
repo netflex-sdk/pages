@@ -1,6 +1,6 @@
 # Netflex Pages
 
-Eloquent compatible model for working with Netflex Pagess.
+Eloquent compatible model for working with Netflex Pages.
 
 <a href="https://packagist.org/packages/netflex/pages"><img src="https://img.shields.io/packagist/v/netflex/pages?label=stable" alt="Stable version"></a>
 <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/github/license/netflex-sdk/pages.svg" alt="License: MIT"></a>
@@ -10,6 +10,12 @@ Eloquent compatible model for working with Netflex Pagess.
 
 ```bash
 composer require netflex/pages
+```
+
+## Generating configuration files
+
+```bash
+php artisan vendor:publish --tag=config
 ```
 
 ## Example usage
