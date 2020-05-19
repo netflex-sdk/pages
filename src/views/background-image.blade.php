@@ -1,25 +1,35 @@
-<style scoped>
-	{!! $selector !!} {
-    background-image: url({!! $src !!});
+{{-- @if($attributes->get('class')) --}}
+<style>
+  .{{ $attributes->get('class') }} {
+    background-image: url({!! $defaultSrc !!});
   }
 
-  @foreach ($srcSets as $set)
-    @media (max-width: {{ $set->width }}px) {
-      {{ $selector }} {
-        background-image: url({!! $set->url !!}?src={{ $set->width }}w);
-      }
-    }
-
-    @media (-webkit-min-device-pixel-ratio: 1.5),
-	         (min--moz-device-pixel-ratio: 1.5),
-	         (-o-min-device-pixel-ratio: 3/2),
-	         (min-device-pixel-ratio: 1.5),
-	         (min-resolution: 1.5dppx) {
-      @media (max-width: {{ $set->width }}px) {
-        {{ $selector }} {
-          background-image: url({!! $set->url !!}?src={{ $set->width }}w);
+  @foreach ($srcSets as $srcSet)
+    @isset($srcSet['sources']['1x'])
+      @media (max-width: {{ $srcSet['maxWidth'] }}px) {
+        .{{ $attributes->get('class') }} {
+          background-image: url({!! $srcSet['sources']['1x'] !!});
         }
       }
-    }
+    @endisset
   @endforeach
-</style>
+
+  @foreach ($srcSets as $srcSet)
+    @foreach($srcSet['sources'] as $resolution => $src)
+      @if($resolution !== '1x')
+        @media (min-resolution: {{ intval($resolution) }}dppx), and (max-width: {{ $srcSet['maxWidth'] }}px) {
+          .{{ $attributes->get('class') }} {
+            background-image: url({!! $src !!});
+          }
+        }
+      @endif
+    @endforeach
+  @endforeach
+
+  }
+  </style>
+
+  <section class="{{ $attributes->get('class') }}">
+
+  </section>
+  {{-- @endif --}}
