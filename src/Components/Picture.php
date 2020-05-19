@@ -99,10 +99,17 @@ class Picture extends Component
    */
   protected function preset()
   {
+    $default = Config::get("media.presets.default", [
+      'mode' => static::MODE_FIT,
+      'resolutions' => ['1x', '2x'],
+    ]);
+
     if ($preset = Config::get("media.presets.{$this->preset}")) {
-      $preset['size'] = $this->size ?? $preset['size'] ?? null;
-      $preset['mode'] = $this->mode ?? $preset['mode'] ?? static::MODE_ORIGINAL;
-      $preset['fill'] = $this->fill ?? $preset['fill'] ?? null;
+      $preset['size'] = $this->size ?? $preset['size'] ?? $default['size'] ?? null;
+      $preset['mode'] = $this->mode ?? $preset['mode'] ?? $default['mode'] ?? static::MODE_ORIGINAL;
+      $preset['fill'] = $this->fill ?? $preset['fill'] ?? $default['fill'] ?? null;
+      $preset['breakpoints'] = $preset['breakpoints'] ?? $default['breakpoints'] ?? null;
+
       return new MediaPreset($preset);
     }
 
@@ -147,6 +154,7 @@ class Picture extends Component
         $mergedSets[] = $path . ' ' . $resolution;
       }
 
+      $srcSet['sources'] = $srcSet['paths'];
       $srcSet['paths'] = implode(' ,', $mergedSets);
       $srcSets[] = $srcSet;
     }
