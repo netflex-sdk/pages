@@ -18,6 +18,50 @@ composer require netflex/pages
 php artisan vendor:publish --tag=config
 ```
 
+## Configuring custom media presets
+
+```php
+<?php
+
+use Netflex\Pages\Components\Picture;
+
+/**
+ *
+ */
+return [
+    'breakpoints' => [
+        'xss' => 320,
+        'xs' => 480,
+        'sm' => 768,
+        'md' => 992,
+        'lg' => 1200,
+        'xl' => 1440,
+        'xxl' => 1920,
+    ],
+
+    'presets' => [
+        'default' => [
+            'mode' => Picture::MODE_ORIGINAL,
+            'resolutions' => ['1x', '2x'],
+        ],
+
+        'banner' => [
+          'mode' => Picture::MODE_LANDSCAPE,
+          'resolutions' => ['1x', '2x'],
+          'size' => [1920, 600],
+          // Customize config per breakpoint:
+          'breakpoints' => [
+            'md' => [
+              'mode' => Picture::MODE_FIT,
+              'resolutions' => ['1x'].
+            ],
+            'lg' => 'md', // Aliasing 'lg' breakpoint to 'md'
+          ]
+        ],
+    ],
+];
+```
+
 ## Example usage
 
 ```php
