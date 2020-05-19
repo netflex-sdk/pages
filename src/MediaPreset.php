@@ -60,6 +60,11 @@ class MediaPreset implements JsonSerializable
     $this->attributes['maxWidth'] = $maxWidth;
   }
 
+  /**
+   * @param array $values
+   * @return array
+   * @throws BreakpointsMissingException
+   */
   public function getBreakpointsAttribute($values = [])
   {
     if ($values && is_array($values)) {

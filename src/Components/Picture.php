@@ -4,8 +4,9 @@ namespace Netflex\Pages\Components;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\View\Component;
-use Netflex\Pages\Exceptions\InvalidPresetException;
+
 use Netflex\Pages\MediaPreset;
+use Netflex\Pages\Exceptions\InvalidPresetException;
 
 class Picture extends Component
 {
@@ -31,7 +32,6 @@ class Picture extends Component
   public $mode;
   public $size;
   public $fill;
-
   /**
    * Create a new component instance.
    *
@@ -50,7 +50,9 @@ class Picture extends Component
     $this->fill = $fill;
     $this->title = $title;
     $this->alt = $alt;
-    $this->size = $this->size ?? ((int) $width . 'x' . (int) $height);
+
+    $this->size = $this->size ? $this->size : null;
+    $this->size = !$this->size && $width && $height ? ((int) $width . 'x' . (int) $height) : $this->size;
 
     if ($this->inline) {
       insert_content_if_not_exists($this->area, 'image');
@@ -62,7 +64,6 @@ class Picture extends Component
   {
     if ($this->inline && current_mode() === 'edit') {
       $preset = $this->preset();
-
       return [
         'id' => 'e-' . ($this->content->id ?? null) . '-picture-' . uniqid(),
         'data-content-type' => 'image',
@@ -72,7 +73,6 @@ class Picture extends Component
         'data-content-id' => ($this->content->id ?? null)
       ];
     }
-
     return [];
   }
 
@@ -82,11 +82,20 @@ class Picture extends Component
       return content($this->area, 'image')->path ?? null;
     }
 
+    if (is_object($this->src) && property_exists($this->src, 'path')) {
+      return $this->src->path;
+    }
+
+    if (is_array($this->src) && array_key_exists('path', $this->src)) {
+      return $this->src['path'];
+    }
+
     return $this->src;
   }
 
   /**
    * @return MediaPreset
+   * @throws InvalidPresetException
    */
   protected function preset()
   {
@@ -94,15 +103,13 @@ class Picture extends Component
       $preset['size'] = $this->size ?? $preset['size'] ?? null;
       $preset['mode'] = $this->mode ?? $preset['mode'] ?? static::MODE_ORIGINAL;
       $preset['fill'] = $this->fill ?? $preset['fill'] ?? null;
-
       return new MediaPreset($preset);
     }
 
     throw new InvalidPresetException($this->preset);
   }
 
-  public function
-  default()
+  public function defaultSrc()
   {
     $preset = $this->preset();
 
@@ -110,14 +117,16 @@ class Picture extends Component
       return media_url($src, $preset->size, $preset->mode, $preset->fill);
     }
 
-    $size = $preset->size === '0x0' ? '256x256' : $preset->size;
-
-    return 'https://placehold.it/' . $size;
+    if ($this->inline && current_mode() === 'edit') {
+      $size = $preset->size === '0x0' ? '256x256' : $preset->size;
+      return 'https://placehold.it/' . $size;
+    }
   }
 
   public function srcSets()
   {
     $srcSets = [];
+
     foreach ($this->preset()->breakpoints as $breakpoint => $preset) {
       /** @var MediaPreset */
       $preset = $preset;
@@ -129,15 +138,16 @@ class Picture extends Component
       ];
 
       foreach ($preset->resolutions as $resolution) {
-        $srcSet['paths'][$resolution] = media_url($this->src(), $preset->size, $preset->mode, $preset->fill) . '?src=' . $preset->maxWidth . '&res=' . $resolution;
+        $srcSet['paths'][$resolution] = media_url($this->src(), $preset->size, $preset->mode, $preset->fill) . '?src=' . $preset->maxWidth . 'w&res=' . $resolution;
       }
 
       $mergedSets = [];
+
       foreach ($srcSet['paths'] as $resolution => $path) {
         $mergedSets[] = $path . ' ' . $resolution;
       }
 
-      $srcSet['paths'] = implode(', ', $mergedSets);
+      $srcSet['paths'] = implode(' ,', $mergedSets);
       $srcSets[] = $srcSet;
     }
 
@@ -163,7 +173,6 @@ class Picture extends Component
     if ($this->content) {
       return $this->content->description ?? $this->alt;
     }
-
     return $this->alt;
   }
 
@@ -174,6 +183,6 @@ class Picture extends Component
    */
   public function render()
   {
-    return view('components.responsive-picture');
+    return view('nf::picture');
   }
 }
