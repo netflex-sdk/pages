@@ -20,7 +20,7 @@
     @foreach ($srcSets as $srcSet)
       @foreach($srcSet['sources'] as $resolution => $src)
         @if($resolution !== '1x')
-          @media (min-resolution: {{ intval($resolution) }}dppx), and (max-width: {{ $srcSet['maxWidth'] }}px) {
+          @media (min-resolution: {{ intval($resolution) }}dppx) and (max-width: {{ $srcSet['maxWidth'] }}px) {
             .{{ $class }} {
               background-image: url({!! $src !!});
             }
