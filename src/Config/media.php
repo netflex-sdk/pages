@@ -2,10 +2,16 @@
 
 use Netflex\Pages\Components\Picture;
 
-/**
- *
- */
 return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Breakpoints
+    |--------------------------------------------------------------------------
+    |
+    | Your application's defined breakpoints sizes (max-width)
+    |
+    */
     'breakpoints' => [
         'xss' => 320,
         'xs' => 480,
@@ -16,6 +22,22 @@ return [
         'xxl' => 1920,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Presets
+    |--------------------------------------------------------------------------
+    |
+    | Defined media presets for responsive pictures and background-images
+    | Supported parameters:
+    |   - mode
+    |   - resolutions
+    |   - fill
+    |   - size
+    |   - breakpoints
+    |     - mode
+    |     - resolutions
+    |     - fill
+    */
     'presets' => [
         'default' => [
             'mode' => Picture::MODE_ORIGINAL,
