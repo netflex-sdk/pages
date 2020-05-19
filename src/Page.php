@@ -239,22 +239,6 @@ class Page extends QueryableModel implements Responsable
   }
 
   /**
-   * Renders this page's meta data
-   *
-   * @return void
-   */
-  public function renderMetaTags()
-  {
-    SEOTools::setTitle('Home');
-    SEOTools::setDescription('This is my page description');
-    SEOTools::opengraph()->setUrl('http://current.url.com');
-    SEOTools::setCanonical('https://codecasts.com.br/lesson');
-    SEOTools::opengraph()->addProperty('type', 'articles');
-    SEOTools::twitter()->setSite('@LuizVinicius73');
-    SEOTools::jsonLd()->addImage('https://codecasts.com.br/img/logo.jpg');
-  }
-
-  /**
    * Renders the given blocks
    *
    * @param string $area
