@@ -32,6 +32,7 @@ class Picture extends Component
   public $mode;
   public $size;
   public $fill;
+
   /**
    * Create a new component instance.
    *
@@ -50,6 +51,9 @@ class Picture extends Component
     $this->fill = $fill;
     $this->title = $title;
     $this->alt = $alt;
+
+    $width = $width ?? $height ?? null;
+    $height = $height ?? $width ?? null;
 
     $this->size = $this->size ? $this->size : null;
     $this->size = !$this->size && $width && $height ? ((int) $width . 'x' . (int) $height) : $this->size;
