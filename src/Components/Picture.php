@@ -2,7 +2,11 @@
 
 namespace Netflex\Pages\Components;
 
+use Illuminate\Support\Facades\Config;
 use Illuminate\View\Component;
+
+use Netflex\Pages\MediaPreset;
+use Netflex\Pages\Exceptions\InvalidPresetException;
 
 class Picture extends Component
 {
@@ -15,207 +19,161 @@ class Picture extends Component
   const MODE_AUTO = 'a';
   const MODE_CROP = 'c';
 
-  public function __construct(
-    $area = null,
-    $size = null,
-    $width = null,
-    $height = null,
-    $mode = Picture::MODE_EXACT,
-    $color = '0,0,0',
-    $src = null,
-    $alt = null,
-    $title = null,
-    $class = null,
-    $style = null,
-    $imageClass = null,
-    $imageStyle = null,
-    $resolutions = ['1x'],
-    $breakpoints = [320, 480, 768, 992, 1200, 1440, 1920]
-  ) {
-    $mode = $width && !$height ? self::MODE_LANDSCAPE : $mode;
-    $mode = $height && !$width ? self::MODE_PORTRAIT : $mode;
-    $height = !$height && $width ? $width : $height;
-    $width = !$width && $height ? $height : $width;
+  protected $src;
+  protected $area;
+  protected $inline;
+  protected $content;
+  protected $title;
+  protected $alt;
+  protected $preset = 'default';
 
-    $this->settings = (object) [
-      'alias' => $area ?? null,
-      'size' => $size ?? (($width && $height) ? "{$width}x{$height}" : null),
-      'mode' => $mode,
-      'color' => $color,
-      'src' => $src,
-      'alt' => $alt,
-      'title' => $title,
-      'class' => $class,
-      'style' => $style,
-      'imageClass' => $imageClass,
-      'imageStyle' => $imageStyle,
-      'inline' => (bool) ($area ?? false),
-      'content' => null,
-      'resolutions' => $resolutions,
-      'breakpoints' => $breakpoints
-    ];
+  public $pictureClass = null;
+  public $imageClass = null;
+  public $mode;
+  public $size;
+  public $fill;
+  /**
+   * Create a new component instance.
+   *
+   * @return void
+   */
+  public function __construct($area = null, $alt = null, $title = null, $src = null, $mode = null, $width = null, $height = null, $size = null, $fill = null, $imageClass = null, $pictureClass = null, $preset = 'default')
+  {
+    $this->inline = !!$area;
+    $this->area = blockhash_append($area);
+    $this->src = $src;
+    $this->preset = $preset;
+    $this->imageClass = $imageClass;
+    $this->pictureClass = $pictureClass;
+    $this->mode = $mode;
+    $this->size = $size;
+    $this->fill = $fill;
+    $this->title = $title;
+    $this->alt = $alt;
 
-    if ($this->settings->inline) {
-      $area = $this->settings->alias;
-      if (current_mode() === 'edit') {
-        $this->settings->area = blockhash_append($area);
-        $area = $this->settings->area;
-        $this->settings->content = insert_content_if_not_exists($area, 'image');
-      } else {
-        $this->settings->content = content($area, null);
-      }
+    $this->size = $this->size ? $this->size : null;
+    $this->size = !$this->size && $width && $height ? ((int) $width . 'x' . (int) $height) : $this->size;
 
-      if ($this->settings->content) {
-        $this->settings->src = $this->settings->content ?? null;
-        if ($this->settings->src) {
-          $this->settings->alt = $this->settings->src->description ?? null;
-          $this->settings->title = $this->settings->src->title ?? null;
-        }
-      }
+    if ($this->inline) {
+      insert_content_if_not_exists($this->area, 'image');
+      $this->content = content($this->area, null);
     }
   }
 
-  public function id()
+  public function editorSettings()
   {
-    if ($this->settings->inline) {
-      return $this->settings->content->id ?? null;
+    if ($this->inline && current_mode() === 'edit') {
+      $preset = $this->preset();
+      return [
+        'id' => 'e-' . ($this->content->id ?? null) . '-picture-' . uniqid(),
+        'data-content-type' => 'image',
+        'data-content-field' => 'image',
+        'data-content-dimensions' => $preset->size,
+        'data-content-compressiontype' => $preset->mode,
+        'data-content-id' => ($this->content->id ?? null)
+      ];
     }
-  }
-
-  public function inline()
-  {
-    return $this->settings->inline;
-  }
-
-  public function size()
-  {
-    $size = $this->settings->size;
-
-    if (is_string($size)) {
-      $size = strtolower($size);
-
-      if (strpos($size, 'x') > 0) {
-        list($width, $height) = explode('x', $size);
-        return "{$width}x{$height}";
-      }
-
-      if (is_numeric($size)) {
-        return "{$size}x{$size}";
-      }
-
-      return $size;
-    }
-
-    if (is_int($size)) {
-      return "{$size}x{$size}";
-    }
-
-    if (is_array($size)) {
-      list($width, $height) = $size;
-      return "{$width}x{$height}";
-    }
-
-    return (!$size && current_mode() === 'edit' && !$this->settings->content) ? '256x256' : null;
-  }
-
-  public function mode()
-  {
-    if (!$this->size()) {
-      return Picture::MODE_ORIGINAL;
-    }
-
-    $mode = $this->settings->mode ?? null;
-    $mode = (!$mode && ($this->settings->size ?? null)) ? Picture::MODE_EXACT : $mode;
-    return $mode ?? Picture::MODE_ORIGINAL;
-  }
-
-  public function color()
-  {
-    $color = $this->settings->color ?? null;
-    return $color;
-  }
-
-  public function path()
-  {
-    if (is_object($this->settings->src) && property_exists($this->settings->src, 'path')) {
-      return $this->settings->src->path;
-    }
-
-    if (is_object($this->settings->src) && property_exists($this->settings->src, 'image')) {
-      return $this->settings->src->image;
-    }
-
-    if (is_array($this->settings->src) && array_key_exists('path', $this->settings->src)) {
-      return $this->settings->src['path'];
-    }
-
-    if (is_array($this->settings->src) && array_key_exists('image', $this->settings->src)) {
-      return $this->settings->src['image'];
-    }
-
-    if (is_string($this->settings->src)) {
-      return $this->settings->src;
-    }
+    return [];
   }
 
   public function src()
   {
-    $src = $this->path();
-    $src = $src ?
-      media_url(
-        $src,
-        $this->size(),
-        $this->mode(),
-        $this->color()
-      ) : $src;
-
-    if (!$src && current_mode() === 'edit') {
-      return "https://placehold.it/{$this->size()}";
+    if ($this->inline) {
+      return content($this->area, 'image')->path ?? null;
     }
 
-    return $src;
+    if (is_object($this->src) && property_exists($this->src, 'path')) {
+      return $this->src->path;
+    }
+
+    if (is_array($this->src) && array_key_exists('path', $this->src)) {
+      return $this->src['path'];
+    }
+
+    return $this->src;
+  }
+
+  /**
+   * @return MediaPreset
+   * @throws InvalidPresetException
+   */
+  protected function preset()
+  {
+    if ($preset = Config::get("media.presets.{$this->preset}")) {
+      $preset['size'] = $this->size ?? $preset['size'] ?? null;
+      $preset['mode'] = $this->mode ?? $preset['mode'] ?? static::MODE_ORIGINAL;
+      $preset['fill'] = $this->fill ?? $preset['fill'] ?? null;
+      return new MediaPreset($preset);
+    }
+
+    throw new InvalidPresetException($this->preset);
+  }
+
+  public function defaultSrc()
+  {
+    $preset = $this->preset();
+
+    if ($src = $this->src()) {
+      return media_url($src, $preset->size, $preset->mode, $preset->fill);
+    }
+
+    if ($this->inline && current_mode() === 'edit') {
+      $size = $preset->size === '0x0' ? '256x256' : $preset->size;
+      return 'https://placehold.it/' . $size;
+    }
   }
 
   public function srcSets()
   {
-    return picture_srcsets(
-      array_merge(['path' => $this->src()], (array) $this->settings)
-    );
-  }
+    $srcSets = [];
 
-  public function alt()
-  {
-    return $this->settings->alt;
-  }
+    foreach ($this->preset()->breakpoints as $breakpoint => $preset) {
+      /** @var MediaPreset */
+      $preset = $preset;
 
-  public function title()
-  {
-    return $this->settings->title;
-  }
+      $srcSet = [
+        'breakpoint' => $breakpoint,
+        'maxWidth' => $preset->maxWidth,
+        'paths' => []
+      ];
 
-  public function imageClass()
-  {
-    return $this->settings->imageClass ?? null;
-  }
+      foreach ($preset->resolutions as $resolution) {
+        $srcSet['paths'][$resolution] = media_url($this->src(), $preset->size, $preset->mode, $preset->fill) . '?src=' . $preset->maxWidth . 'w&res=' . $resolution;
+      }
 
-  public function class()
-  {
-    return $this->settings->class ?? null;
-  }
+      $mergedSets = [];
 
-  public function style()
-  {
-    return $this->settings->style ?? null;
-  }
+      foreach ($srcSet['paths'] as $resolution => $path) {
+        $mergedSets[] = $path . ' ' . $resolution;
+      }
 
-  public function imageStyle()
-  {
-    return $this->settings->imageStyle ?? null;
+      $srcSet['paths'] = implode(' ,', $mergedSets);
+      $srcSets[] = $srcSet;
+    }
+
+    return $srcSets;
   }
 
   public function shouldRender()
   {
-    return current_mode() === 'live' && !$this->path() ? false : true;
+    return current_mode() === 'edit' || $this->src();
+  }
+
+  public function title()
+  {
+    if ($this->content) {
+      return $this->content->title ?? $this->title;
+    }
+
+    return $this->title;
+  }
+
+  public function alt()
+  {
+    if ($this->content) {
+      return $this->content->description ?? $this->alt;
+    }
+    return $this->alt;
   }
 
   /**

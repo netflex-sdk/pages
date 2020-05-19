@@ -1,72 +1,10 @@
-@section('picture_attributes')
-    @parent
-
-    @if($inline && current_mode() === 'edit')
-        id="e-{{ $id ?? null }}-picture-{{ uniqid() }}"
-        data-content-type="image"
-        data-content-field="image"
-        data-content-dimensions="{{ $size ?? null }}"
-        data-content-compressiontype="{{ $mode ?? null }}"
-        data-content-id="{{ $id ?? null }}"
-        class="{{ $class ?? null}} find-image"
-    @else
-        @isset($class)
-            class="{{ $class }}"
-        @endisset
-    @endif
-@overwrite
-
-@section('picture')
-    @parent
-
-    @foreach($srcSets ?? [] as $set)
-        <source srcset="{!! $set->url !!}" media="(max-width: {{ $set->width }}px)">
-    @endforeach
-@overwrite
-
-@section('picture_attributes')
-    @parent
-
-    @isset($alt)
-        alt="{{ $alt ?? null }}"
-    @endisset
-
-    @isset($title)
-        title="{{ $title ?? null }}"
-    @endisset
-
-    @isset($style)
-        style="{{ $style ?? null }}"
-    @endisset
-@append
-
-@section('image_attributes')
-    @parent
-
-    @isset($imageClass)
-        class="{{ $imageClass ?? null }}"
-    @endisset
-
-    @isset($src)
-        src="{!! $src??null !!}"
-    @endisset
-
-    @isset($imageStyle)
-        style="{{ $imageStyle ?? null }}"
-    @endisset
-
-    @isset($alt)
-        alt="{{ $alt ?? null }}"
-    @endisset
-
-    @isset($title)
-        title="{{ $title ?? null }}"
-    @endisset
-@overwrite
-
-@isset($src, $srcSets)
-    <picture @yield('picture_attributes')>
-        @yield('picture')
-        <img @yield('image_attributes') />
-    </picture>
-@endisset
+@mode('edit')
+<img {{ $attributes->only('class')->merge(['class' => $imageClass . ' find-image']) }} src="{{ $defaultSrc }}" {{ $attributes->except('id')->merge($editorSettings()) }}" width="100" height="100">
+@else
+<picture {{ $attributes->merge(['class' => $pictureClass]) }}>
+  @foreach ($srcSets as $srcSet)
+    <source srcset="{{ $srcSet['paths'] }}" media="(max-width: {{ $srcSet['maxWidth'] }}px)">
+  @endforeach
+  <img class="{{  collect([$attributes->get('class'), $imageClass])->filter()->join(' ') }}" src="{{ $defaultSrc }}" title="{{ $title }}" alt="{{ $alt }}">
+</picture>
+@endmode

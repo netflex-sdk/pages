@@ -2,6 +2,7 @@
 
 namespace Netflex\Pages\Providers;
 
+use Illuminate\Support\Facades\App;
 use Netflex\Pages\Components\EditorButton;
 use Netflex\Pages\Components\Image;
 use Netflex\Pages\Components\Picture;
@@ -30,7 +31,9 @@ class PagesServiceProvider extends ServiceProvider
 
   public function boot()
   {
-    //
+    $this->publishes([
+      __DIR__ . '/../Config/media.php' => config_path('media.php')
+    ], 'config');
   }
 
   protected function registerBladeDirectives()
