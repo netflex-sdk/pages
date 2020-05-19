@@ -2,11 +2,13 @@
 
 namespace Netflex\Pages;
 
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Str;
-use Netflex\Pages\Components\Picture;
-use Netflex\Support\Accessors;
 use JsonSerializable;
+
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Config;
+
+use Netflex\Support\Accessors;
+use Netflex\Pages\Components\Picture;
 use Netflex\Pages\Exceptions\BreakpointsMissingException;
 
 /**
@@ -27,6 +29,23 @@ class MediaPreset implements JsonSerializable
   public function __construct($preset = [])
   {
     $this->attributes = $preset;
+  }
+
+  /**
+   * Registers a preset
+   *
+   * @param string $name
+   * @param static|array $preset
+   * @return void
+   */
+  public static function register($name, $preset)
+  {
+    if (is_array($preset)) {
+      /** @var static */
+      $preset = new static($preset);
+    }
+
+    Config::set("media.presets.$name", $preset);
   }
 
   public function getModeAttribute($mode = null)
