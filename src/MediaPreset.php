@@ -70,6 +70,9 @@ class MediaPreset implements JsonSerializable
       ->filter(function ($resolution) {
         return Str::endsWith($resolution, 'x');
       })
+      ->sort(function ($a, $b) {
+        return intval($a) - intval($b);
+      })
       ->values()
       ->toArray();
   }
