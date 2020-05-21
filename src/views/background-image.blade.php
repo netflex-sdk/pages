@@ -1,5 +1,4 @@
-@php($hasSlot = !!((string) $slot))
-@php($class = $attributes->get('class') ?? ($hasSlot ? ('bg_' . uniqid()) : null))
+@php($class = $attributes->get('class') ?? (isset($slot) ? ('bg_' . uniqid()) : null))
 
 @if($class)
   <style>
@@ -29,7 +28,7 @@
       @endforeach
     @endforeach
   </style>
-  @if($hasSlot)
+  @isset($slot)
     <div class="{!! $class !!}">
       {{ $slot }}
     </div>
