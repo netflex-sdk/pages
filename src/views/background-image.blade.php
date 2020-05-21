@@ -1,15 +1,18 @@
-@php($class = $attributes->get('class') ?? (isset($slot) ? ('bg_' . uniqid()) : null))
 
-@if($class)
+@php($hasSlot = !empty($slot->toHtml()))
+@php($bgCss = $hasSlot ? 'bg_' . uniqid() : $attributes->get('class'))
+@php($class = $attributes->get('class') . ' ' . ($hasSlot ? ($bgCss) : null))
+
+@if($bgCss)
   <style>
-    .{{ $class }} {
+    .{{ $bgCss }} {
       background-image: url({!! $defaultSrc !!});
     }
 
     @foreach ($srcSets as $srcSet)
       @isset($srcSet['sources']['1x'])
         @media (max-width: {{ $srcSet['maxWidth'] }}px) {
-          .{{ $class }} {
+          .{{ $bgCss }} {
             background-image: url({!! $srcSet['sources']['1x'] !!});
           }
         }
@@ -20,7 +23,7 @@
       @foreach($srcSet['sources'] as $resolution => $src)
         @if($resolution !== '1x')
           @media (min-resolution: {{ intval($resolution) }}dppx) and (max-width: {{ $srcSet['maxWidth'] }}px) {
-            .{{ $class }} {
+            .{{ $bgCss }} {
               background-image: url({!! $src !!});
             }
           }
@@ -28,9 +31,11 @@
       @endforeach
     @endforeach
   </style>
-  @isset($slot)
-    <div class="{!! $class !!}">
+
+  @if($hasSlot)
+    <{{ $attributes->get('selector') }} class="{!! $class !!}">
       {{ $slot }}
-    </div>
-  @endisset
+    </{{ $attributes->get('selector') }}>
+  @endif
+
 @endif
