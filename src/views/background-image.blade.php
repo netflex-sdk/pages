@@ -32,5 +32,5 @@
     <div class="{!! $class !!}">
       {{ $slot }}
     </div>
-  @endif
+  @endisset
 @endif
