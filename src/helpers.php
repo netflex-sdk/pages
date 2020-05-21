@@ -265,7 +265,8 @@ if (!function_exists('map_content')) {
             return call_user_func(array($model, 'find'), $entries->toArray());
           })
             ->flatten()
-            ->filter();
+            ->filter()
+            ->values();
         };
 
         return $entries;
@@ -704,4 +705,3 @@ if (!function_exists('media_url')) {
     return "$schema://$cdn/media/$type/{$size}{$fill}{$file}";
   }
 }
-
