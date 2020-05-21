@@ -1,7 +1,10 @@
 
-@php($hasSlot = !empty($slot->toHtml()))
-@php($bgCss = $hasSlot ? 'bg_' . uniqid() : $attributes->get('class'))
-@php($class = $attributes->get('class') . ' ' . ($hasSlot ? ($bgCss) : null))
+@php
+  $hasSlot = !empty($slot->toHtml()) || $attributes->get('selector');
+  $bgCss = $hasSlot ? 'bg_' . uniqid() : $attributes->get('class');
+  $class = $attributes->get('class') . ' ' . ($hasSlot ? ($bgCss) : null);
+  $selector = $attributes->get('selector') ? $attributes->get('selector') : 'div';
+@endphp
 
 @if($bgCss)
   <style>
