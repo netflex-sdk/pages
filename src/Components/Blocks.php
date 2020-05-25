@@ -8,7 +8,7 @@ class Blocks extends Component
 {
     public $area;
     public $variables;
-    public $blocks;
+    public $blocks = [];
 
     /**
      * Create a new component instance.
