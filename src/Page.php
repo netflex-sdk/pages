@@ -19,11 +19,7 @@ use Netflex\Pages\Traits\HidesDefaultFields;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Responsable;
-
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\View;
-
-use Artesaos\SEOTools\Facades\SEOTools;
 use Illuminate\Support\Facades\App;
 
 /**
@@ -239,23 +235,20 @@ class Page extends QueryableModel implements Responsable
   }
 
   /**
-   * Renders the given blocks
+   * Retrieves the component names of the given block
    *
    * @param string $area
-   * @param array $vars
    * @return string
    */
-  public function renderBlocks($area, $vars = [])
+  public function getBlocks($area)
   {
-    $blocks = $this->mapBlocks($area, function ($block) use ($vars) {
-      $component = Template::retrieve((int) $block->text);
-      $view = 'components.' . $component->alias;
-
-      return View::exists($view) ? trim(View::make($view, $vars)->render())
-        : null;
+    $blocks = $this->mapBlocks($area, function ($block) {
+      if ($template = Template::retrieve((int) $block->text)) {
+        return $template->alias;
+      };
     });
 
-    return $blocks->filter()->join("\n");
+    return $blocks->filter();
   }
 
   /**
@@ -285,9 +278,9 @@ class Page extends QueryableModel implements Responsable
   {
     $master = $this->master;
     if ($master && $master !== $this) {
-        if ($master->type === 'domain' && preg_match('/^(?!:\/\/)(?=.{1,255}$)((.{1,63}\.){1,127}(?![0-9]*$)[a-z0-9-]+\.?)$/', $master->name) !== false) {
-            return $master->name;
-        }
+      if ($master->type === 'domain' && preg_match('/^(?!:\/\/)(?=.{1,255}$)((.{1,63}\.){1,127}(?![0-9]*$)[a-z0-9-]+\.?)$/', $master->name) !== false) {
+        return $master->name;
+      }
     }
   }
 
