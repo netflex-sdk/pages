@@ -1,5 +1,5 @@
 @mode('edit')
-<img {{ $attributes->only('class')->merge(['class' => $imageClass . ' find-image']) }} src="{{ $defaultSrc }}" {{ $attributes->except('id')->merge($editorSettings()) }} width="100" height="100">
+<img {{ $attributes->only('class')->merge(['class' => $imageClass . ' find-image']) }} src="{{ $defaultSrc }}" {{ $attributes->except('id')->merge($editorSettings()) }}>
 @else
 <picture {{ $attributes->merge(['class' => $pictureClass]) }}>
   @foreach ($srcSets as $srcSet)
