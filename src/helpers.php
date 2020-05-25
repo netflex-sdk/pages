@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\HtmlString;
 use Netflex\Pages\Extension;
 use Netflex\Pages\JwtPayload;
 
@@ -23,9 +24,10 @@ if (!function_exists('render_component_tag')) {
    *
    * @param string $component
    * @param ComponentAttributeBag|array $variables
+   * @param HtmlString|string|null $slot
    * @return string|null
    */
-  function render_component_tag($component, $variables = [])
+  function render_component_tag($component, $variables = [], $slot = null)
   {
     // Normalize component name
     $component = Str::kebab($component);
@@ -55,7 +57,12 @@ if (!function_exists('render_component_tag')) {
         });
       }, array_keys($variables));
 
-      $compiled = Blade::compileString("<$component $attributes />");
+      $slotBinding = 'app()->get(\'__attribute_' . blockhash_append('slot') . '\')';
+      app()->bind('__attribute_' . blockhash_append('slot'), function () use ($slot) {
+        return $slot;
+      });
+
+      $compiled = Blade::compileString("<$component $attributes>{!! $slotBinding !!}</$component>");
 
       return str_replace('<?php', '', str_replace('?>', '', $compiled));
     } catch (InvalidArgumentException $e) {
