@@ -4,15 +4,67 @@ use Netflex\Pages\Page;
 use Netflex\API\Facades\API;
 use Netflex\Foundation\Variable;
 use Netflex\Foundation\GlobalContent;
+use Illuminate\View\ComponentAttributeBag;
 
 use Carbon\Carbon;
 
 use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Netflex\Pages\Extension;
 use Netflex\Pages\JwtPayload;
+
+if (!function_exists('render_component_tag')) {
+  /**
+   * Renders a component tag, using its class if available
+   *
+   * @param string $component
+   * @param ComponentAttributeBag|array $variables
+   * @return string|null
+   */
+  function render_component_tag($component, $variables = [])
+  {
+    // Normalize component name
+    $component = Str::kebab($component);
+
+    if (!Str::startsWith($component, 'x-')) {
+      $component = 'x-' . $component;
+    }
+
+    // Normalize to array in case of ComponentAttributeBag
+    $variables = collect($variables)->toArray();
+
+    try {
+      $attributes = implode(' ', array_map(
+        function ($key) {
+          return sprintf(
+            ':%s="%s"',
+            $key,
+            'app()->get(\'__attribute_' . blockhash_append($key) . '\')'
+          );
+        },
+        array_keys($variables)
+      ));
+
+      array_map(function ($key) use ($variables) {
+        app()->bind('__attribute_' . blockhash_append($key), function () use ($key, $variables) {
+          return $variables[$key];
+        });
+      }, array_keys($variables));
+
+      $compiled = Blade::compileString("<$component $attributes />");
+
+      return str_replace('<?php', '', str_replace('?>', '', $compiled));
+    } catch (InvalidArgumentException $e) {
+      throw $e;
+    } catch (Exception $e) {
+      return null;
+    }
+  }
+}
 
 if (!function_exists('jwt_payload')) {
   /**
@@ -220,7 +272,7 @@ if (!function_exists('insert_content_if_not_exists')) {
 if (!function_exists('blocks')) {
   function blocks($area, $variables = [])
   {
-    return current_page()->renderBlocks($area, $variables);
+    return current_page()->getBlocks($area, $variables);
   }
 }
 
@@ -265,7 +317,8 @@ if (!function_exists('map_content')) {
             return call_user_func(array($model, 'find'), $entries->toArray());
           })
             ->flatten()
-            ->filter();
+            ->filter()
+            ->values();
         };
 
         return $entries;
@@ -704,4 +757,3 @@ if (!function_exists('media_url')) {
     return "$schema://$cdn/media/$type/{$size}{$fill}{$file}";
   }
 }
-
