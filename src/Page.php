@@ -221,7 +221,7 @@ class Page extends QueryableModel implements Responsable
       return $content->area === $area;
     })->mapWithKeys(function ($block) {
       if ($template = Template::retrieve((int) $block->text)) {
-        return [$template->alias => $block->title ? $block->title :null];
+        return [$template->alias => $block->title ? $block->title : null];
       };
     });
 
