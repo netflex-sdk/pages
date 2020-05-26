@@ -210,31 +210,6 @@ class Page extends QueryableModel implements Responsable
   }
 
   /**
-   * Maps the blocks of the given area
-   *
-   * @param string $area
-   * @param Closure $mapper
-   * @return array
-   */
-  public function mapBlocks(string $area, Closure $mapper)
-  {
-    $blockhash = blockhash();
-
-    $mapped = $this->content->filter(function ($content) use ($area) {
-      return $content->area === $area;
-    })->map(function ($area) use ($mapper) {
-      blockhash($area->title);
-      $mapped = $mapper($area);
-      blockhash(null);
-      return $mapped;
-    });
-
-    blockhash($blockhash);
-
-    return $mapped;
-  }
-
-  /**
    * Retrieves the component names of the given block
    *
    * @param string $area
@@ -242,9 +217,11 @@ class Page extends QueryableModel implements Responsable
    */
   public function getBlocks($area)
   {
-    $blocks = $this->mapBlocks($area, function ($block) {
+    $blocks = $this->content->filter(function ($content) use ($area) {
+      return $content->area === $area;
+    })->mapWithKeys(function ($block) {
       if ($template = Template::retrieve((int) $block->text)) {
-        return $template->alias;
+        return [$template->alias => $block->title ? $block->title :null];
       };
     });
 

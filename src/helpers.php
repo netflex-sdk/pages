@@ -279,7 +279,8 @@ if (!function_exists('insert_content_if_not_exists')) {
 if (!function_exists('blocks')) {
   function blocks($area, $variables = [])
   {
-    return current_page()->getBlocks($area, $variables);
+    return current_page()
+      ->getBlocks($area, $variables);
   }
 }
 

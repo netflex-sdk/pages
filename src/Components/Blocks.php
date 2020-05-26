@@ -23,7 +23,7 @@ class Blocks extends Component
 
     public function shouldRender()
     {
-        return current_mode() === 'live' && !$this->blocks ? false : true;
+        return $this->blocks->count() > 0;
     }
 
     /**
