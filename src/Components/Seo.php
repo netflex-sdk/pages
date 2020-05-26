@@ -13,7 +13,7 @@ class Seo extends Component
     public $canonical;
     public $suffix = false;
 
-    public function __construct($title = null, $description = null, $images = [], $canonical = null, $suffix = false)
+    public function __construct($title = null, $description = null, $images = [], $canonical = null, $suffix = true)
     {
         $this->title = $title;
         $this->description = $description;
@@ -23,30 +23,36 @@ class Seo extends Component
     }
 
     public function tags () {
-        $seo = SEOTools::setTitle($this->title ?? SEOTools::getTitle(), $this->suffix);
 
         if ($page = current_page()) {
-            $seo->setTitle($page->title, $this->suffix)
-                ->setDescription($page->description);
+            
+            if(SEOTools::getTitle() === SEOTools::metatags()->getDefaultTitle()) {
+                SEOTools::setTitle($page->title, $this->suffix);
+            }
+            
+            if(!SEOTools::metatags()->getDescription()) {
+                SEOTools::setDescription($page->description);
+            }
+                
         }
 
         if ($this->title) {
-            $seo->setTitle($this->title, $this->suffix);
+            SEOTools::setTitle($this->title, $this->suffix);
         }
 
         if ($this->description) {
-            $seo->setDescription($this->description);
+            SEOTools::setDescription($this->description);
         }
 
         if (count($this->images)) {
-            $seo->addImages($this->images);
+            SEOTools::addImages($this->images);
         }
 
         if ($this->canonical) {
-            $seo->setCanonical($this->canonical);
+            SEOTools::setCanonical($this->canonical);
         }
 
-        return $seo->generate();
+        return SEOTools::generate();
     }
 
     /**

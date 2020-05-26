@@ -300,7 +300,7 @@ class Page extends QueryableModel implements Responsable
       return $title;
     }
 
-    return trim($this->name . Variable::get('site_meta_title'), ' -');
+    return $this->name;
   }
 
   /**
