@@ -316,17 +316,34 @@ if (!function_exists('map_content')) {
         });
       case 'entries':
         $page_editable = page_first_editable($settings['alias']);
-        $entries = $content->map(function ($item) {
+
+        $entryIds = $content->sort(function ($a, $b) {
+          return ((int) $b->sorting ?? null) - ((int) $a->sorting ?? null);
+        })->values()->map(function ($item) {
           return (int) $item->text;
         });
 
         if (isset($page_editable['config']['model'])) {
-          $entries = Collection::make($page_editable['config']['model'])->map(function ($model) use ($entries) {
-            return call_user_func(array($model, 'find'), $entries->toArray());
+          $entries = Collection::make($page_editable['config']['model'])->map(function ($model) use ($entryIds) {
+            return call_user_func(array($model, 'find'), $entryIds->toArray());
           })
             ->flatten()
             ->filter()
-            ->values();
+            ->sort(function ($a, $b) use ($entryIds) {
+              foreach ($entryIds as $sorting => $id) {
+                if ($id === $a->id) {
+                  $a->sorting = $sorting;
+                }
+                if ($id === $b->id) {
+                  $b->sorting = $sorting;
+                }
+                if ($a->sorting && $b->sorting) {
+                  break;
+                }
+              }
+
+              return $b->sorting - $a->sorting;
+            })->values();
         };
 
         return $entries;
