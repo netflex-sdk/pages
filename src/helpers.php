@@ -321,28 +321,16 @@ if (!function_exists('map_content')) {
           return ((int) $b->sorting ?? null) - ((int) $a->sorting ?? null);
         })->values()->map(function ($item) {
           return (int) $item->text;
-        });
+        })->toArray();
 
         if (isset($page_editable['config']['model'])) {
           $entries = Collection::make($page_editable['config']['model'])->map(function ($model) use ($entryIds) {
-            return call_user_func(array($model, 'find'), $entryIds->toArray());
+            return call_user_func(array($model, 'find'), $entryIds);
           })
             ->flatten()
             ->filter()
-            ->sort(function ($a, $b) use ($entryIds) {
-              foreach ($entryIds as $sorting => $id) {
-                if ($id === $a->id) {
-                  $a->sorting = $sorting;
-                }
-                if ($id === $b->id) {
-                  $b->sorting = $sorting;
-                }
-                if ($a->sorting && $b->sorting) {
-                  break;
-                }
-              }
-
-              return $b->sorting - $a->sorting;
+            ->sortBy(function ($item) use ($entryIds) {
+              return array_search(item->getKey(), $entryIds);
             })->values();
         };
 
