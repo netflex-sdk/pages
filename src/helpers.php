@@ -295,6 +295,8 @@ if (!function_exists('map_content')) {
    */
   function map_content($content, $settings, $field = 'auto')
   {
+    $content = collect($content);
+
     if ($field === null) {
       return $content->shift();
     }
@@ -330,7 +332,7 @@ if (!function_exists('map_content')) {
             ->flatten()
             ->filter()
             ->sortBy(function ($item) use ($entryIds) {
-              return array_search(item->getKey(), $entryIds);
+              return array_search($item->getKey(), $entryIds);
             })->values();
         };
 
