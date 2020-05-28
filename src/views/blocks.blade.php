@@ -1,5 +1,11 @@
-@foreach($blocks as $block => $hash)
-  @php(blockhash($hash))
-  <x-component :is="$block" :variables="$variables" />
-  @php(blockhash(null))
+@foreach($blocks as $block)
+  @php
+    @list($component, $hash) = $block;
+    blockhash($hash)
+  @endphp
+  
+  <x-component :is="$component" :variables="$variables" />
+  @php
+    blockhash(null)
+  @endphp
 @endforeach
