@@ -110,10 +110,16 @@ if (!function_exists('resolve_extension')) {
 }
 
 if (!function_exists('static_content')) {
+  /**
+   * @param string $area
+   * @param string $block
+   * @param string $column
+   * @return HtmlString
+   */
   function static_content($area, $block = null, $column = null)
   {
     if ($content = GlobalContent::retrieve($area)) {
-      return $content->globals
+      return new HtmlString($content->globals
         ->filter(function ($item) use ($block) {
           if ($block) {
             return $item->alias === $block;
@@ -128,12 +134,18 @@ if (!function_exists('static_content')) {
         ->filter()
         ->reduce(function ($value, $item) {
           return $item . $value;
-        }, '');
+        }, ''));
     }
   }
 }
 
 if (!function_exists('navigation_data')) {
+  /**
+   * @param int $parent
+   * @param string $type
+   * @param string $root
+   * @return object
+   */
   function navigation_data($parent = null, $type = 'nav', $root = null)
   {
     try {
@@ -353,11 +365,16 @@ if (!function_exists('map_content')) {
       case 'editor_large':
       case 'textarea':
         if ($item = $content->shift()) {
-          return $item->html ?? '';
+          return new HtmlString($item->html ?? '');
         }
 
         return null;
       case 'text':
+        if ($item = $content->shift()) {
+          return new HtmlString($item->text ?? '');
+        }
+
+        return null;
       case 'select':
       case 'color':
         if ($item = $content->shift()) {
@@ -389,7 +406,11 @@ if (!function_exists('map_content')) {
         return null;
       case 'datetime':
         if ($item = $content->shift()) {
-          return Carbon::parse($item->text ?? 0);
+          try {
+            return Carbon::parse($item->text ?? 0);
+          } catch (Exception $e) {
+            return null;
+          }
         }
 
         return null;
@@ -448,6 +469,10 @@ if (!function_exists('map_content')) {
 }
 
 if (!function_exists('content')) {
+  /**
+   * @param string $alias
+   * @param string $field = 'auto'
+   */
   function content($alias, $field = 'auto')
   {
     $settings = page_first_editable($alias);
