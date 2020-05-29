@@ -35,6 +35,8 @@ if (!function_exists('render_component_tag')) {
     if (!Str::startsWith($component, 'x-')) {
       $component = 'x-' . $component;
     }
+    
+    $component = str_replace(‘/’, ‘.’, $component);
 
     // Normalize to array in case of ComponentAttributeBag
     $variables = collect($variables)->toArray();
