@@ -1,4 +1,4 @@
-@mode('edit')
+@if($inline && current_mode() === 'edit')
 <img {{ $attributes->only('class')->merge(['class' => $imageClass . ' find-image']) }} src="{{ $defaultSrc }}" {{ $attributes->except('id')->merge($editorSettings()) }}>
 @else
 <picture {{ $attributes->merge(['class' => $pictureClass]) }}>

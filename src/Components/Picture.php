@@ -21,7 +21,6 @@ class Picture extends Component
 
   protected $src;
   protected $area;
-  protected $inline;
   protected $content;
   protected $title;
   protected $alt;
@@ -32,6 +31,7 @@ class Picture extends Component
   public $mode;
   public $size;
   public $fill;
+  public $inline;
 
   /**
    * Create a new component instance.
