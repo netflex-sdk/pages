@@ -333,9 +333,10 @@ if (!function_exists('map_content')) {
 
         $entryIds = $content->sort(function ($a, $b) {
           return ((int) $b->sorting ?? null) - ((int) $a->sorting ?? null);
-        })->values()->map(function ($item) {
-          return (int) $item->text;
-        })->toArray();
+        })->reverse()
+          ->values()->map(function ($item) {
+            return (int) $item->text;
+          })->toArray();
 
         if (isset($page_editable['config']['model'])) {
           $entries = Collection::make($page_editable['config']['model'])->map(function ($model) use ($entryIds) {
