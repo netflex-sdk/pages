@@ -3,17 +3,19 @@
 namespace Netflex\Pages\Providers;
 
 use Throwable;
+use ReflectionClass;
+
 use API;
-use Cache;
-use Exception;
+
 use Netflex\Pages\Page;
 use Netflex\Pages\Middleware\BindPage;
 use Netflex\Pages\Middleware\GroupAuthentication;
 use Netflex\Pages\Controllers\PageController;
 use Netflex\Pages\Controllers\Controller;
 use Netflex\Pages\Middleware\JwtProxy;
-
 use Netflex\Foundation\Redirect;
+use Netflex\Pages\JwtPayload;
+use Netflex\Pages\PreviewRequest;
 
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Route;
@@ -22,9 +24,7 @@ use Illuminate\Http\Request;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
-use Netflex\Pages\JwtPayload;
-use Netflex\Pages\PreviewRequest;
-use ReflectionClass;
+use Illuminate\Support\Facades\Cache;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -224,6 +224,19 @@ class RouteServiceProvider extends ServiceProvider
 
   protected function mapNetflexRoutes()
   {
+    Route::get('.well-known/netflex/CacheStore', function (Request $request) {
+      if ($key = $request->get('key')) {
+        if (Cache::has($key)) {
+          Cache::forget($key);
+          return ['success' => true, 'message' => 'Key deleted'];
+        }
+
+        return ['success' => false, 'message' => 'Key does not exist'];
+      }
+
+      return ['success' => false, 'message' => 'Key is missing'];
+    });
+
     Route::middleware('jwt_proxy')
       ->group(function () {
 
