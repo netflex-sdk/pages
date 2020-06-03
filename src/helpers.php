@@ -121,7 +121,7 @@ if (!function_exists('static_content')) {
   function static_content($area, $block = null, $column = null)
   {
     if ($content = GlobalContent::retrieve($area)) {
-      return new HtmlString($content->globals
+      $staticContent = $content->globals
         ->filter(function ($item) use ($block) {
           if ($block) {
             return $item->alias === $block;
@@ -136,7 +136,13 @@ if (!function_exists('static_content')) {
         ->filter()
         ->reduce(function ($value, $item) {
           return $item . $value;
-        }, ''));
+        }, '');
+
+      if ($staticContent !== strip_tags($staticContent)) {
+        $staticContent = new HtmlString($staticContent);
+      }
+
+      return $staticContent;
     }
   }
 }
