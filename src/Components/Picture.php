@@ -3,6 +3,7 @@
 namespace Netflex\Pages\Components;
 
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\HtmlString;
 use Illuminate\View\Component;
 
 use Netflex\Pages\MediaPreset;
@@ -82,8 +83,14 @@ class Picture extends Component
 
   public function src()
   {
+    $this->src = $this->src ? (string) $this->src : $this->src;
+
     if ($this->inline) {
       return content($this->area, 'image')->path ?? null;
+    }
+
+    if ($this->src instanceof HtmlString) {
+      $this->src = (string) $this->src;
     }
 
     if (is_object($this->src) && property_exists($this->src, 'path')) {

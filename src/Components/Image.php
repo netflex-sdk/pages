@@ -2,6 +2,7 @@
 
 namespace Netflex\Pages\Components;
 
+use Illuminate\Support\HtmlString;
 use Illuminate\View\Component;
 
 class Image extends Component
@@ -127,6 +128,10 @@ class Image extends Component
     }
 
     public function path () {
+        if ($this->settings->src instanceof HtmlString) {
+          $this->settings->src = (string) $this->settings->src;
+        }
+
         if (is_object($this->settings->src) && property_exists($this->settings->src, 'path')) {
             return $this->settings->src->path;
         }
