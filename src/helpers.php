@@ -35,7 +35,7 @@ if (!function_exists('render_component_tag')) {
     if (!Str::startsWith($component, 'x-')) {
       $component = 'x-' . $component;
     }
-    
+
     $component = str_replace('/', '.', $component);
 
     // Normalize to array in case of ComponentAttributeBag
@@ -364,17 +364,22 @@ if (!function_exists('map_content')) {
             'file' => (int) $item->file
           ]];
         });
-      case 'editor_small':
-      case 'editor_large':
-      case 'textarea':
+      case 'editor-small':
+      case 'editor-large':
         if ($item = $content->shift()) {
           return new HtmlString($item->html ?? '');
         }
 
         return null;
+      case 'textarea':
+        if ($item = $content->shift()) {
+          return $item->html ?? null;
+        }
+
+        return null;
       case 'text':
         if ($item = $content->shift()) {
-          return new HtmlString($item->text ?? '');
+          return $item->html ?? null;
         }
 
         return null;
