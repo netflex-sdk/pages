@@ -83,8 +83,6 @@ class Picture extends Component
 
   public function src()
   {
-    $this->src = $this->src ? (string) $this->src : $this->src;
-
     if ($this->inline) {
       return content($this->area, 'image')->path ?? null;
     }
