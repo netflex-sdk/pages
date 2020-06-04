@@ -21,7 +21,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Log;
 
 /**
  * @property int $id
@@ -240,8 +239,6 @@ class Page extends QueryableModel implements Responsable
 
   public function getMasterAttribute()
   {
-    Log::debug('Page::getMasterAttribute');
-
     if (!$this->parent) {
       return $this;
     }
@@ -256,8 +253,6 @@ class Page extends QueryableModel implements Responsable
    */
   public function getDomainAttribute()
   {
-    Log::debug('Page::getDomainAttribute');
-
     $master = $this->master;
 
     if ($master && $master !== $this) {
@@ -269,8 +264,6 @@ class Page extends QueryableModel implements Responsable
 
   public function getLangAttribute()
   {
-    Log::debug('Page::getLangAttribute');
-
     if (!$this->attributes['lang']) {
       $parent = $this->parent;
       while ($parent && !$parent->lang) {

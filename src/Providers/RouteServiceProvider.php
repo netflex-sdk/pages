@@ -19,7 +19,6 @@ use Netflex\Pages\PreviewRequest;
 
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Collection;
@@ -225,8 +224,6 @@ class RouteServiceProvider extends ServiceProvider
   protected function mapNetflexRoutes()
   {
     Route::get('.well-known/netflex/CacheStore', function (Request $request) {
-      Log::debug('Route => ".well-known/netflex/CacheStore"');
-
       if ($key = $request->get('key')) {
         if (Cache::has($key)) {
           Cache::forget($key);
