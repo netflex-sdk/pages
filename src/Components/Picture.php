@@ -19,6 +19,19 @@ class Picture extends Component
   const MODE_LANDSCAPE = 'l';
   const MODE_AUTO = 'a';
   const MODE_CROP = 'c';
+  const MODE_FIT_DIRECTION = 'rcf';
+
+  const DIRECTION_TOP = 't';
+  const DIRECTION_TOP_LEFT = 'tl';
+  const DIRECTION_TOP_RIGHT = 'tr';
+
+  const DIRECTION_BOTTOM = 'b';
+  const DIRECTION_BOTTOM_LEFT = 'bl';
+  const DIRECTION_BOTTOM_RIGHT = 'br';
+
+  const DIRECTION_LEFT = 'l';
+  const DIRECTION_RIGHT = 'r';
+  const DIRECTION_CENTER = 'c';
 
   protected $src;
   protected $area;
@@ -33,13 +46,14 @@ class Picture extends Component
   public $size;
   public $fill;
   public $inline;
+  public $direction;
 
   /**
    * Create a new component instance.
    *
    * @return void
    */
-  public function __construct($area = null, $alt = null, $title = null, $src = null, $mode = null, $width = null, $height = null, $size = null, $fill = null, $imageClass = null, $pictureClass = null, $preset = 'default')
+  public function __construct($area = null, $alt = null, $title = null, $src = null, $mode = null, $width = null, $height = null, $size = null, $fill = null, $imageClass = null, $pictureClass = null, $preset = 'default', $direction = null)
   {
     $this->inline = !!$area;
     $this->area = blockhash_append($area);
@@ -52,6 +66,7 @@ class Picture extends Component
     $this->fill = $fill;
     $this->title = $title;
     $this->alt = $alt;
+    $this->direction = $direction;
 
     $width = $width ?? $height ?? null;
     $height = $height ?? $width ?? null;
@@ -111,12 +126,14 @@ class Picture extends Component
     $default = Config::get("media.presets.default", [
       'mode' => static::MODE_FIT,
       'resolutions' => ['1x', '2x', '3x'],
+      'direction' => static::DIRECTION_CENTER
     ]);
 
     if ($preset = Config::get("media.presets.{$this->preset}")) {
       $preset['size'] = $this->size ?? $preset['size'] ?? $default['size'] ?? null;
       $preset['mode'] = $this->mode ?? $preset['mode'] ?? $default['mode'] ?? static::MODE_ORIGINAL;
       $preset['fill'] = $this->fill ?? $preset['fill'] ?? $default['fill'] ?? null;
+      $preset['direction'] = $this->direction ?? $preset['direction'] ?? $default['direction'] ?? null;
       $preset['resolutions'] = $preset['resolutions'] ?? $default['resolutions'] ?? null;
       $preset['breakpoints'] = $preset['breakpoints'] ?? $default['breakpoints'] ?? null;
 
@@ -131,13 +148,25 @@ class Picture extends Component
     $preset = $this->preset();
 
     if ($src = $this->src()) {
-      return media_url($src, $preset->size, $preset->mode, $preset->fill);
+      return media_url($src, $preset->size, $preset->mode, $preset->fill, $preset->direction);
     }
 
     if ($this->inline && current_mode() === 'edit') {
       $size = $preset->size === '0x0' ? '256x256' : $preset->size;
       return 'https://placehold.it/' . $size;
     }
+  }
+
+  public function defaultPath()
+  {
+
+    $defaultPath = [];
+    $preset = $this->preset();
+
+    foreach ($preset->resolutions as $resolution) {
+      $defaultPath[] = media_url($this->src(), $preset->size, $preset->mode, $preset->fill, $preset->direction) . '?res=' . $resolution . ' ' . $resolution;
+    }
+    return new HtmlString(implode(', ', $defaultPath));
   }
 
   public function srcSets()
@@ -148,6 +177,10 @@ class Picture extends Component
       /** @var MediaPreset */
       $preset = $preset;
 
+      if ($preset->maxWidth >= $preset->width) {
+        continue;
+      }
+
       $srcSet = [
         'breakpoint' => $breakpoint,
         'maxWidth' => $preset->maxWidth,
@@ -155,7 +188,7 @@ class Picture extends Component
       ];
 
       foreach ($preset->resolutions as $resolution) {
-        $srcSet['paths'][$resolution] = media_url($this->src(), $preset->size, $preset->mode, $preset->fill) . '?src=' . $preset->maxWidth . 'w&res=' . $resolution;
+        $srcSet['paths'][$resolution] = media_url($this->src(), $preset->size, $preset->mode, $preset->fill, $preset->direction) . '?src=' . $preset->maxWidth . 'w&res=' . $resolution;
       }
 
       $mergedSets = [];
@@ -165,7 +198,7 @@ class Picture extends Component
       }
 
       $srcSet['sources'] = $srcSet['paths'];
-      $srcSet['paths'] = implode(' ,', $mergedSets);
+      $srcSet['paths'] = new HtmlString(implode(' ,', $mergedSets));
       $srcSets[] = $srcSet;
     }
 

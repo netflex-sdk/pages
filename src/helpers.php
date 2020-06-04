@@ -757,9 +757,10 @@ if (!function_exists('media_url')) {
    * @param array|string|int $size
    * @param string $type
    * @param array|string|int $color
+   * @param string|null $direction
    * @return string
    */
-  function media_url($file, $size = null, $type = 'rc', $color = '0,0,0', ...$gb)
+  function media_url($file, $size = null, $type = 'rc', $color = '255,255,255,1', $direction = null)
   {
     if (is_object($file)) {
       $file = $file->path ?? null;
@@ -780,34 +781,39 @@ if (!function_exists('media_url')) {
     $height = is_array($size) ? floor(($size[1] ?? 0)) : 0;
     $size = is_array($size) ? "{$width}x{$height}" : $size;
 
-    $fill = null;
+    if ($direction && $type === 'rc') {
+      $type = 'rcf';
+    }
+
+    $options = null;
 
     if ($type === 'fill') {
-      if ((is_string($color) || (is_int($color) || is_float($color))) && count($gb)) {
-        $color = [$color, $gb[0] ?? 0, $gb[1] ?? 0];
-      }
-
       if (is_string($color)) {
         $color = explode(',', $color);
       }
 
       if (is_int($color) || is_float($color)) {
         $color = floor($color % 256);
-        $color = "$color,$color,$color";
+        $color = "$color,$color,$color,1";
       }
 
       if (is_array($color)) {
         $r = floor((intval($color[0] ?? 0)) % 256);
         $g = floor((intval($color[1] ?? 0)) % 256);
         $b = floor((intval($color[2] ?? 0)) % 256);
-        $color = "$r,$g,$b";
+        $a = floatval($color[3] ?? 1.0);
+        $color = "$r,$g,$b,$a";
       }
 
-      $fill = $color . "/";
+      $options = $color . "/";
+    }
+
+    if ($type === 'rcf') {
+      $options = $direction . '/';
     }
 
     $size = $type === 'o' ?  null : "$size/";
 
-    return "$schema://$cdn/media/$type/{$size}{$fill}{$file}";
+    return "$schema://$cdn/media/$type/{$size}{$options}{$file}";
   }
 }

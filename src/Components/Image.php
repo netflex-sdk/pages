@@ -15,6 +15,19 @@ class Image extends Component
     const MODE_LANDSCAPE = 'l';
     const MODE_AUTO = 'a';
     const MODE_CROP = 'c';
+    const MODE_FIT_DIRECTION = 'rcf';
+
+    const DIRECTION_TOP = 't';
+    const DIRECTION_TOP_LEFT = 'tl';
+    const DIRECTION_TOP_RIGHT = 'tr';
+
+    const DIRECTION_BOTTOM = 'b';
+    const DIRECTION_BOTTOM_LEFT = 'bl';
+    const DIRECTION_BOTTOM_RIGHT = 'br';
+
+    const DIRECTION_LEFT = 'l';
+    const DIRECTION_RIGHT = 'r';
+    const DIRECTION_CENTER = 'c';
 
     public function __construct(
         $area = null,
@@ -23,6 +36,7 @@ class Image extends Component
         $height = null,
         $mode = Image::MODE_EXACT,
         $color = '0,0,0',
+        $direction = null,
         $src = null,
         $alt = null,
         $title = null,
@@ -39,6 +53,7 @@ class Image extends Component
             'size' => $size ?? (($width && $height) ? "{$width}x{$height}" : null),
             'mode' => $mode,
             'color' => $color,
+            'direction' => $direction,
             'src' => $src,
             'alt' => $alt,
             'title' => $title,
@@ -75,7 +90,8 @@ class Image extends Component
         }
     }
 
-    public function inline () {
+    public function inline()
+    {
         return $this->settings->inline;
     }
 
@@ -121,15 +137,22 @@ class Image extends Component
         return $mode ?? Image::MODE_ORIGINAL;
     }
 
+    public function direction()
+    {
+        $direction = $this->settings->direction ?? null;
+        return $direction;
+    }
+
     public function color()
     {
         $color = $this->settings->color ?? null;
         return $color;
     }
 
-    public function path () {
+    public function path()
+    {
         if ($this->settings->src instanceof HtmlString) {
-          $this->settings->src = (string) $this->settings->src;
+            $this->settings->src = (string) $this->settings->src;
         }
 
         if (is_object($this->settings->src) && property_exists($this->settings->src, 'path')) {
@@ -161,7 +184,8 @@ class Image extends Component
                 $src,
                 $this->size(),
                 $this->mode(),
-                $this->color()
+                $this->color(),
+                $this->direction(),
             ) : $src;
 
         if (!$src && current_mode() === 'edit') {
