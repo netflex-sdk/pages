@@ -93,6 +93,7 @@ class Picture extends Component
         'data-content-id' => ($this->content->id ?? null)
       ];
     }
+
     return [];
   }
 
