@@ -12,6 +12,14 @@
       background-image: url({!! $defaultSrc !!});
     }
 
+    @foreach($defaultPaths as $resolution => $src)
+      @media (min-resolution: {{ intval($resolution) }}dppx) {
+        .{{ $bgCss }} {
+          background-image: url({!! $src !!});
+        }
+      }
+    @endforeach
+
     @foreach ($srcSets as $srcSet)
       @isset($srcSet['sources']['1x'])
         @media (max-width: {{ $srcSet['maxWidth'] }}px) {

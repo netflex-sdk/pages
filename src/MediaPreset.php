@@ -18,6 +18,8 @@ use Netflex\Pages\Exceptions\BreakpointsMissingException;
  * @property-read string[] $resolutions
  * @property-read array $breakpoints
  * @property-read int $maxWidth
+ * @property-read int $width
+ * @property-read int $height
  */
 class MediaPreset implements JsonSerializable
 {
@@ -153,6 +155,16 @@ class MediaPreset implements JsonSerializable
       default:
         return '0x0';
     }
+  }
+
+  public function getWidthAttribute()
+  {
+    return (int) explode('x', $this->size)[0];
+  }
+
+  public function getHeightAttribute()
+  {
+    return (int) explode('x', $this->size)[1];
   }
 
   public function getMaxWidthAttribute($maxWidth = 0)

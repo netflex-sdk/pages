@@ -5,6 +5,6 @@
   @foreach ($srcSets as $srcSet)
     <source srcset="{{ $srcSet['paths'] }}" media="(max-width: {{ $srcSet['maxWidth'] }}px)">
   @endforeach
-  <img class="{{  collect([$attributes->get('class'), $imageClass])->filter()->join(' ') }}" src="{{ $defaultSrc }}" srcset="{{ $defaultPath }}" title="{{ $title }}" alt="{{ $alt }}">
+  <img class="{{  collect([$attributes->get('class'), $imageClass])->filter()->join(' ') }}" src="{{ $defaultSrc }}" srcset="{{ $defaultSrcSet }}" title="{{ $title }}" alt="{{ $alt }}">
 </picture>
 @endmode

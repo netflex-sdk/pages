@@ -158,16 +158,28 @@ class Picture extends Component
     }
   }
 
-  public function defaultPath()
+  public function defaultPaths()
   {
 
-    $defaultPath = [];
+    $resolutionPaths = [];
     $preset = $this->preset();
 
     foreach ($preset->resolutions as $resolution) {
-      $defaultPath[] = media_url($this->src(), $preset->size, $preset->mode, $preset->fill, $preset->direction) . '?res=' . $resolution . ' ' . $resolution;
+      $resolutionPaths[$resolution] = media_url($this->src(), $preset->size, $preset->mode, $preset->fill, $preset->direction) . '?res=' . $resolution;
     }
-    return new HtmlString(implode(', ', $defaultPath));
+
+    return $resolutionPaths;
+  }
+
+  public function defaultSrcSet()
+  {
+
+    $paths = $this->defaultPaths();
+    $srcset = [];
+    foreach ($paths as $resolution => $path) {
+      $srcset[] = $path . ' ' . $resolution;
+    }
+    return implode(', ', $srcset);
   }
 
   public function srcSets()
