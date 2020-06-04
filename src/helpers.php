@@ -385,7 +385,7 @@ if (!function_exists('map_content')) {
         return null;
       case 'text':
         if ($item = $content->shift()) {
-          return $item->html ?? null;
+          return $item->text ?? null;
         }
 
         return null;
