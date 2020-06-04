@@ -190,10 +190,6 @@ class Picture extends Component
       /** @var MediaPreset */
       $preset = $preset;
 
-      if ($preset->maxWidth >= $preset->width) {
-        continue;
-      }
-
       $srcSet = [
         'breakpoint' => $breakpoint,
         'maxWidth' => $preset->maxWidth,

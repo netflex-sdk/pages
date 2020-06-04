@@ -13,11 +13,13 @@
     }
 
     @foreach($defaultPaths as $resolution => $src)
-      @media (min-resolution: {{ intval($resolution) }}dppx) {
-        .{{ $bgCss }} {
-          background-image: url({!! $src !!});
+      @if($resolution !== '1x') 
+        @media (min-resolution: {{ intval($resolution) }}dppx) {
+          .{{ $bgCss }} {
+            background-image: url({!! $src !!});
+          }
         }
-      }
+      @endif
     @endforeach
 
     @foreach ($srcSets as $srcSet)
