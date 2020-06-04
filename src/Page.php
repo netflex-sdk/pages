@@ -21,6 +21,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @property int $id
@@ -239,6 +240,8 @@ class Page extends QueryableModel implements Responsable
 
   public function getMasterAttribute()
   {
+    Log::debug('Page::getMasterAttribute');
+
     if (!$this->parent) {
       return $this;
     }
@@ -253,7 +256,10 @@ class Page extends QueryableModel implements Responsable
    */
   public function getDomainAttribute()
   {
+    Log::debug('Page::getDomainAttribute');
+
     $master = $this->master;
+
     if ($master && $master !== $this) {
       if ($master->type === 'domain' && preg_match('/^(?!:\/\/)(?=.{1,255}$)((.{1,63}\.){1,127}(?![0-9]*$)[a-z0-9-]+\.?)$/', $master->name) !== false) {
         return $master->name;
@@ -263,6 +269,8 @@ class Page extends QueryableModel implements Responsable
 
   public function getLangAttribute()
   {
+    Log::debug('Page::getLangAttribute');
+
     if (!$this->attributes['lang']) {
       $parent = $this->parent;
       while ($parent && !$parent->lang) {
@@ -359,7 +367,7 @@ class Page extends QueryableModel implements Responsable
   public static function all()
   {
     return Cache::rememberForever('pages', function () {
-      return static::raw('*')->get();
+      return static::raw('*')->orderBy('sorting', 'asc')->get();
     });
   }
 

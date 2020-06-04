@@ -225,6 +225,8 @@ class RouteServiceProvider extends ServiceProvider
   protected function mapNetflexRoutes()
   {
     Route::get('.well-known/netflex/CacheStore', function (Request $request) {
+      Log::debug('Route => ".well-known/netflex/CacheStore"');
+
       if ($key = $request->get('key')) {
         if (Cache::has($key)) {
           Cache::forget($key);
@@ -239,7 +241,6 @@ class RouteServiceProvider extends ServiceProvider
 
     Route::middleware('jwt_proxy')
       ->group(function () {
-
         Route::any('.well-known/netflex', function (Request $request) {
           if ($payload = jwt_payload()) {
             current_mode($payload->mode);
@@ -257,6 +258,7 @@ class RouteServiceProvider extends ServiceProvider
                 break;
             }
           }
+
           abort(400);
         })->name('Netflex Editor Proxy');
       });
