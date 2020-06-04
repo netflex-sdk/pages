@@ -59,7 +59,7 @@ class MediaPreset implements JsonSerializable
 
   public function getResolutionsAttribute($resolutions)
   {
-    $resolutions = $resolutions ?? ['1x', '2x'];
+    $resolutions = $resolutions ?? ['1x', '2x', '3x'];
     return collect($resolutions)
       ->filter(function ($resolution) {
         return is_string($resolution);

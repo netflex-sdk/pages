@@ -110,13 +110,14 @@ class Picture extends Component
   {
     $default = Config::get("media.presets.default", [
       'mode' => static::MODE_FIT,
-      'resolutions' => ['1x', '2x'],
+      'resolutions' => ['1x', '2x', '3x'],
     ]);
 
     if ($preset = Config::get("media.presets.{$this->preset}")) {
       $preset['size'] = $this->size ?? $preset['size'] ?? $default['size'] ?? null;
       $preset['mode'] = $this->mode ?? $preset['mode'] ?? $default['mode'] ?? static::MODE_ORIGINAL;
       $preset['fill'] = $this->fill ?? $preset['fill'] ?? $default['fill'] ?? null;
+      $preset['resolutions'] = $preset['resolutions'] ?? $default['resolutions'] ?? null;
       $preset['breakpoints'] = $preset['breakpoints'] ?? $default['breakpoints'] ?? null;
 
       return new MediaPreset($preset);

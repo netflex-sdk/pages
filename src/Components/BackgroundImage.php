@@ -14,11 +14,6 @@ class BackgroundImage extends Component
             return $b['maxWidth'] - $a['maxWidth'];
         });
 
-        return array_map(function ($srcSet) {
-            $srcSet['sources'] = array_reverse($srcSet['sources'], true);
-            return $srcSet;
-        }, $srcSets);
-
         return $srcSets;
     }
 
