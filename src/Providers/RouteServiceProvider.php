@@ -227,6 +227,7 @@ class RouteServiceProvider extends ServiceProvider
       if ($key = $request->get('key')) {
         if (Cache::has($key)) {
           Cache::forget($key);
+          usleep(random_int(250000, 1500000));
           return ['success' => true, 'message' => 'Key deleted'];
         }
 
