@@ -249,7 +249,7 @@ class Page extends QueryableModel implements Responsable
       return $this;
     }
 
-    return $this->parent->master ?? $this;
+    return $this->parent->master ?? null;
   }
 
   /**
