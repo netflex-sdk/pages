@@ -24,6 +24,7 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -225,9 +226,18 @@ class RouteServiceProvider extends ServiceProvider
   {
     Route::get('.well-known/netflex/CacheStore', function (Request $request) {
       if ($key = $request->get('key')) {
+        if ($key === 'pages') {
+          try {
+            Cache::put('pages', Page::raw('*')->orderBy('sorting', 'asc')->get());
+            return ['success' => true, 'message' => 'Key updated'];
+          } catch (Throwable $e) {
+            Log::debug('Cache update failed', ['exception' => $e]);
+          }
+        }
+
         if (Cache::has($key)) {
           Cache::forget($key);
-          usleep(random_int(250000, 1500000));
+          usleep(random_int(250000, 1000000));
           return ['success' => true, 'message' => 'Key deleted'];
         }
 
