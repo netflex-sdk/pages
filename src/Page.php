@@ -2,7 +2,6 @@
 
 namespace Netflex\Pages;
 
-use Closure;
 use Throwable;
 
 use Netflex\API\Facades\API;
@@ -11,7 +10,6 @@ use Netflex\Query\Builder;
 use Netflex\Query\QueryableModel;
 
 use Netflex\Foundation\Template;
-use Netflex\Foundation\Variable;
 
 use Netflex\Pages\Traits\CastsDefaultFields;
 use Netflex\Pages\Traits\HidesDefaultFields;
@@ -61,6 +59,14 @@ class Page extends QueryableModel implements Responsable
 
   /** @var string */
   const TEMPLATE_FOLDER = 'f';
+
+  /**
+   * Holds all page objects
+   * Avoids recursive resolution of pages
+   *
+   * @var Collection|null
+   */
+  protected static $allItems = null;
 
   /**
    * The relation associated with the model.
@@ -243,7 +249,7 @@ class Page extends QueryableModel implements Responsable
       return $this;
     }
 
-    return $this->parent->master;
+    return $this->parent->master ?? $this;
   }
 
   /**
@@ -359,9 +365,15 @@ class Page extends QueryableModel implements Responsable
    */
   public static function all()
   {
-    return Cache::rememberForever('pages', function () {
-      return static::raw('*')->orderBy('sorting', 'asc')->get();
-    });
+    if (!static::$allItems) {
+      static::$allItems = Cache::rememberForever('pages', function () {
+        return static::raw('*')
+          ->orderBy('sorting', 'asc')
+          ->get();
+      });
+    }
+
+    return static::$allItems;
   }
 
   /**
