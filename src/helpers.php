@@ -267,11 +267,13 @@ if (!function_exists('insert_content_if_not_exists')) {
    *
    * @param string $area
    * @param array $content
-   * @return array
+   * @return object
    */
   function insert_content_if_not_exists($alias, $type)
   {
     $page = current_page();
+    $alias = blockhash_append($alias);
+
     $content = $page->content->first(function ($content) use ($alias) {
       return $content->area === $alias;
     });

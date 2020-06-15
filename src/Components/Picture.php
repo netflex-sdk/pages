@@ -56,7 +56,7 @@ class Picture extends Component
   public function __construct($area = null, $alt = null, $title = null, $src = null, $mode = null, $width = null, $height = null, $size = null, $fill = null, $imageClass = null, $pictureClass = null, $preset = 'default', $direction = null)
   {
     $this->inline = !!$area;
-    $this->area = blockhash_append($area);
+    $this->area = $area;
     $this->src = $src;
     $this->preset = $preset;
     $this->imageClass = $imageClass;
@@ -84,6 +84,7 @@ class Picture extends Component
   {
     if ($this->inline && current_mode() === 'edit') {
       $preset = $this->preset();
+
       return [
         'id' => 'e-' . ($this->content->id ?? null) . '-picture-' . uniqid(),
         'data-content-type' => 'image',
@@ -173,12 +174,13 @@ class Picture extends Component
 
   public function defaultSrcSet()
   {
-
     $paths = $this->defaultPaths();
     $srcset = [];
+
     foreach ($paths as $resolution => $path) {
       $srcset[] = $path . ' ' . $resolution;
     }
+
     return implode(', ', $srcset);
   }
 
