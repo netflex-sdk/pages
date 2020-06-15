@@ -75,7 +75,7 @@ class Picture extends Component
     $this->size = !$this->size && $width && $height ? ((int) $width . 'x' . (int) $height) : $this->size;
 
     if ($this->inline) {
-      insert_content_if_not_exists($this->area, 'image');
+      insert_content_if_not_exists(blockhash_append($this->area), 'image');
       $this->content = content($this->area, null);
     }
   }

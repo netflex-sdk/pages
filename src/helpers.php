@@ -272,7 +272,6 @@ if (!function_exists('insert_content_if_not_exists')) {
   function insert_content_if_not_exists($alias, $type)
   {
     $page = current_page();
-    $alias = blockhash_append($alias);
 
     $content = $page->content->first(function ($content) use ($alias) {
       return $content->area === $alias;
