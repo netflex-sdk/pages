@@ -1,9 +1,9 @@
 
 @php
-$hasSlot = !empty($slot->toHtml()) || $attributes->get('selector');
+$hasSlot = !empty($slot->toHtml()) || $attributes->get('is');
 $bgCss = $hasSlot ? 'bg_' . uniqid() : $attributes->get('class');
 $class = $attributes->get('class') . ' ' . ($hasSlot ? ($bgCss) : null);
-$selector = $attributes->get('selector') ? $attributes->get('selector') : 'div';
+$is = $attributes->get('is') ?? 'div';
 $stack = $attributes->get('stack') ? $attributes->get('stack') : null;
 @endphp
 
@@ -19,8 +19,8 @@ $stack = $attributes->get('stack') ? $attributes->get('stack') : null;
   }
 
   @foreach($defaultPaths as $resolution => $src)
-    @if($resolution !== '1x') 
-      @media 
+    @if($resolution !== '1x')
+      @media
       (-webkit-min-device-pixel-ratio: {{ intval($resolution) }}),
       (min--moz-device-pixel-ratio: {{ intval($resolution) }}),
       (-o-min-device-pixel-ratio: {{ intval($resolution) }}/1),
@@ -46,7 +46,7 @@ $stack = $attributes->get('stack') ? $attributes->get('stack') : null;
   @foreach ($srcSets as $srcSet)
     @foreach($srcSet['sources'] as $resolution => $src)
       @if($resolution !== '1x')
-        @media 
+        @media
         (-webkit-min-device-pixel-ratio: {{ intval($resolution) }}) and (max-width: {{ $srcSet['maxWidth'] }}px),
         (min--moz-device-pixel-ratio: {{ intval($resolution) }}) and (max-width: {{ $srcSet['maxWidth'] }}px),
         (-o-min-device-pixel-ratio: {{ intval($resolution) }}/1) and (max-width: {{ $srcSet['maxWidth'] }}px),
@@ -67,9 +67,9 @@ $stack = $attributes->get('stack') ? $attributes->get('stack') : null;
 @endif
 
 @if($hasSlot)
-  <{{ $attributes->get('selector') }} class="{!! $class !!}">
+  <{{ $attributes->get('is') }} class="{!! $class !!}">
     {{ $slot }}
-  </{{ $attributes->get('selector') }}>
+  </{{ $attributes->get('is') }}>
 @endif
 
 @endif
