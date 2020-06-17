@@ -1,9 +1,9 @@
 
 @php
-$hasSlot = !empty($slot->toHtml()) || $attributes->get('is');
+$hasSlot = !empty($slot->toHtml()) || $is;
 $bgCss = $hasSlot ? 'bg_' . uniqid() : $attributes->get('class');
 $class = $attributes->get('class') . ' ' . ($hasSlot ? ($bgCss) : null);
-$is = $attributes->get('is') ?? 'div';
+$is = $is ?? 'div';
 $stack = $attributes->get('stack') ? $attributes->get('stack') : null;
 @endphp
 
@@ -67,9 +67,9 @@ $stack = $attributes->get('stack') ? $attributes->get('stack') : null;
 @endif
 
 @if($hasSlot)
-  <{{ $attributes->get('is') }} class="{!! $class !!}">
+  <{{ $is }} class="{!! $class !!}">
     {{ $slot }}
-  </{{ $attributes->get('is') }}>
+  </{{ $is }}>
 @endif
 
 @endif
