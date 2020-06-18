@@ -679,7 +679,8 @@ if (!function_exists('current_domain')) {
   {
     if (!count($args)) {
       $domain = current_page() ? current_page()->domain : null;
-      if (App::has('__current_domain__')) {
+
+      if (!$domain && App::has('__current_domain__')) {
         $domain = App::get('__current_domain__');
       }
 
