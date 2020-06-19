@@ -57,6 +57,10 @@ class PagesServiceProvider extends ServiceProvider
       return if_mode(...$modes);
     });
 
+    Blade::if('domain', function ($domain) {
+      return current_mode() === $domain;
+    });
+
     Blade::directive('content', function ($expression) {
       return "<?php echo content($expression); ?>";
     });
