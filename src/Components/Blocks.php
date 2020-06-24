@@ -19,7 +19,7 @@ class Blocks extends Component
   {
     $this->area = blockhash_append($area);
     $this->variables = $variables;
-    $this->blocks = blocks($this->area, $this->variables);
+    $this->blocks = blocks($this->area);
   }
 
   public function shouldRender()

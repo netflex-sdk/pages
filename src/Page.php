@@ -219,7 +219,7 @@ class Page extends QueryableModel implements Responsable
    * Retrieves the component names of the given block
    *
    * @param string $area
-   * @return string
+   * @return Collection
    */
   public function getBlocks($area)
   {

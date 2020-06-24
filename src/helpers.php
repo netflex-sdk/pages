@@ -298,10 +298,10 @@ if (!function_exists('insert_content_if_not_exists')) {
 }
 
 if (!function_exists('blocks')) {
-  function blocks($area, $variables = [])
+  function blocks($area)
   {
     return current_page()
-      ->getBlocks($area, $variables);
+      ->getBlocks($area);
   }
 }
 
