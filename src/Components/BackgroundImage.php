@@ -14,9 +14,9 @@ class BackgroundImage extends Component
    *
    * @return void
    */
-  public function __construct($area = null, $alt = null, $title = null, $src = null, $mode = null, $width = null, $height = null, $size = null, $fill = null, $imageClass = null, $pictureClass = null, $preset = 'default', $direction = null, $is = 'div')
+  public function __construct($area = null, $alt = null, $title = null, $src = null, $mode = null, $width = null, $height = null, $size = null, $fill = null, $imageClass = null, $pictureClass = null, $preset = 'default', $direction = null, $is = null)
   {
-    parent::__construct($area, $alt, $title, $src, $mode, $width, $height, $size, $fill, $imageClass,$pictureClass, $preset, $direction);
+    parent::__construct($area, $alt, $title, $src, $mode, $width, $height, $size, $fill, $imageClass, $pictureClass, $preset, $direction);
     $this->is = $is;
   }
 
