@@ -12,28 +12,30 @@ class Seo extends Component
     public $images = [];
     public $canonical;
     public $suffix = false;
+    public $cardType;
 
-    public function __construct($title = null, $description = null, $images = [], $canonical = null, $suffix = true)
+    public function __construct($title = null, $description = null, $images = [], $canonical = null, $suffix = true, $cardType = 'summary')
     {
         $this->title = $title;
         $this->description = $description;
         $this->images = $images;
         $this->canonical = $canonical;
         $this->suffix = $suffix;
+        $this->cardType = $cardType;
     }
 
     public function tags () {
 
         if ($page = current_page()) {
-            
+
             if(SEOTools::getTitle() === SEOTools::metatags()->getDefaultTitle()) {
                 SEOTools::setTitle($page->title, $this->suffix);
             }
-            
+
             if(!SEOTools::metatags()->getDescription()) {
                 SEOTools::setDescription($page->description);
             }
-                
+
         }
 
         if ($this->title) {
@@ -51,6 +53,8 @@ class Seo extends Component
         if ($this->canonical) {
             SEOTools::setCanonical($this->canonical);
         }
+
+        SEOTools::twitter()->settype($this->cardType);
 
         return SEOTools::generate();
     }
