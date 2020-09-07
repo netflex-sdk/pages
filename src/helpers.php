@@ -645,6 +645,12 @@ if (!function_exists('blockhash')) {
 
     $value = array_shift($args) ?? null;
 
+    if ($value && !is_string($value)) {
+      $frame = debug_backtrace()[0];
+      $type = is_object($frame['args'][0]) ? get_class($frame['args'][0]) : gettype($frame['args'][0]);
+      throw new TypeError('Argument 1 passed to ' . $frame['function'] . '() must be of type string, ' . $type . ' given on line ' . $frame['line']);
+    }
+
     App::bind('__blockhash__', function () use ($value) {
       return $value;
     });
@@ -689,6 +695,13 @@ if (!function_exists('current_domain')) {
 
     $value = array_shift($args) ?? current_page()->domain;
 
+    if ($value && !is_string($value)) {
+      $frame = debug_backtrace()[0];
+      $type = is_object($frame['args'][0]) ? get_class($frame['args'][0]) : gettype($frame['args'][0]);
+      throw new TypeError('Argument 1 passed to ' . $frame['function'] . '() must be of type string, ' . $type . ' given on line ' . $frame['line']);
+    }
+
+
     App::bind('__current_domain__', function () use ($value) {
       return $value;
     });
@@ -716,6 +729,12 @@ if (!function_exists('current_page')) {
 
     $value = array_shift($args) ?? null;
 
+    if ($value && !($value instanceof Page)) {
+      $frame = debug_backtrace()[0];
+      $type = is_object($frame['args'][0]) ? get_class($frame['args'][0]) : gettype($frame['args'][0]);
+      throw new TypeError('Argument 1 passed to ' . $frame['function'] . '() must be an instance of Netflex\Pages\Page, ' . $type . ' given on line ' . $frame['line']);
+    }
+
     App::bind('__current_page__', function () use ($value) {
       return $value;
     });
@@ -742,6 +761,12 @@ if (!function_exists('current_mode')) {
     }
 
     $value = array_shift($args) ?? null;
+
+    if ($value && !is_string($value)) {
+      $frame = debug_backtrace()[0];
+      $type = is_object($frame['args'][0]) ? get_class($frame['args'][0]) : gettype($frame['args'][0]);
+      throw new TypeError('Argument 1 passed to ' . $frame['function'] . '() must be of type string, ' . $type . ' given on line ' . $frame['line']);
+    }
 
     App::bind('__mode__', function () use ($value) {
       return $value;
