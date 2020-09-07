@@ -53,6 +53,10 @@ class RouteServiceProvider extends ServiceProvider
   {
     $this->registerMiddlewareGroups();
     parent::boot();
+
+    Request::macro('page', function () {
+      return current_page();
+    });
   }
 
   protected function registerMiddlewareGroups()
