@@ -32,7 +32,7 @@ class PagesServiceProvider extends ServiceProvider
   public function boot()
   {
     $this->publishes([
-      __DIR__ . '/../Config/media.php' => config_path('media.php')
+      __DIR__ . '/../Config/media.php' => $this->app->configPath('media.php')
     ], 'config');
   }
 
