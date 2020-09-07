@@ -18,26 +18,32 @@
       "src/helpers.php"
     ]
   },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/apility/seotools"
+    }
+  ],
   "require": {
     "php": "^7.3",
-    "artesaos/seotools": "^0.17",
-    "illuminate/auth": "^7.0",
-    "illuminate/contracts": "^7.0",
-    "illuminate/routing": "^7.0",
-    "illuminate/support": "^7.0",
-    "illuminate/view": "^7.0",
-    "netflex/foundation": "^2.0",
-    "netflex/query-builder": "^2.0.0",
-    "netflex/support": "^2.0"
+    "artesaos/seotools": "dev-master",
+    "illuminate/auth": "^8.0",
+    "illuminate/contracts": "^8.0",
+    "illuminate/routing": "^8.0",
+    "illuminate/support": "^8.0",
+    "illuminate/view": "^8.0",
+    "netflex/foundation": "^3.0",
+    "netflex/query-builder": "^3.0",
+    "netflex/support": "^3.0"
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require-dev": {
-    "illuminate/cache": "^7.0",
-    "illuminate/container": "^7.0",
-    "illuminate/events": "^7.0",
-    "illuminate/filesystem": "^7.0",
-    "illuminate/view": "^7.0",
+    "illuminate/cache": "^8.0",
+    "illuminate/container": "^8.0",
+    "illuminate/events": "^8.0",
+    "illuminate/filesystem": "^8.0",
+    "illuminate/view": "^8.0",
     "larapack/dd": "^1.1",
     "vlucas/phpdotenv": "^3.6"
   },
