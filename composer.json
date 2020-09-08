@@ -18,15 +18,9 @@
       "src/helpers.php"
     ]
   },
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/apility/seotools"
-    }
-  ],
   "require": {
     "php": "^7.3",
-    "artesaos/seotools": "dev-master",
+    "apility/seotools": "^1.0",
     "illuminate/auth": "^8.0",
     "illuminate/contracts": "^8.0",
     "illuminate/routing": "^8.0",
@@ -36,8 +30,6 @@
     "netflex/query-builder": "^3.0",
     "netflex/support": "^3.0"
   },
-  "minimum-stability": "dev",
-  "prefer-stable": true,
   "require-dev": {
     "illuminate/cache": "^8.0",
     "illuminate/container": "^8.0",
@@ -56,10 +48,10 @@
         "Netflex\\Pages\\Providers\\SEOToolsServiceProvider"
       ],
       "aliases": {
-        "SEOMeta": "Artesaos\\SEOTools\\Facades\\SEOMeta",
-        "OpenGraph": "Artesaos\\SEOTools\\Facades\\OpenGraph",
-        "Twitter": "Artesaos\\SEOTools\\Facades\\TwitterCard",
-        "SEO": "Artesaos\\SEOTools\\Facades\\SEOTools"
+        "SEOMeta": "Apility\\SEOTools\\Facades\\SEOMeta",
+        "OpenGraph": "Apility\\SEOTools\\Facades\\OpenGraph",
+        "Twitter": "Apility\\SEOTools\\Facades\\TwitterCard",
+        "SEO": "Apility\\SEOTools\\Facades\\SEOTools"
       }
     }
   }
