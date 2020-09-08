@@ -2,7 +2,7 @@
 @foreach($blocks as $block)
   @php(@list($component, $hash) = $block)
   @php(blockhash($hash))
-  <x-component :is="$component" :variables="$variables" />
+  <x-dynamic-component :component="$component" :variables="$variables" />
   @php(blockhash(null))
 @endforeach
 

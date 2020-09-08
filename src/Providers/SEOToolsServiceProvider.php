@@ -2,19 +2,19 @@
 
 namespace Netflex\Pages\Providers;
 
-use Artesaos\SEOTools\SEOTools;
-use Artesaos\SEOTools\SEOMeta;
-use Artesaos\SEOTools\OpenGraph;
-use Artesaos\SEOTools\TwitterCards;
-use Artesaos\SEOTools\JsonLd;
+use Apility\SEOTools\SEOTools;
+use Apility\SEOTools\SEOMeta;
+use Apility\SEOTools\OpenGraph;
+use Apility\SEOTools\TwitterCards;
+use Apility\SEOTools\JsonLd;
 
-use Artesaos\SEOTools\Contracts\SEOTools as SEOToolsContract;
-use Artesaos\SEOTools\Contracts\MetaTags as MetaTagsContract;
-use Artesaos\SEOTools\Contracts\TwitterCards as TwitterCardsContract;
-use Artesaos\SEOTools\Contracts\OpenGraph as OpenGraphContract;
-use Artesaos\SEOTools\Contracts\JsonLd as JsonLdContract;
+use Apility\SEOTools\Contracts\SEOTools as SEOToolsContract;
+use Apility\SEOTools\Contracts\MetaTags as MetaTagsContract;
+use Apility\SEOTools\Contracts\TwitterCards as TwitterCardsContract;
+use Apility\SEOTools\Contracts\OpenGraph as OpenGraphContract;
+use Apility\SEOTools\Contracts\JsonLd as JsonLdContract;
 
-use Artesaos\SEOTools\Providers\SEOToolsServiceProvider as ServiceProvider;
+use Apility\SEOTools\Providers\SEOToolsServiceProvider as ServiceProvider;
 use Illuminate\Config\Repository as Config;
 use Netflex\Foundation\Variable;
 
