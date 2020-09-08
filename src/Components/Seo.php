@@ -3,7 +3,7 @@
 namespace Netflex\Pages\Components;
 
 use Illuminate\View\Component;
-use Artesaos\SEOTools\Facades\SEOTools;
+use Apility\SEOTools\Facades\SEOTools;
 
 class Seo extends Component
 {
