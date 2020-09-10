@@ -24,6 +24,7 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 
 class RouteServiceProvider extends ServiceProvider
@@ -271,7 +272,7 @@ class RouteServiceProvider extends ServiceProvider
           return $page->type === 'page' && $page->template && $page->published;
         })->each(function ($page) {
           $controller = $page->template->controller ?? null;
-          $pageController = PageController::class;
+          $pageController = Config::get('pages.controller', PageController::class);
           $class = trim($controller ? ("\\{$this->namespace}\\{$controller}") : "\\{$pageController}", '\\');
 
           try {

@@ -34,6 +34,10 @@ class PagesServiceProvider extends ServiceProvider
     $this->publishes([
       __DIR__ . '/../Config/media.php' => $this->app->configPath('media.php')
     ], 'config');
+
+    $this->publishes([
+      __DIR__ . '/../Config/pages.php' => $this->app->configPath('pages.php')
+    ], 'config');
   }
 
   protected function registerBladeDirectives()
