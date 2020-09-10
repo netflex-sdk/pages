@@ -7,12 +7,14 @@ use Apility\SEOTools\SEOMeta;
 use Apility\SEOTools\OpenGraph;
 use Apility\SEOTools\TwitterCards;
 use Apility\SEOTools\JsonLd;
+use Apility\SEOTools\JsonLdMulti;
 
 use Apility\SEOTools\Contracts\SEOTools as SEOToolsContract;
 use Apility\SEOTools\Contracts\MetaTags as MetaTagsContract;
 use Apility\SEOTools\Contracts\TwitterCards as TwitterCardsContract;
 use Apility\SEOTools\Contracts\OpenGraph as OpenGraphContract;
 use Apility\SEOTools\Contracts\JsonLd as JsonLdContract;
+use Apility\SEOTools\Contracts\JsonLdMulti as JsonLdMultiContract;
 
 use Apility\SEOTools\Providers\SEOToolsServiceProvider as ServiceProvider;
 use Illuminate\Config\Repository as Config;
@@ -84,6 +86,16 @@ class SEOToolsServiceProvider extends ServiceProvider
       ]);
     });
 
+    $this->app->singleton('seotools.json-ld-multi', function ($app) {
+      return new JsonLdMulti([
+        'title'       => Variable::get('site_meta_title') ?? false,
+        'description' => Variable::get('site_meta_description') ?? false,
+        'url'         => false, // Set null for using Url::current(), set false to total remove
+        'type'        => 'WebPage',
+        'images'      => [],
+      ]);
+    });
+
     $this->app->singleton('seotools', function () {
       return new SEOTools();
     });
@@ -106,11 +118,13 @@ class SEOToolsServiceProvider extends ServiceProvider
       TwitterCardsContract::class,
       OpenGraphContract::class,
       JsonLdContract::class,
+      JsonLdMultiContract::class,
       'seotools',
       'seotools.metatags',
       'seotools.opengraph',
       'seotools.twitter',
       'seotools.json-ld',
+      'seotools.json-ld-multi'
     ];
   }
 }
