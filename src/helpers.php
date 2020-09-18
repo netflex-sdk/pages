@@ -780,7 +780,7 @@ if (!function_exists('media_url')) {
   /**
    * Get URL to a CDN image
    *
-   * @param File|string $file
+   * @param object|array|string $file
    * @param array|string|int $size
    * @param string $type
    * @param array|string|int $color
@@ -789,8 +789,9 @@ if (!function_exists('media_url')) {
    */
   function media_url($file, $size = null, $type = 'rc', $color = '255,255,255,1', $direction = null)
   {
-    if (is_object($file)) {
-      $file = $file->path ?? null;
+    if (is_array($file) || is_object($file)) {
+      $fallback = (is_object($file) && method_exists($file, '__toString')) ? (string) $file : null;
+      $file = data_get($file, 'path', $fallback);
     }
 
     $schema = Variable::get('site_cdn_protocol');
