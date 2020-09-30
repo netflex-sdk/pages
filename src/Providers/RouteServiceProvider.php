@@ -322,7 +322,7 @@ class RouteServiceProvider extends ServiceProvider
   protected function mapSitemap()
   {
     Route::get('/sitemap.xml', function () {
-      $entries = [];
+      $entries = $this->getSitemapEntries();
 
       return response(view('nf::sitemap-xml', ['entries' => $entries]), 200, ['Content-Type' => 'application/xml']);
     })->name('Sitemap');
@@ -330,5 +330,10 @@ class RouteServiceProvider extends ServiceProvider
     Route::get('/sitemap.xsl', function () {
       return response(view('nf::sitemap-xsl'), 200, ['Content-Type' => 'text/xsl']);
     })->name('Sitemap Stylsheet');
+  }
+
+  protected function getSitemapEntries()
+  {
+    return [];
   }
 }
