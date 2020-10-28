@@ -247,13 +247,22 @@ if (!function_exists('editor_tools')) {
 }
 
 if (!function_exists('current_revision')) {
+  /**
+   * @return int|null
+   */
   function current_revision()
   {
-    return current_page() ? current_page()->revision : null;
+    if ($page = current_page()) {
+      return $page->revision;
+    }
   }
 }
 
 if (!function_exists('route_hash')) {
+  /**
+   * @param Route $route
+   * @return string
+   */
   function route_hash(Route $route)
   {
     return 'route.' . md5(spl_object_hash($route));
@@ -271,37 +280,44 @@ if (!function_exists('insert_content_if_not_exists')) {
    */
   function insert_content_if_not_exists($alias, $type)
   {
-    $page = current_page();
+    if ($page = current_page()) {
+      $content = $page->content->first(function ($content) use ($alias) {
+        return $content->area === $alias;
+      });
 
-    $content = $page->content->first(function ($content) use ($alias) {
-      return $content->area === $alias;
-    });
+      if ($content) {
+        return $content;
+      }
 
-    if ($content) {
-      return $content;
+      $contentId = API::post('builder/content', [
+        'relation' => 'page',
+        'relation_id' => $page->id,
+        'revision' => current_revision(),
+        'published' => true,
+        'area' => $alias,
+        'type' => $type,
+      ])->content_id;
+
+      Cache::forget('page');
+      Cache::forget('page/' . $page->id);
+
+      return API::get("builder/content/$contentId");
     }
-
-    $contentId = API::post('builder/content', [
-      'relation' => 'page',
-      'relation_id' => $page->id,
-      'revision' => current_revision(),
-      'published' => true,
-      'area' => $alias,
-      'type' => $type,
-    ])->content_id;
-
-    Cache::forget('page');
-    Cache::forget('page/' . $page->id);
-
-    return API::get("builder/content/$contentId");
   }
 }
 
 if (!function_exists('blocks')) {
+  /**
+   * @param string $area
+   * @return Collection
+   */
   function blocks($area)
   {
-    return current_page()
-      ->getBlocks($area);
+    if ($page = current_page()) {
+      return $page->getBlocks($area);
+    }
+
+    return collect([]);
   }
 }
 
@@ -496,9 +512,7 @@ if (!function_exists('content')) {
       $settings = ['alias' => blockhash_append($alias), 'type' => 'text'];
     }
 
-    $page = current_page();
-
-    if ($page) {
+    if ($page = current_page()) {
       $content = $page->content->filter(function ($content) use ($settings) {
         return $content->area === $settings['alias'];
       });
@@ -526,24 +540,25 @@ if (!function_exists('page_editable')) {
    */
   function page_editable(...$args)
   {
-    $page = current_page() ? current_page()->id : null;
-    $binding = '__' . rtrim('page_editable:' . $page, ':') . '__';
+    if ($page = current_page()) {
+      $binding = '__' . rtrim('page_editable:' . $page->id, ':') . '__';
 
-    if (!count($args)) {
-      if (App::has($binding)) {
-        return App::get($binding);
+      if (!count($args)) {
+        if (App::has($binding)) {
+          return App::get($binding);
+        }
+
+        return [];
       }
 
-      return [];
-    }
+      $value = array_shift($args) ?? [];
 
-    $value = array_shift($args) ?? [];
+      App::bind($binding, function () use ($value) {
+        return $value;
+      });
 
-    App::bind($binding, function () use ($value) {
       return $value;
-    });
-
-    return $value;
+    }
   }
 }
 
