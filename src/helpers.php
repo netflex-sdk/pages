@@ -17,6 +17,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\HtmlString;
 use Netflex\Pages\Extension;
 use Netflex\Pages\JwtPayload;
+use Netflex\Pages\NavigationData;
 
 if (!function_exists('render_component_tag')) {
   /**
@@ -149,52 +150,16 @@ if (!function_exists('static_content')) {
 
 if (!function_exists('navigation_data')) {
   /**
+   * Resolves navigation data
+   * 
    * @param int $parent
    * @param string $type
    * @param string $root
-   * @return object
+   * @return Collection
    */
   function navigation_data($parent = null, $type = 'nav', $root = null)
   {
-    try {
-      $pages = $parent ? Page::find($parent)->children : Page::where('published', true)
-        ->where(function ($query) {
-          return $query->where('parent_id', null)
-            ->orWhere('parent_id', 0);
-        })->get();
-
-      $mapPage = function (Page $page) use ($root, $type) {
-        $target = '';
-        $url = $page->url;
-
-        switch ($page->type) {
-          case Page::TYPE_EXTERNAL:
-            $target = '_blank';
-            $url = $root . $target;
-            break;
-          case Page::TYPE_FOLDER:
-            break;
-          default:
-            break;
-        }
-
-        return (object) [
-          'id' => $page->id,
-          'url' => $url,
-          'target' => $target,
-          'type' => $page->type,
-          'title' => $page->nav_title ? $page->nav_title : $page->name,
-          'children' => navigation_data($page->id, $type, $root)
-        ];
-      };
-
-      return $pages->filter(function (Page $page) use ($type) {
-        return (bool) $page->{'visible_' . $type};
-      })->map($mapPage);
-    } catch (Exception $e) {
-      throw $e;
-      return Collection::make();
-    }
+    return NavigationData::get($parent, $type, $root);
   }
 }
 

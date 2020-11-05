@@ -42,6 +42,7 @@ use Illuminate\Support\Facades\App;
  * @property Page|null $master
  * @property string|null $lang
  * @property-read string|null $domain
+ * @property-read Page|null $parent
  */
 class Page extends QueryableModel implements Responsable
 {
@@ -492,5 +493,18 @@ class Page extends QueryableModel implements Responsable
   public static function current()
   {
     return current_page();
+  }
+
+  /**
+   * Resolves navigation data for this page
+   * 
+   * @param string $type
+   * @param string|null $root
+   * 
+   * @return Collection
+   */
+  public function navigationData($type = 'nav', $root = null)
+  {
+    return NavigationData::get($this->id, $type, $root);
   }
 }
