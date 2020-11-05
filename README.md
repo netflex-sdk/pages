@@ -90,7 +90,7 @@ $freshPage->save();
 
 ## Contributing
 
-Thank you for considering contributing to the Netflex Structure! Please read the [contribution guide](CONTRIBUTING.md).
+Thank you for considering contributing to the Netflex Pages! Please read the [contribution guide](CONTRIBUTING.md).
 
 ## Code of Conduct
 
@@ -98,7 +98,7 @@ In order to ensure that the community is welcoming to all, please review and abi
 
 ## License
 
-Netflex Structure is open-sourced software licensed under the [MIT license](LICENSE.md).
+Netflex Pages is open-sourced software licensed under the [MIT license](LICENSE.md).
 
 <hr>
 
