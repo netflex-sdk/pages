@@ -168,11 +168,11 @@ if (!function_exists('navigation_data')) {
         $url = $page->url;
 
         switch ($page->type) {
-          case Page::TEMPLATE_EXTERNAL:
+          case Page::TYPE_EXTERNAL:
             $target = '_blank';
             $url = $root . $target;
             break;
-          case Page::TEMPLATE_FOLDER:
+          case Page::TYPE_FOLDER:
             break;
           default:
             break;
