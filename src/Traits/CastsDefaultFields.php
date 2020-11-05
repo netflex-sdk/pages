@@ -66,7 +66,7 @@ trait CastsDefaultFields
   public function getTypeAttribute()
   {
     if (!isset($this->attributes['template'])) {
-      return 'page';
+      return Page::TYPE_PAGE;
     }
 
     switch ($this->attributes['template']) {
