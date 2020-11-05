@@ -275,36 +275,49 @@ class RouteServiceProvider extends ServiceProvider
           $pageController = Config::get('pages.controller', PageController::class);
           $class = trim($controller ? ("\\{$this->namespace}\\{$controller}") : "\\{$pageController}", '\\');
 
+          /** @var Controller|null */
+          $controllerInstance = null;
+
           try {
-            tap(new $class, function (Controller $controller) use ($page) {
-              $class = get_class($controller);
-              $routeDefintions = $controller->getRoutes();
+            // We attempt to instantiate the target class
+            $controllerInstance = app($class);
+            $class = get_class($controllerInstance);
+            $routeDefintions = $controllerInstance->getRoutes();
 
-              foreach ($routeDefintions as $routeDefintion) {
-                $routeDefintion->url = trim($routeDefintion->url, '/');
-                $url = trim("{$page->url}/{$routeDefintion->url}", '/');
-                $action = "$class@{$routeDefintion->action}";
+            foreach ($routeDefintions as $routeDefintion) {
+              $routeDefintion->url = trim($routeDefintion->url, '/');
+              $url = trim("{$page->url}/{$routeDefintion->url}", '/');
+              $action = "$class@{$routeDefintion->action}";
 
-                $route = Route::domain('');
+              $route = Route::domain('');
 
-                if ($domain = $page->domain) {
-                  $route = $route->domain($domain);
-                }
-
-                $route = $route->match($routeDefintion->methods, $url, $action)
-                  ->name($page->id);
-
-                $this->app->bind(route_hash($route), function () use ($page) {
-                  return $page;
-                });
+              if ($domain = $page->domain) {
+                $route = $route->domain($domain);
               }
-            });
+
+              $route = $route->match($routeDefintion->methods, $url, $action)
+                ->name($page->id);
+
+              $this->app->bind(route_hash($route), function () use ($page) {
+                return $page;
+              });
+            }
           } catch (Throwable $e) {
-            if (App::environment() !== 'master') {
-              throw $e;
+            // The target controller class doesn't exist,
+            // we register a wildcard route for the page, so we can throw an error
+            // when attempting to route to the page
+            Log::warning($e->getMessage());
+            $route = Route::domain('');
+
+            if ($domain = $page->domain) {
+              $route = $route->domain($domain);
             }
 
-            Log::warning("Route {$page->url} could not be registered because {$e->getMessage()}");
+            $route->any(rtrim($page->url, '/') . '/{any?}', function () use ($class) {
+              // Since the target $class doesn't exist,
+              // this will throw an error for the developer if APP_DEBUG is enabled
+              return app($class);
+            })->name($page->id);
           }
         });
       });
