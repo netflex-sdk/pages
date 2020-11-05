@@ -275,7 +275,7 @@ class Page extends QueryableModel implements Responsable
     $master = $this->master;
 
     if ($master && $master !== $this) {
-      if ($master->type === 'domain' && preg_match('/^(?!:\/\/)(?=.{1,255}$)((.{1,63}\.){1,127}(?![0-9]*$)[a-z0-9-]+\.?)$/', $master->name) !== false) {
+      if ($master->type === static::TYPE_DOMAIN && preg_match('/^(?!:\/\/)(?=.{1,255}$)((.{1,63}\.){1,127}(?![0-9]*$)[a-z0-9-]+\.?)$/', $master->name) !== false) {
         return $master->name;
       }
     }
