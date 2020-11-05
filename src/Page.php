@@ -48,17 +48,30 @@ class Page extends QueryableModel implements Responsable
   use CastsDefaultFields;
   use HidesDefaultFields;
 
-  /** @var string */
-  const TEMPLATE_DOMAIN = 'd';
+  /**
+   * @var string Routing domain
+   */
+  const TYPE_DOMAIN = 'domain';
 
-  /** @var string */
-  const TEMPLATE_EXTERNAL = 'e';
+  /**
+   * @var string An external URL
+   */
+  const TYPE_EXTERNAL = 'external';
 
-  /** @var string */
-  const TEMPLATE_INTERAL = 'i';
+  /**
+   * @var string An internal URL
+   */
+  const TYPE_INTERNAL = 'internal';
 
-  /** @var string */
-  const TEMPLATE_FOLDER = 'f';
+  /**
+   * @var string A navigation folder
+   */
+  const TYPE_FOLDER = 'folder';
+
+  /**
+   * @var string A regular page
+   */
+  const TYPE_PAGE = 'page';
 
   /**
    * Holds all page objects

@@ -25,6 +25,14 @@ class MediaPreset implements JsonSerializable
 {
   use Accessors;
 
+  /**
+   * @var array
+   */
+  const ORIGINAL = [
+    'mode' => Picture::MODE_ORIGINAL,
+    'resolutions' => ['1x', '2x']
+  ];
+
   /** @var array */
   protected $attributes = [];
 

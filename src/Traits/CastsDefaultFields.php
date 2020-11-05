@@ -66,35 +66,37 @@ trait CastsDefaultFields
   public function getTypeAttribute()
   {
     if (!isset($this->attributes['template'])) {
-        return 'page';
+      return 'page';
     }
 
     switch ($this->attributes['template']) {
-      case PAGE::TEMPLATE_DOMAIN:
-        return 'domain';
-      case Page::TEMPLATE_EXTERNAL:
-        return 'external';
-      case Page::TEMPLATE_INTERAL:
-        return 'internal';
-      case Page::TEMPLATE_FOLDER:
-        return 'folder';
+      case 'd':
+        return Page::TYPE_DOMAIN;
+      case 'e':
+        return Page::TYPE_EXTERNAL;
+      case 'i':
+        return Page::TYPE_INTERNAL;
+      case 'f':
+        return Page::TYPE_FOLDER;
       default:
-        return 'page';
+        return Page::TYPE_PAGE;
     }
   }
 
-    /**
+  /**
    * @param string $url
    * @return string
    */
   public function getUrlAttribute($url)
   {
     switch ($this->type) {
-      case 'external':
+      case Page::TYPE_DOMAIN:
+        return null;
+      case Page::TYPE_EXTERNAL:
         return $url;
-      case 'internal':
+      case Page::TYPE_INTERNAL:
         return static::find($url)->url ?? '#';
-      case 'f':
+      case Page::TYPE_FOLDER:
         return '#';
       default:
         return '/' . trim($url === 'index/' ? '/' : $url, '/');
