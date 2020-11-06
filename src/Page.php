@@ -19,6 +19,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Traits\Macroable;
 
 /**
  * @property int $id
@@ -48,6 +49,7 @@ class Page extends QueryableModel implements Responsable
 {
   use CastsDefaultFields;
   use HidesDefaultFields;
+  use Macroable;
 
   /**
    * @var string Routing domain
@@ -332,7 +334,7 @@ class Page extends QueryableModel implements Responsable
    */
   public function toResponse($request)
   {
-    $current_page = current_page();
+    $page = current_page();
     $blockhash = blockhash();
 
     current_page($this);
@@ -340,7 +342,7 @@ class Page extends QueryableModel implements Responsable
 
     $rendered = $this->template ? $this->template->toResponse() : null;
 
-    current_page($current_page);
+    current_page($page);
     blockhash($blockhash);
 
     return $rendered;

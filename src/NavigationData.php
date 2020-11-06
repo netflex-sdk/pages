@@ -18,6 +18,7 @@ use Illuminate\Support\Traits\Macroable;
  * @property Collection $children
  * @property Page $page
  * @property Page|null $parent
+ * @property bool $active
  */
 class NavigationData implements JsonSerializable
 {
@@ -44,7 +45,8 @@ class NavigationData implements JsonSerializable
       'url' => $this->url,
       'target' => $this->target,
       'type' => $this->type,
-      'children' => $this->children->toArray()
+      'children' => $this->children->toArray(),
+      'active' => $this->active
     ];
   }
 
@@ -59,11 +61,26 @@ class NavigationData implements JsonSerializable
     }
   }
 
+  public function getActiveAttribute()
+  {
+    if ($page = current_page()) {
+      return $this->page->id === $page->id;
+    }
+
+    return false;
+  }
+
   /**
    * @return Page|null
    */
   public function getPageAttribute()
   {
+    if ($page = current_page()) {
+      if ($page->id === $this->id) {
+        return $page;
+      }
+    }
+
     return Page::find($this->id);
   }
 

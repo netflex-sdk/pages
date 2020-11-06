@@ -2,6 +2,8 @@
 
 namespace Netflex\Pages;
 
+use Illuminate\Support\Traits\Macroable;
+
 use Netflex\Pages\JwtPayload;
 use Netflex\Support\Accessors;
 
@@ -13,6 +15,7 @@ use Netflex\Support\Accessors;
 class PreviewRequest
 {
   use Accessors;
+  use Macroable;
 
   /** @var array */
   protected $attributes = [];

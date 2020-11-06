@@ -6,6 +6,7 @@ use JsonSerializable;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Traits\Macroable;
 
 use Netflex\Support\Accessors;
 use Netflex\Pages\Components\Picture;
@@ -24,6 +25,7 @@ use Netflex\Pages\Exceptions\BreakpointsMissingException;
 class MediaPreset implements JsonSerializable
 {
   use Accessors;
+  use Macroable;
 
   /**
    * @var array

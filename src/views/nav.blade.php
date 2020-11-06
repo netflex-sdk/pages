@@ -3,7 +3,7 @@
     @foreach ($children as $child)
       <li class="{{ $liClass }}">
         <a
-          class="{{ implode(' ', array_filter([$aClass, $isActive($child) ? $activeClass : null])) }}"
+          class="{{ $aClassList($child) }}"
           target="{{ $child->target }}"
           href="{{ $child->url }}"
           role="menuitem"
@@ -12,9 +12,9 @@
         </a>
         @if($child->children->count())
           <x-nav
-            :class="implode(' ', array_filter([$attributes->get('class'), $dropdownClass]))"
+            :class="$dropdownClassList"
             :parent="$child->id"
-            :levels="$levels !== null ? ($levels - 1) : $levels"
+            :levels="$dropdownLevels()"
             :type="$type"
             :root="$root"
           />

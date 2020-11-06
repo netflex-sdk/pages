@@ -4,6 +4,7 @@ namespace Netflex\Pages\Components;
 
 use Netflex\Pages\Page;
 use Illuminate\View\Component;
+use Netflex\Pages\NavigationData;
 
 class Nav extends Component
 {
@@ -19,10 +20,21 @@ class Nav extends Component
   /**
    * Create a new component instance.
    *
-   * @return void
+   * @param Page|int $parent
+   * @param int|null $levels
+   * @param string $type
+   * @param string|null $root
+   * @param string|null $activeClass
+   * @param string|null $dropdownClass
+   * @param string|null $liClass
+   * @param string|null $aClass
    */
   public function __construct($parent = null, $levels = null, $type = 'nav', $root = null, $activeClass = null, $dropdownClass = 'dropdown-container', $liClass = null, $aClass = null)
   {
+    if ($parent instanceof Page) {
+      $parent = $parent->id;
+    }
+
     $this->levels = $levels;
     $this->type = $type;
     $this->root = $root;
@@ -30,20 +42,42 @@ class Nav extends Component
     $this->dropdownClass = $dropdownClass;
     $this->liClass = $liClass;
     $this->aClass = $aClass;
-    $this->children = navigation_data($parent, $type, $root);
+    $this->children = NavigationData::get($parent, $type, $root);
+  }
+
+  /**
+   * @param NavigationData $child
+   * @return string
+   */
+  public function aClassList(NavigationData $child)
+  {
+    return implode(' ', array_filter([$this->aClass, $child->active ? $this->activeClass : null]));
+  }
+
+  /**
+   * @return string
+   */
+  public function dropdownClassList()
+  {
+    return implode(' ', array_filter([$this->attributes->get('class'), $this->dropdownClass]));
+  }
+
+  /**
+   * @return int|null
+   */
+  public function dropdownLevels()
+  {
+    return $this->levels !== null ? ($this->levels - 1) : $this->levels;
   }
 
   /**
    * @param object $child
+   * @deprecated v3.1.5 This is no longer needed, as the active status can be checked on the NavigationData object directly
    * @return bool
    */
-  public function isActive($child)
+  public function isActive(NavigationData $child)
   {
-    if ($page = current_page()) {
-      return $child->id === $page->id;
-    }
-
-    return false;
+    return $child->active;
   }
 
   /**
