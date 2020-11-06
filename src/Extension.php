@@ -8,11 +8,14 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Traits\Macroable;
 
 use Netflex\Pages\Exceptions\NotImplementedException;
 
 abstract class Extension implements Renderable, Responsable
 {
+  use Macroable;
+  
   protected $view;
   protected $name;
   protected $data = [];

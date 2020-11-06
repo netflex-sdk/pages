@@ -3,6 +3,7 @@
 namespace Netflex\Pages;
 
 use Netflex\Support\Accessors;
+use Illuminate\Support\Traits\Macroable;
 
 /**
  * @property-read string $relation
@@ -22,6 +23,7 @@ use Netflex\Support\Accessors;
 class JwtPayload
 {
     use Accessors;
+    use Macroable;
 
     /** @var array */
     protected $attributes = [];
