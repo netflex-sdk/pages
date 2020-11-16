@@ -756,6 +756,22 @@ if (!function_exists('current_mode')) {
   }
 }
 
+if (!function_exists('cdn_url')) {
+  /**
+   * Generates a CDN url with optional path appended
+   * 
+   * @param string|null $path
+   * @return string
+   */
+  function cdn_url ($path = null)
+  {
+    $schema = Variable::get('site_cdn_protocol');
+    $cdn = Variable::get('site_cdn_url');
+
+    return trim((rtrim("$schema://$cdn", '/') . '/' . trim('/', $path)), '/');
+  }
+}
+
 if (!function_exists('media_url')) {
   /**
    * Get URL to a CDN image
@@ -774,11 +790,8 @@ if (!function_exists('media_url')) {
       $file = data_get($file, 'path', $fallback);
     }
 
-    $schema = Variable::get('site_cdn_protocol');
-    $cdn = Variable::get('site_cdn_url');
-
     if (!$size && !$type && empty($gb)) {
-      return "$schema://$cdn/$file";
+      return cdn_url($file);
     }
 
     $size = (is_string($size) && !(strpos($size, 'x') > 0)) ? "{$size}x{$size}" : $size;
@@ -822,6 +835,6 @@ if (!function_exists('media_url')) {
 
     $size = $type === 'o' ?  null : "$size/";
 
-    return "$schema://$cdn/media/$type/{$size}{$options}{$file}";
+    return cdn_url("/media/$type/{$size}{$options}{$file}");
   }
 }
