@@ -114,18 +114,18 @@ if (!function_exists('resolve_extension')) {
 
 if (!function_exists('static_content')) {
   /**
-   * @param string $area
    * @param string $block
+   * @param string $area
    * @param string $column
    * @return HtmlString
    */
-  function static_content($area, $block = null, $column = null)
+  function static_content($block, $area = null, $column = null)
   {
-    if ($content = GlobalContent::retrieve($area)) {
+    if ($content = GlobalContent::retrieve($block)) {
       $staticContent = $content->globals
-        ->filter(function ($item) use ($block) {
-          if ($block) {
-            return $item->alias === $block;
+        ->filter(function ($item) use ($area) {
+          if ($area) {
+            return $item->alias === $area;
           }
 
           return true;
