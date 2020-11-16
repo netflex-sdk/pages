@@ -13,9 +13,9 @@ class StaticContent extends Component
      *
      * @return void
      */
-    public function __construct($area, $block = null, $column = null)
+    public function __construct($block, $area = null, $column = null)
     {
-        $this->content = static_content($area, $block, $column);
+        $this->content = static_content($block, $area, $column);
     }
 
     public function shouldRender()
