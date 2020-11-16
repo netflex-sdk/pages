@@ -768,7 +768,7 @@ if (!function_exists('cdn_url')) {
     $schema = Variable::get('site_cdn_protocol');
     $cdn = Variable::get('site_cdn_url');
 
-    return trim((rtrim("$schema://$cdn", '/') . '/' . trim('/', $path)), '/');
+    return trim((rtrim("$schema://$cdn", '/') . '/' . trim($path, '/')), '/');
   }
 }
 
