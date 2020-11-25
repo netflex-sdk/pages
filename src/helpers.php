@@ -524,6 +524,8 @@ if (!function_exists('page_editable')) {
 
       return $value;
     }
+
+    return [];
   }
 }
 
