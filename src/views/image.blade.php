@@ -30,8 +30,16 @@
     @isset($style)
         style="{{ $style ?? null }}"
     @endisset
+
+    @if($width)
+        width="{{ $width }}"
+    @endif
+
+    @if($height)
+        height="{{ $height }}"
+    @endif
 @overwrite
 
 @isset($src)
-    <img @yield('attributes')>
+    <img @yield('attributes') {{ $attributes }} />
 @endisset
