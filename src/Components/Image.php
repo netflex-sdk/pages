@@ -2,6 +2,7 @@
 
 namespace Netflex\Pages\Components;
 
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\Component;
 
@@ -43,6 +44,16 @@ class Image extends Component
     $class = null,
     $style = null
   ) {
+    $explicitWidth = $width !== null;
+    $explicitHeight = $height !== null;
+
+    $useExplicitWidthAndHeight = Config::get('media.options.image.setWidthAndHeightAttributes', false);
+
+    if (!$useExplicitWidthAndHeight) {
+      $explicitHeight = null;
+      $explicitWidth = null;
+    }
+
     $mode = $width && !$height ? self::MODE_LANDSCAPE : $mode;
     $mode = $height && !$width ? self::MODE_PORTRAIT : $mode;
     $height = !$height && $width ? $width : $height;
@@ -51,6 +62,8 @@ class Image extends Component
     $this->settings = (object) [
       'area' => $area ?? null,
       'size' => $size ?? (($width && $height) ? "{$width}x{$height}" : null),
+      'explicitWidth' => $explicitWidth,
+      'explicitHeight' => $explicitHeight,
       'mode' => $mode,
       'color' => $color,
       'direction' => $direction,
@@ -88,6 +101,28 @@ class Image extends Component
     if ($this->settings->inline) {
       return $this->settings->content->id ?? null;
     }
+  }
+
+  public function width () {
+    if ($this->settings->explicitWidth) {
+      @list($width) = explode('x', $this->size());
+      if ($width ?? null) {
+        return (int) $width;
+      }
+    }
+
+    return null;
+  }
+
+  public function height () {
+    if ($this->settings->explicitHeight) {
+      @list($_, $height) = explode('x', $this->size());
+      if ($height ?? null) {
+        return (int) $height;
+      }
+    }
+
+    return null;
   }
 
   public function inline()
