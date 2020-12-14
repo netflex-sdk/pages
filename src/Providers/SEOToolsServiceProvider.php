@@ -2,27 +2,27 @@
 
 namespace Netflex\Pages\Providers;
 
+use Netflex\Foundation\Variable;
+
 use Apility\SEOTools\SEOTools;
 use Apility\SEOTools\SEOMeta;
 use Apility\SEOTools\OpenGraph;
 use Apility\SEOTools\TwitterCards;
 use Apility\SEOTools\JsonLd;
 use Apility\SEOTools\JsonLdMulti;
-
 use Apility\SEOTools\Contracts\SEOTools as SEOToolsContract;
 use Apility\SEOTools\Contracts\MetaTags as MetaTagsContract;
 use Apility\SEOTools\Contracts\TwitterCards as TwitterCardsContract;
 use Apility\SEOTools\Contracts\OpenGraph as OpenGraphContract;
 use Apility\SEOTools\Contracts\JsonLd as JsonLdContract;
 use Apility\SEOTools\Contracts\JsonLdMulti as JsonLdMultiContract;
-
 use Apility\SEOTools\Providers\SEOToolsServiceProvider as ServiceProvider;
-use Illuminate\Config\Repository as Config;
-use Netflex\Foundation\Variable;
+
+use Illuminate\Support\Facades\Config;
+use Illuminate\Config\Repository as ConfigRepository;
 
 class SEOToolsServiceProvider extends ServiceProvider
 {
-
   /**
    * Register the service provider.
    *
@@ -31,7 +31,7 @@ class SEOToolsServiceProvider extends ServiceProvider
   public function register()
   {
     $this->app->singleton('seotools.metatags', function ($app) {
-      return new SEOMeta(new Config([
+      return new SEOMeta(new ConfigRepository(Config::get('seotools.meta', [
         'defaults'       => [
           'title'        => Variable::get('site_meta_title') ?? false,
           'titleBefore'  => false,
@@ -41,7 +41,6 @@ class SEOToolsServiceProvider extends ServiceProvider
           'canonical'    => false,
           'robots'       => false,
         ],
-
         'webmaster_tags' => [
           'google'    => null,
           'bing'      => null,
@@ -49,13 +48,12 @@ class SEOToolsServiceProvider extends ServiceProvider
           'pinterest' => null,
           'yandex'    => null,
         ],
-
         'add_notranslate_class' => false,
-      ]));
+      ])));
     });
 
     $this->app->singleton('seotools.opengraph', function ($app) {
-      return new OpenGraph([
+      return new OpenGraph(Config::get('seotools.opengraph', [
         'defaults' => [
           'title'       => Variable::get('site_meta_title') ?? false,
           'description' => Variable::get('site_meta_description') ?? false,
@@ -64,36 +62,36 @@ class SEOToolsServiceProvider extends ServiceProvider
           'site_name'   => false,
           'images'      => [],
         ]
-      ]);
+      ]));
     });
 
     $this->app->singleton('seotools.twitter', function ($app) {
-      return new TwitterCards([
+      return new TwitterCards(Config::get('seotools.twitter', [
         'defaults' => [
           'card'        => 'summary',
           'site'        => false,
         ],
-      ]);
+      ]));
     });
 
     $this->app->singleton('seotools.json-ld', function ($app) {
-      return new JsonLd([
+      return new JsonLd(Config::get('seotools.json-ld', [
         'title'       => Variable::get('site_meta_title') ?? false,
         'description' => Variable::get('site_meta_description') ?? false,
         'url'         => false, // Set null for using Url::current(), set false to total remove
         'type'        => 'WebPage',
         'images'      => [],
-      ]);
+      ]));
     });
 
     $this->app->singleton('seotools.json-ld-multi', function ($app) {
-      return new JsonLdMulti([
+      return new JsonLdMulti(Config::get('seotools.json-ld', [
         'title'       => Variable::get('site_meta_title') ?? false,
         'description' => Variable::get('site_meta_description') ?? false,
         'url'         => false, // Set null for using Url::current(), set false to total remove
         'type'        => 'WebPage',
         'images'      => [],
-      ]);
+      ]));
     });
 
     $this->app->singleton('seotools', function () {
