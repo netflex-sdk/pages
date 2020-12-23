@@ -17,7 +17,7 @@
 @overwrite
 
 @if($tag() !== null)
-    <{{ $tag() }} @yield('attributes')>
+    <{{ $tag() }} @yield('attributes') {{ $attributes }}>
 @endif
     {!! $value ?? null !!}
 @if($tag() !== null)
