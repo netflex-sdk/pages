@@ -102,17 +102,17 @@ class NavigationData implements JsonSerializable
         })->get();
 
       $mapPage = function (Page $page) use ($root, $type) {
-        $target = '';
+        $target = $page->nav_target;
         $url = $page->url;
 
         switch ($page->type) {
           case Page::TYPE_EXTERNAL:
-            $target = '_blank';
-            $url = $root . $target;
+            $target = $target ?? '_blank';
             break;
           case Page::TYPE_FOLDER:
             break;
           default:
+            $url = $root . $url;
             break;
         }
 
