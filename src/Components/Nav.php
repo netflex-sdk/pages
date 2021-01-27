@@ -28,8 +28,9 @@ class Nav extends Component
    * @param string|null $dropdownClass
    * @param string|null $liClass
    * @param string|null $aClass
+   * @param bool $showTitle
    */
-  public function __construct($parent = null, $levels = null, $type = 'nav', $root = null, $activeClass = null, $dropdownClass = 'dropdown-container', $liClass = null, $aClass = null)
+  public function __construct($parent = null, $levels = null, $type = 'nav', $root = null, $activeClass = null, $dropdownClass = 'dropdown-container', $liClass = null, $aClass = null, $showTitle = false)
   {
     if ($parent instanceof Page) {
       $parent = $parent->id;
@@ -43,6 +44,7 @@ class Nav extends Component
     $this->liClass = $liClass;
     $this->aClass = $aClass;
     $this->children = NavigationData::get($parent, $type, $root);
+    $this->showTitle = $showTitle;
   }
 
   /**
