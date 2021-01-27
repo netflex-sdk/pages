@@ -7,6 +7,7 @@
           target="{{ $child->target }}"
           href="{{ $child->url }}"
           role="menuitem"
+          title="{{ $showTitle ? $child->title : '' }}"
         >
           {{ $child->title }}
         </a>
@@ -17,6 +18,7 @@
             :levels="$dropdownLevels()"
             :type="$type"
             :root="$root"
+            :showTitle="$showTitle"
           />
         @endif
       </li>
