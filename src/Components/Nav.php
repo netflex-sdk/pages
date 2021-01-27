@@ -16,6 +16,7 @@ class Nav extends Component
   public $dropdownClass;
   public $liClass;
   public $aClass;
+  public $showTitle;
 
   /**
    * Create a new component instance.
