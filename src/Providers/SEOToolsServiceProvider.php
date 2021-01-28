@@ -30,8 +30,12 @@ class SEOToolsServiceProvider extends ServiceProvider
    */
   public function register()
   {
-    $this->app->singleton('seotools.metatags', function ($app) {
-      return new SEOMeta(new ConfigRepository(Config::get('seotools.meta', [
+    if (!Config::has('seotools')) {
+      Config::set('seotools', []);
+    }
+
+    Config::set('seotools', array_replace_recursive([
+      'meta' => [
         'defaults'       => [
           'title'        => Variable::get('site_meta_title') ?? false,
           'titleBefore'  => false,
@@ -49,11 +53,8 @@ class SEOToolsServiceProvider extends ServiceProvider
           'yandex'    => null,
         ],
         'add_notranslate_class' => false,
-      ])));
-    });
-
-    $this->app->singleton('seotools.opengraph', function ($app) {
-      return new OpenGraph(Config::get('seotools.opengraph', [
+      ],
+      'opengraph' => [
         'defaults' => [
           'title'       => Variable::get('site_meta_title') ?? false,
           'description' => Variable::get('site_meta_description') ?? false,
@@ -62,36 +63,40 @@ class SEOToolsServiceProvider extends ServiceProvider
           'site_name'   => false,
           'images'      => [],
         ]
-      ]));
+        ],
+        'twitter' => [
+          'defaults' => [
+            'card'        => 'summary',
+            'site'        => false,
+          ],
+        ],
+        'json-ld' => [
+            'title'       => Variable::get('site_meta_title') ?? false,
+            'description' => Variable::get('site_meta_description') ?? false,
+            'url'         => false, // Set null for using Url::current(), set false to total remove
+            'type'        => 'WebPage',
+            'images'      => [],
+        ]
+    ], Config::get('seotools', [])));
+
+    $this->app->singleton('seotools.metatags', function ($app) {
+      return new SEOMeta(new ConfigRepository(Config::get('seotools.meta', [])));
+    });
+
+    $this->app->singleton('seotools.opengraph', function ($app) {
+      return new OpenGraph(Config::get('seotools.opengraph', []));
     });
 
     $this->app->singleton('seotools.twitter', function ($app) {
-      return new TwitterCards(Config::get('seotools.twitter', [
-        'defaults' => [
-          'card'        => 'summary',
-          'site'        => false,
-        ],
-      ]));
+      return new TwitterCards(Config::get('seotools.twitter', []));
     });
 
     $this->app->singleton('seotools.json-ld', function ($app) {
-      return new JsonLd(Config::get('seotools.json-ld', [
-        'title'       => Variable::get('site_meta_title') ?? false,
-        'description' => Variable::get('site_meta_description') ?? false,
-        'url'         => false, // Set null for using Url::current(), set false to total remove
-        'type'        => 'WebPage',
-        'images'      => [],
-      ]));
+      return new JsonLd(Config::get('seotools.json-ld', []));
     });
 
     $this->app->singleton('seotools.json-ld-multi', function ($app) {
-      return new JsonLdMulti(Config::get('seotools.json-ld', [
-        'title'       => Variable::get('site_meta_title') ?? false,
-        'description' => Variable::get('site_meta_description') ?? false,
-        'url'         => false, // Set null for using Url::current(), set false to total remove
-        'type'        => 'WebPage',
-        'images'      => [],
-      ]));
+      return new JsonLdMulti(Config::get('seotools.json-ld', []));
     });
 
     $this->app->singleton('seotools', function () {
