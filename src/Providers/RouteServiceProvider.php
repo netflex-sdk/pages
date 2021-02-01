@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
+use Netflex\Pages\Exceptions\InvalidRouteDefintionException;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -285,6 +286,22 @@ class RouteServiceProvider extends ServiceProvider
             $routeDefintions = $controllerInstance->getRoutes();
 
             foreach ($routeDefintions as $routeDefintion) {
+              if (!isset($routeDefintion->url) || empty($routeDefintion->url)) {
+                throw new InvalidRouteDefintionException($class, $routeDefintion);
+              }
+
+              if (!isset($routeDefintion->action) || empty($routeDefintion->action)) {
+                throw new InvalidRouteDefintionException($class, $routeDefintion);
+              }
+
+              if (!isset($routeDefintion->methods) || !is_array($routeDefintion->methods) || empty($routeDefintion->methods)) {
+                if (isset($routeDefintion->method) && is_string($routeDefintion->method) && !empty($routeDefintion->method)) {
+                  $routeDefintion->methods = [$routeDefintion->method];
+                } else {
+                  $routeDefintion->methods = [];
+                }
+              }
+
               $routeDefintion->url = trim($routeDefintion->url, '/');
               $url = trim("{$page->url}/{$routeDefintion->url}", '/');
               $action = "$class@{$routeDefintion->action}";
@@ -295,8 +312,13 @@ class RouteServiceProvider extends ServiceProvider
                 $route = $route->domain($domain);
               }
 
-              $route = $route->match($routeDefintion->methods, $url, $action)
-                ->name($page->id);
+              if (empty($routeDefintion->methods)) {
+                throw new InvalidRouteDefintionException($class, $routeDefintion);
+              } else {
+                $route = $route->match($routeDefintion->methods, $url, $action);
+              }
+
+              $route = $route->name($page->id);
 
               $this->app->bind(route_hash($route), function () use ($page) {
                 return $page;
