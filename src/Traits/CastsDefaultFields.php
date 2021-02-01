@@ -25,7 +25,6 @@ trait CastsDefaultFields
       'parent_id' => 'int',
       'public' => 'bool',
       'published' => 'bool',
-      'content'
     ];
 
     static::retrieved(function ($model) use ($defaults) {
