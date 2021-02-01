@@ -321,6 +321,10 @@ if (!function_exists('map_content')) {
       case 'entries':
         $page_editable = page_first_editable($settings['alias']);
 
+        if (!isset($page_editable['config']['model'])) {
+          throw new Exception("Entries field '{$settings['alias']}' has no model configured");
+        }
+        
         $entryIds = $content->sort(function ($a, $b) {
           return ((int) $b->sorting ?? null) - ((int) $a->sorting ?? null);
         })->reverse()
@@ -328,16 +332,14 @@ if (!function_exists('map_content')) {
             return (int) $item->text;
           })->toArray();
 
-        if (isset($page_editable['config']['model'])) {
-          $entries = Collection::make($page_editable['config']['model'])->map(function ($model) use ($entryIds) {
-            return call_user_func(array($model, 'find'), $entryIds);
-          })
-            ->flatten()
-            ->filter()
-            ->sortBy(function ($item) use ($entryIds) {
-              return array_search($item->getKey(), $entryIds);
-            })->values();
-        };
+        $entries = Collection::make($page_editable['config']['model'])->map(function ($model) use ($entryIds) {
+          return call_user_func(array($model, 'find'), $entryIds);
+        })
+          ->flatten()
+          ->filter()
+          ->sortBy(function ($item) use ($entryIds) {
+            return array_search($item->getKey(), $entryIds);
+          })->values();
 
         return $entries;
       case 'gallery':
