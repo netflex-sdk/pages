@@ -1,6 +1,6 @@
-<a href="#"
-    class="{{ $class ?? null }}"
-    style="{{ $style ?? null }}"
+<a
+    {{ $attributes->merge(['class' => $class, 'style' => $style ]) }}
+    href="#"
     data-area-name="{{ $name ?? null }}"
     data-area-field="{{ $field ?? null }}"
     data-area-description="{{ $description ?? null }}"
@@ -11,9 +11,9 @@
     data-max-items="{{ $items ?? null }}"
     data-directory-id="{{ $relationId ?? null }}"
 >
-    @isset($slot)
+    @if(isset($slot) && $slot && $slot->isNotEmpty())
         {{ $slot }}
     @else
         {{ $icon ?? null }} {{ $label ?? null }}
-    @endisset
+    @endif
 </a>

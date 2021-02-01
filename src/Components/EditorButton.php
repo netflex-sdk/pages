@@ -2,6 +2,7 @@
 
 namespace Netflex\Pages\Components;
 
+use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
 
@@ -24,7 +25,19 @@ class EditorButton extends Component
     /**
      * Create a new component instance.
      *
-     * @return void
+     * @param string $area
+     * @param null $type
+     * @param int $items
+     * @param string|null $name
+     * @param string|null $label
+     * @param string|null $description
+     * @param string $style
+     * @param string|null $icon
+     * @param string|null $position
+     * @param string|null $field
+     * @param string|array|null $model
+     * @param array|null $options
+     * @throws Exception
      */
     public function __construct(
         $area = '',
@@ -41,11 +54,11 @@ class EditorButton extends Component
         $options = null
     ) {
         $this->page = current_page();
-        $this->position = $position;
-        $this->class = implode(' ', [
-            'netflex-content-settings-btn',
-            "netflex-content-btn-pos-$position"
-        ]);
+        $class = ['netflex-content-settings-btn'];
+        if ($position) {
+            $class[] = "netflex-content-btn-pos-$position";
+        }
+        $this->class = implode(' ', $class);
         $this->name = $name ?? $area;
         $this->label = $label ?? $name ?? $area;
         $this->name = $this->name ?? $this->label ?? $this->area;
