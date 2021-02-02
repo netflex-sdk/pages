@@ -15,39 +15,49 @@ class InvalidRouteDefintionException extends Exception implements ProvidesSoluti
     /** @var object|null */
     protected $routeDefinition;
 
-    public function __construct($class, $routeDefinition = null)
+    /** @var int */
+    protected $error;
+
+    const E_UNKNOWN = 0;
+    const E_UNDEFINED = 1;
+    const E_ACTION = 2;
+    const E_URL = 3;
+    const E_METHODS = 4;
+
+    public function __construct($class, $routeDefinition = null, $error = 0)
     {
         $this->class = $class;
         $this->routeDefinition = $routeDefinition;
 
-        parent::__construct('Invalid Route Definition(s) in Controller');
+        $this->error = 0;
+
+        if (in_array($error, [static::E_UNKNOWN, static::E_UNDEFINED, static::E_ACTION, static::E_URL, static::E_METHODS])) {
+            $this->error = $error;
+        }
+
+        parent::__construct(sprintf('Invalid route definition(s) in %s', $this->class));
     }
 
     public function getSolution(): Solution
     {
-        $hasDefintion = (bool) $this->routeDefinition;
-        $hasAction = (bool) (isset($this->routeDefinition->action) && !empty($this->routeDefinition->action));
-        $hasUrl = (bool) (isset($this->routeDefinition->url) && !empty($this->routeDefinition->url));
-        $hasMethods = (bool) (
-            (isset($this->routeDefinition->methods) && is_array($this->routeDefinition->methods) && !empty($this->routeDefinition->methods)) ||
-            (isset($this->routeDefinition->method) && is_string($this->routeDefinition->method) && !empty($this->routeDefinition->method)));
-
         $solution = BaseSolution::create('One or more of the routes defined in "' . $this->class . '" is invalid.');
 
-        if (!$hasDefintion) {
-            $solution = $solution->setSolutionDescription('No definition provided');
-        }
-
-        if (!$hasAction) {
-            $solution = $solution->setSolutionDescription('No route action provided');
-        }
-
-        if (!$hasUrl) {
-            $solution = $solution->setSolutionDescription('No route url provided');
-        }
-
-        if (!$hasMethods) {
-            $solution = $solution->setSolutionDescription('No route method(s) provided');
+        switch ($this->error) {
+            case static::E_UNDEFINED:
+                $solution->setSolutionDescription('No definition provided');
+                break;
+            case static::E_ACTION:
+                $solution->setSolutionDescription('No route action provided');
+                break;
+            case static::E_URL:
+                $solution->setSolutionDescription('No route url provided');
+                break;
+            case static::E_METHODS:
+                $solution->setSolutionDescription('No route method(s) provided');
+                break;
+            default:
+                $solution->setSolutionDescription('The route is invalid');
+                break;
         }
 
         return $solution->setDocumentationLinks([

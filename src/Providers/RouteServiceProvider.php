@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Netflex\Pages\Exceptions\InvalidRouteDefintionException;
 
 class RouteServiceProvider extends ServiceProvider
@@ -287,24 +288,34 @@ class RouteServiceProvider extends ServiceProvider
 
             foreach ($routeDefintions as $routeDefintion) {
               if (!isset($routeDefintion->url) || empty($routeDefintion->url)) {
-                throw new InvalidRouteDefintionException($class, $routeDefintion);
+                throw new InvalidRouteDefintionException($class, $routeDefintion, InvalidRouteDefintionException::E_URL);
               }
 
               if (!isset($routeDefintion->action) || empty($routeDefintion->action)) {
-                throw new InvalidRouteDefintionException($class, $routeDefintion);
+                throw new InvalidRouteDefintionException($class, $routeDefintion, InvalidRouteDefintionException::E_ACTION);
               }
 
-              if (!isset($routeDefintion->methods) || !is_array($routeDefintion->methods) || empty($routeDefintion->methods)) {
-                if (isset($routeDefintion->method) && is_string($routeDefintion->method) && !empty($routeDefintion->method)) {
-                  $routeDefintion->methods = [$routeDefintion->method];
-                } else {
-                  $routeDefintion->methods = [];
-                }
+              $methods = collect([$routeDefintion->methods ?? [], $routeDefintion->method ?? null])
+                ->flatten()
+                ->filter()
+                ->filter(function ($method) {
+                  return in_array($method, ['GET', 'PUT', 'POST', 'PATCH', 'DELETE', 'OPTIONS']);
+                })
+                ->toArray();
+
+              if (empty($methods)) {
+                throw new InvalidRouteDefintionException($class, $routeDefintion, InvalidRouteDefintionException::E_METHODS);
               }
 
               $routeDefintion->url = trim($routeDefintion->url, '/');
               $url = trim("{$page->url}/{$routeDefintion->url}", '/');
               $action = "$class@{$routeDefintion->action}";
+
+              $routeName = $routeDefintion->name ? Str::slug($routeDefintion->name) : null;
+              $routeName = !$routeName ? ($routeDefintion->url ? Str::slug($routeDefintion->url) : 'index') : $routeName;
+
+              $names = collect([Str::slug($page->name), $routeName])->filter();
+              $name = ($names->count() > 1) ? $names->join('.') : null;
 
               $route = Route::domain('');
 
@@ -312,18 +323,16 @@ class RouteServiceProvider extends ServiceProvider
                 $route = $route->domain($domain);
               }
 
-              if (empty($routeDefintion->methods)) {
-                throw new InvalidRouteDefintionException($class, $routeDefintion);
-              } else {
-                $route = $route->match($routeDefintion->methods, $url, $action);
-              }
+              $route = $route->match($routeDefintion->methods, $url, $action);
 
-              $route = $route->name($page->id);
+              $route = $route->name($name ?? $page->id);
 
               $this->app->bind(route_hash($route), function () use ($page) {
                 return $page;
               });
             }
+          } catch (InvalidRouteDefintionException $e) {
+            throw $e;
           } catch (Throwable $e) {
             // The target controller class doesn't exist,
             // we register a wildcard route for the page, so we can throw an error
