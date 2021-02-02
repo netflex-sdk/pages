@@ -29,11 +29,20 @@ abstract class Controller extends BaseController
     $routes = Collection::make($this->routes);
 
     $hasIndexRoute = $routes->first(function ($route) {
-      return $route['url'] === '/' && in_array('GET', $route['methods']);
+      $methods = collect([$route['methods'] ?? [], $route['method'] ?? null])
+        ->flatten()
+        ->filter()
+        ->unique()
+        ->map(function ($method) {
+          return strtoupper($method);
+        });
+
+      return $route['url'] === '/' && $methods->contains('GET');
     });
 
     if (!$hasIndexRoute) {
       $routes->push([
+        'name' => null,
         'url' => '/',
         'methods' => ['GET'],
         'action' => 'fallbackIndex'
@@ -42,8 +51,17 @@ abstract class Controller extends BaseController
 
     return $routes
       ->map(function ($route) {
+        $methods = collect([$route['methods'] ?? [], $route['method'] ?? null])
+          ->flatten()
+          ->filter()
+          ->unique()
+          ->map(function ($method) {
+            return strtoupper($method);
+          });
+
         return (object) [
-          'methods' => $route['methods'] ?? ['GET'],
+          'name' => $route['name'] ?? null,
+          'methods' => $methods->toArray(),
           'action' => $route['action'] ?? 'index',
           'url' => $route['url'] ?? '/'
         ];
