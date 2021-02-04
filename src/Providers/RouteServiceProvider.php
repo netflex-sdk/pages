@@ -311,8 +311,12 @@ class RouteServiceProvider extends ServiceProvider
               $url = trim("{$page->url}/{$routeDefintion->url}", '/');
               $action = "$class@{$routeDefintion->action}";
 
-              $routeName = $routeDefintion->name ? Str::slug($routeDefintion->name) : null;
-              $routeName = !$routeName ? ($routeDefintion->url ? Str::slug($routeDefintion->url) : 'index') : $routeName;
+              $routeName = null;
+
+              if (isset($routeDefintion->name)) {
+                $routeName = Str::slug($routeDefintion->name);
+                $routeName = !$routeName ? ($routeDefintion->url ? Str::slug($routeDefintion->url) : 'index') : $routeName;
+              }
 
               $names = collect([Str::slug($page->name), $routeName])->filter();
               $name = ($names->count() > 1) ? $names->join('.') : null;

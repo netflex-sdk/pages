@@ -75,12 +75,14 @@ abstract class Controller extends BaseController
             return strtoupper($method);
           });
 
-        return (object) [
-          'name' => $route['name'] ?? null,
-          'methods' => $methods->toArray(),
-          'action' => $route['action'] ?? 'index',
-          'url' => $route['url'] ?? '/'
-        ];
+          if ($methods->count() && isset($route['action']) && isset($route['url'])) {
+            return (object) [
+              'name' => $route['name'] ?? null,
+              'methods' => $methods->toArray(),
+              'action' => $route['action'],
+              'url' => $route['url']
+            ];
+          }
       });
   }
 
