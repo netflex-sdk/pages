@@ -15,9 +15,12 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\HtmlString;
+
 use Netflex\Pages\Extension;
 use Netflex\Pages\JwtPayload;
 use Netflex\Pages\NavigationData;
+
+use Netflex\Pages\Contracts\MediaUrlResolvable;
 
 if (!function_exists('render_component_tag')) {
   /**
@@ -764,13 +767,17 @@ if (!function_exists('cdn_url')) {
   /**
    * Generates a CDN url with optional path appended
    * 
-   * @param string|null $path
+   * @param MediaUrlResolvable|string|null $path
    * @return string
    */
   function cdn_url ($path = null)
   {
     $schema = Variable::get('site_cdn_protocol');
     $cdn = Variable::get('site_cdn_url');
+
+    if ($path instanceof MediaUrlResolvable) {
+      $path = $path->getPathAttribute();
+    }
 
     return trim((rtrim("$schema://$cdn", '/') . '/' . trim($path, '/')), '/');
   }
@@ -780,7 +787,7 @@ if (!function_exists('media_url')) {
   /**
    * Get URL to a CDN image
    *
-   * @param object|array|string $file
+   * @param MediaUrlResolvable|object|array|string $file
    * @param array|string|int $size
    * @param string $type
    * @param array|string|int $color
@@ -789,9 +796,13 @@ if (!function_exists('media_url')) {
    */
   function media_url($file, $size = null, $type = 'rc', $color = '255,255,255,1', $direction = null)
   {
-    if (is_array($file) || is_object($file)) {
-      $fallback = (is_object($file) && method_exists($file, '__toString')) ? (string) $file : null;
-      $file = data_get($file, 'path', $fallback);
+    if ($file instanceof MediaUrlResolvable) {
+      $file = $file->getPathAttribute();
+    } else {
+      if (is_array($file) || is_object($file)) {
+        $fallback = (is_object($file) && method_exists($file, '__toString')) ? (string) $file : null;
+        $file = data_get($file, 'path', $fallback);
+      }
     }
 
     if (!$size && !$type && empty($gb)) {
