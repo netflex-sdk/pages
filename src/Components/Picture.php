@@ -47,13 +47,14 @@ class Picture extends Component
   public $fill;
   public $inline;
   public $direction;
+  public $loading;
 
   /**
    * Create a new component instance.
    *
    * @return void
    */
-  public function __construct($area = null, $alt = null, $title = null, $src = null, $mode = null, $width = null, $height = null, $size = null, $fill = null, $imageClass = null, $pictureClass = null, $preset = 'default', $direction = null)
+  public function __construct($area = null, $alt = null, $title = null, $src = null, $mode = null, $width = null, $height = null, $size = null, $fill = null, $imageClass = null, $pictureClass = null, $preset = 'default', $direction = null, $loading = 'lazy')
   {
     $this->inline = !!$area;
     $this->area = $area;
@@ -67,6 +68,7 @@ class Picture extends Component
     $this->title = $title;
     $this->alt = $alt;
     $this->direction = $direction;
+    $this->loading = $loading;
 
     $width = $width ?? $height ?? null;
     $height = $height ?? $width ?? null;
