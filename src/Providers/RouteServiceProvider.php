@@ -331,8 +331,6 @@ class RouteServiceProvider extends ServiceProvider
                 return $page;
               });
             }
-          } catch (InvalidRouteDefintionException $e) {
-            throw $e;
           } catch (Throwable $e) {
             // The target controller class doesn't exist,
             // we register a wildcard route for the page, so we can throw an error
@@ -344,7 +342,10 @@ class RouteServiceProvider extends ServiceProvider
               $route = $route->domain($domain);
             }
 
-            $route->any(rtrim($page->url, '/') . '/{any?}', function () use ($class) {
+            $route->any(rtrim($page->url, '/') . '/{any?}', function () use ($class, $e) {
+              if ($e instanceof InvalidRouteDefintionException) {
+                throw $e;
+              }
               // Since the target $class doesn't exist,
               // this will throw an error for the developer if APP_DEBUG is enabled
               return app($class);
