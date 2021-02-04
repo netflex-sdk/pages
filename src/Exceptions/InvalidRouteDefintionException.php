@@ -18,16 +18,22 @@ class InvalidRouteDefintionException extends Exception implements ProvidesSoluti
     /** @var int */
     protected $error;
 
+    /** @var string */
+    protected $key;
+
     const E_UNKNOWN = 0;
     const E_UNDEFINED = 1;
     const E_ACTION = 2;
     const E_URL = 3;
     const E_METHODS = 4;
+    const E_INVALID = 5;
+    const E_ILLEGAL_KEY = 6;
 
-    public function __construct($class, $routeDefinition = null, $error = 0)
+    public function __construct($class, $routeDefinition = null, $error = 0, $key = null)
     {
         $this->class = $class;
         $this->routeDefinition = $routeDefinition;
+        $this->key = $key;
 
         $this->error = 0;
 
@@ -54,6 +60,12 @@ class InvalidRouteDefintionException extends Exception implements ProvidesSoluti
                 break;
             case static::E_METHODS:
                 $solution->setSolutionDescription('No route method(s) provided');
+                break;
+            case static::E_INVALID:
+                $solution->setSolutionDescription('The $routes array is invalid');
+                break;
+            case static::E_ILLEGAL_KEY:
+                $solution->setSolutionDescription('Invalid key: "' . $this->key . '"');
                 break;
             default:
                 $solution->setSolutionDescription('The route is invalid');
