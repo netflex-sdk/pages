@@ -339,20 +339,14 @@ class RouteServiceProvider extends ServiceProvider
             // The target controller class doesn't exist,
             // we register a wildcard route for the page, so we can throw an error
             // when attempting to route to the page
-            Log::warning($e->getMessage());
             $route = Route::domain('');
 
             if ($domain = $page->domain) {
               $route = $route->domain($domain);
             }
 
-            $route->any(rtrim($page->url, '/') . '/{any?}', function () use ($class, $e) {
-              if ($e instanceof InvalidRouteDefintionException) {
-                throw $e;
-              }
-              // Since the target $class doesn't exist,
-              // this will throw an error for the developer if APP_DEBUG is enabled
-              return app($class);
+            $route->any(rtrim($page->url, '/') . '/{any?}', function () use ($e) {
+              throw $e;
             })->name($page->id);
           }
         });
