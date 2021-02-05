@@ -29,6 +29,17 @@ abstract class Controller extends BaseController
   {
     $routes = Collection::make($this->routes);
 
+    $validRouteDefinitions = $routes->reduce(function ($valid, $route) {
+      $validKeys = ['url', 'method', 'methods', 'action', 'name'];
+      return $valid && is_array($route) && Collection::make(array_keys($route))->reduce(function ($valid, $key) use ($validKeys, $route) {
+        $validKey = in_array($key, $validKeys);
+        if (!$validKey) {
+          throw new InvalidRouteDefintionException(static::class, $route, InvalidRouteDefintionException::E_ILLEGAL_KEY, $key);
+        }
+        return $valid && $validKey;
+      }, true);
+    }, true);
+
     $hasIndexRoute = $routes->first(function ($route) {
       $methods = collect([$route['methods'] ?? [], $route['method'] ?? null])
         ->flatten()
@@ -40,17 +51,6 @@ abstract class Controller extends BaseController
 
       return $route['url'] === '/' && $methods->contains('GET');
     });
-
-    $validRouteDefinitions = $routes->reduce(function ($valid, $route) {
-      $validKeys = ['url', 'method', 'methods', 'action', 'name'];
-      return $valid && is_array($route) && Collection::make(array_keys($route))->reduce(function ($valid, $key) use ($validKeys, $route) {
-        $validKey = in_array($key, $validKeys);
-        if (!$validKey) {
-          throw new InvalidRouteDefintionException(static::class, $route, InvalidRouteDefintionException::E_ILLEGAL_KEY, $key);
-        }
-        return $valid && $validKey;
-      }, true);
-    }, true);
 
     if (!$validRouteDefinitions) {
       throw new InvalidRouteDefintionException(static::class, null, InvalidRouteDefintionException::E_INVALID);
