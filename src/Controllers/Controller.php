@@ -40,6 +40,10 @@ abstract class Controller extends BaseController
       }, true);
     }, true);
 
+    if (!$validRouteDefinitions) {
+      throw new InvalidRouteDefintionException(static::class, null, InvalidRouteDefintionException::E_INVALID);
+    }
+
     $hasIndexRoute = $routes->first(function ($route) {
       $methods = collect([$route['methods'] ?? [], $route['method'] ?? null])
         ->flatten()
@@ -51,10 +55,6 @@ abstract class Controller extends BaseController
 
       return $route['url'] === '/' && $methods->contains('GET');
     });
-
-    if (!$validRouteDefinitions) {
-      throw new InvalidRouteDefintionException(static::class, null, InvalidRouteDefintionException::E_INVALID);
-    }
 
     if (!$hasIndexRoute) {
       $routes->push([
