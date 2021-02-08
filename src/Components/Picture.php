@@ -5,7 +5,7 @@ namespace Netflex\Pages\Components;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\Component;
-
+use Netflex\Pages\Contracts\MediaUrlResolvable;
 use Netflex\Pages\MediaPreset;
 use Netflex\Pages\Exceptions\InvalidPresetException;
 
@@ -108,6 +108,10 @@ class Picture extends Component
 
     if ($this->src instanceof HtmlString) {
       $this->src = (string) $this->src;
+    }
+
+    if ($this->src instanceof MediaUrlResolvable) {
+      return $this->src->getPathAttribute();
     }
 
     if (is_object($this->src) && property_exists($this->src, 'path')) {

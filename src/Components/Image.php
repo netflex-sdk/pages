@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\Component;
 
+use Netflex\Pages\Contracts\MediaUrlResolvable;
+
 class Image extends Component
 {
   const MODE_ORIGINAL = 'o';
@@ -188,6 +190,10 @@ class Image extends Component
   {
     if ($this->settings->src instanceof HtmlString) {
       $this->settings->src = (string) $this->settings->src;
+    }
+
+    if ($this->settings->src instanceof MediaUrlResolvable) {
+      return $this->settings->src->getPathAttribute();
     }
 
     if (is_object($this->settings->src) && property_exists($this->settings->src, 'path')) {
