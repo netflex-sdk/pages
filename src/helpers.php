@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\HtmlString;
-
+use Netflex\Pages\ContentFile;
+use Netflex\Pages\ContentImage;
 use Netflex\Pages\Extension;
 use Netflex\Pages\JwtPayload;
 use Netflex\Pages\NavigationData;
@@ -327,7 +328,7 @@ if (!function_exists('map_content')) {
         if (!isset($page_editable['config']['model'])) {
           throw new Exception("Entries field '{$settings['alias']}' has no model configured");
         }
-        
+
         $entryIds = $content->sort(function ($a, $b) {
           return ((int) $b->sorting ?? null) - ((int) $a->sorting ?? null);
         })->reverse()
@@ -349,13 +350,15 @@ if (!function_exists('map_content')) {
         return $content->mapWithKeys(function ($item) {
           $hash = $item->text;
           unset($item->text);
-          return [$hash => (object) [
-            'id' => $item->id,
-            'title' => $item->title,
-            'description' => $item->description,
-            'path' => $item->image,
-            'file' => (int) $item->file
-          ]];
+          return [
+            $hash => new ContentImage([
+              'id' => $item->id,
+              'title' => $item->title,
+              'description' => $item->description,
+              'path' => $item->image,
+              'file' => (int) $item->file
+            ])
+          ];
         });
       case 'editor-small':
       case 'editor-large':
@@ -417,25 +420,25 @@ if (!function_exists('map_content')) {
         return null;
       case 'image':
         if ($item = $content->shift()) {
-          return (object) [
+          return new ContentImage([
             'id' => $item->id ?? null,
             'path' => $item->image ?? null,
             'file' => $item->file ?? null,
             'title' => $item->name ?? null,
             'description' => $item->description ?? null
-          ];
+          ]);
         }
 
         return null;
       case 'file':
         if ($item = $content->shift()) {
-          return (object) [
+          return new ContentFile([
             'id' => $item->id ?? null,
             'path' => $item->file ?? null,
             'file' => $item->text ?? null,
             'title' => $item->name ?? null,
             'description' => $item->description ?? null
-          ];
+          ]);
         }
 
         return null;
@@ -770,7 +773,7 @@ if (!function_exists('cdn_url')) {
    * @param MediaUrlResolvable|string|null $path
    * @return string
    */
-  function cdn_url ($path = null)
+  function cdn_url($path = null)
   {
     $schema = Variable::get('site_cdn_protocol');
     $cdn = Variable::get('site_cdn_url');
