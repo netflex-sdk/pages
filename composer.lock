@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4657bb1053246987764cb877bce72712",
+    "content-hash": "c45dd16e3f2a623b24eee7527b9b3bea",
     "packages": [
         {
             "name": "apility/seotools",

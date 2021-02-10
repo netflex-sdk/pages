@@ -20,8 +20,8 @@
   },
   "require": {
     "php": "^7.3",
-    "facade/ignition-contracts": "^1.0",
     "apility/seotools": "^1.0",
+    "facade/ignition-contracts": "^1.0",
     "illuminate/auth": "^8.0",
     "illuminate/contracts": "^8.0",
     "illuminate/routing": "^8.0",
