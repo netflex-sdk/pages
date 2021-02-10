@@ -22,6 +22,35 @@ use Netflex\Pages\JwtPayload;
 use Netflex\Pages\NavigationData;
 
 use Netflex\Pages\Contracts\MediaUrlResolvable;
+use Netflex\Pages\Components\Picture;
+use Netflex\Pages\MediaPreset;
+
+const MODE_ORIGINAL = Picture::MODE_ORIGINAL;
+const MODE_EXACT = Picture::MODE_EXACT;
+const MODE_FIT = Picture::MODE_FIT;
+const MODE_PORTRAIT = Picture::MODE_PORTRAIT;
+const MODE_LANDSCAPE = Picture::MODE_LANDSCAPE;
+const MODE_AUTO = Picture::MODE_AUTO;
+const MODE_CROP = Picture::MODE_CROP;
+const MODE_FIT_DIRECTION = Picture::MODE_FIT_DIRECTION;
+
+const DIR_TOP = Picture::DIRECTION_TOP;
+const DIR_TOP_LEFT = Picture::DIRECTION_TOP_LEFT;
+const DIR_TOP_RIGHT = Picture::DIRECTION_TOP_RIGHT;
+const DIR_BOTTOM = Picture::DIRECTION_BOTTOM;
+const DIR_BOTTOM_LEFT = Picture::DIRECTION_BOTTOM_LEFT;
+const DIR_BOTTOM_RIGHT = Picture::DIRECTION_BOTTOM_RIGHT;
+const DIR_LEFT = Picture::DIRECTION_LEFT;
+const DIR_RIGHT = Picture::DIRECTION_RIGHT;
+const DIR_CENTER = Picture::DIRECTION_CENTER;
+
+const MEDIA_PRESET_ORIGINAL = MediaPreset::ORIGINAL;
+
+const PAGE_DOMAIN = Page::TYPE_DOMAIN;
+const PAGE_EXTERNAL = Page::TYPE_EXTERNAL;
+const PAGE_INTERNAL = Page::TYPE_INTERNAL;
+const PAGE_FOLDER = Page::TYPE_FOLDER;
+const PAGE = Page::TYPE_PAGE;
 
 if (!function_exists('render_component_tag')) {
   /**
