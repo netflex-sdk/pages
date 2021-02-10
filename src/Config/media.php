@@ -53,6 +53,6 @@ return [
     |     - fill
     */
     'presets' => [
-        'default' => MediaPreset::ORIGINAL
+        'default' => MEDIA_PRESET_ORIGINAL
     ],
 ];
