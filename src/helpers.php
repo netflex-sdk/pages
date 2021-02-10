@@ -26,13 +26,14 @@ use Netflex\Pages\Components\Picture;
 use Netflex\Pages\MediaPreset;
 
 const MODE_ORIGINAL = Picture::MODE_ORIGINAL;
+const MODE_FILL = Picture::MODE_FILL;
 const MODE_EXACT = Picture::MODE_EXACT;
 const MODE_FIT = Picture::MODE_FIT;
 const MODE_PORTRAIT = Picture::MODE_PORTRAIT;
 const MODE_LANDSCAPE = Picture::MODE_LANDSCAPE;
 const MODE_AUTO = Picture::MODE_AUTO;
 const MODE_CROP = Picture::MODE_CROP;
-const MODE_FIT_DIRECTION = Picture::MODE_FIT_DIRECTION;
+const MODE_FIT_DIR = Picture::MODE_FIT_DIRECTION;
 
 const DIR_TOP = Picture::DIRECTION_TOP;
 const DIR_TOP_LEFT = Picture::DIRECTION_TOP_LEFT;
