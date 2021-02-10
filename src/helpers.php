@@ -26,6 +26,7 @@ use Netflex\Pages\Components\Picture;
 use Netflex\Pages\MediaPreset;
 
 const MODE_ORIGINAL = Picture::MODE_ORIGINAL;
+const MODE_FILL = Picture::MODE_FILL;
 const MODE_EXACT = Picture::MODE_EXACT;
 const MODE_FIT = Picture::MODE_FIT;
 const MODE_PORTRAIT = Picture::MODE_PORTRAIT;
