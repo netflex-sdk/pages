@@ -1,7 +1,5 @@
 <?php
 
-use Netflex\Pages\MediaPreset;
-
 return [
 
     /*
