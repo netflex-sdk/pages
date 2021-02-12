@@ -63,6 +63,12 @@ class ContentFile implements MediaUrlResolvable, JsonSerializable, Arrayable, Js
 
     public function __debugInfo()
     {
-        return $this->attributes;
+        $attributes = [];
+
+        foreach ($this->attributes as $key => $value) {
+            $attributes[$key] = $this->__get($key);
+        }
+
+        return $attributes;
     }
 }
