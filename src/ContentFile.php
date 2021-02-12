@@ -2,8 +2,14 @@
 
 namespace Netflex\Pages;
 
+use ArrayAccess;
+use JsonSerializable;
+
 use Netflex\Support\Accessors;
 use Netflex\Pages\Contracts\MediaUrlResolvable;
+
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
 
 /**
  * @property int|null $id
@@ -12,13 +18,13 @@ use Netflex\Pages\Contracts\MediaUrlResolvable;
  * @property string|null $description
  * @package Netflex\Pages
  */
-class ContentFile implements MediaUrlResolvable
+class ContentFile implements MediaUrlResolvable, JsonSerializable, Arrayable, Jsonable
 {
     use Accessors;
 
     public function __construct($attributes = [])
     {
-        $this->attributes = $attributes;
+        $this->attributes = $attributes ?? [];
     }
 
     public function getIdAttribute($id)
@@ -38,5 +44,31 @@ class ContentFile implements MediaUrlResolvable
     public function getPathAttribute()
     {
         return $this->attributes['path'] ?? null;
+    }
+
+    public function jsonSerialize()
+    {
+        return $this->toArray();
+    }
+
+    public function toArray()
+    {
+        return $this->attributes;
+    }
+
+    public function toJson($options = 0)
+    {
+        return json_encode($this->jsonSerialize(), $options);
+    }
+
+    public function __debugInfo()
+    {
+        $attributes = [];
+
+        foreach ($this->attributes as $key => $value) {
+            $attributes[$key] = $this->__get($key);
+        }
+
+        return $attributes;
     }
 }
