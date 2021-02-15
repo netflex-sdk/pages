@@ -11,6 +11,7 @@ use Illuminate\Support\Traits\Macroable;
 use Netflex\Support\Accessors;
 use Netflex\Pages\Components\Picture;
 use Netflex\Pages\Exceptions\BreakpointsMissingException;
+use Netflex\Pages\Exceptions\InvalidPresetException;
 
 /**
  * @property-read string $mode
@@ -58,6 +59,42 @@ class MediaPreset implements JsonSerializable
     }
 
     Config::set("media.presets.$name", $preset);
+  }
+
+  /**
+   * @param string $name 
+   * @return MediaPreset|null 
+   */
+  public static function find($name) {
+    $default = Config::get("media.presets.default", [
+      'mode' => MODE_FIT,
+      'resolutions' => ['1x', '2x', '3x'],
+      'direction' => DIR_CENTER
+    ]);
+
+    if ($preset = Config::get("media.presets.{$name}")) {
+      $preset['size'] = $preset['size'] ?? $default['size'] ?? null;
+      $preset['mode'] = $preset['mode'] ?? $default['mode'] ?? MODE_ORIGINAL;
+      $preset['fill'] = $preset['fill'] ?? $default['fill'] ?? null;
+      $preset['direction'] = $preset['direction'] ?? $default['direction'] ?? null;
+      $preset['resolutions'] = $preset['resolutions'] ?? $default['resolutions'] ?? null;
+      $preset['breakpoints'] = $preset['breakpoints'] ?? $default['breakpoints'] ?? null;
+
+      return new MediaPreset($preset);
+    }
+  }
+
+  /**
+   * @param string $name 
+   * @return MediaPreset 
+   * @throws InvalidPresetException 
+   */
+  public static function findOrFail($name) {
+    if ($preset = static::find($name)) {
+      return $preset;
+    }
+
+    throw new InvalidPresetException($name);
   }
 
   public function getModeAttribute($mode = null)
