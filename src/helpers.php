@@ -355,18 +355,25 @@ if (!function_exists('map_content')) {
       case 'entries':
         $page_editable = page_first_editable($settings['alias']);
 
-        if (!isset($page_editable['config']['model'])) {
-          throw new Exception("Entries field '{$settings['alias']}' has no model configured");
+        $models = Collection::make([
+          'Netflex\\Structure\\Entry'
+        ]);
+
+        if (isset($page_editable['config']['model'])) {
+          $models = $models->merge(Collection::make($page_editable['config']['model']));
         }
 
         $entryIds = $content->sort(function ($a, $b) {
           return ((int) $b->sorting ?? null) - ((int) $a->sorting ?? null);
-        })->reverse()
-          ->values()->map(function ($item) {
+        })
+          ->reverse()
+          ->values()
+          ->map(function ($item) {
             return (int) $item->text;
-          })->toArray();
+          })
+          ->toArray();
 
-        $entries = Collection::make($page_editable['config']['model'])->map(function ($model) use ($entryIds) {
+        $entries = $models->map(function ($model) use ($entryIds) {
           return call_user_func(array($model, 'find'), $entryIds);
         })
           ->flatten()
