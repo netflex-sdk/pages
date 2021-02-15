@@ -360,7 +360,7 @@ if (!function_exists('map_content')) {
         ]);
 
         if (isset($page_editable['config']['model'])) {
-          $models = $models->merge(Collection::make($page_editable['config']['model']));
+          $models = Collection::make($page_editable['config']['model']);
         }
 
         $entryIds = $content->sort(function ($a, $b) {
