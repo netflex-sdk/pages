@@ -821,13 +821,13 @@ if (!function_exists('media_url')) {
    * Get URL to a CDN image
    *
    * @param MediaUrlResolvable|object|array|string $file
-   * @param array|string|int $size
+   * @param array|string|int|MediaPreset $presetOrSize
    * @param string $type
    * @param array|string|int $color
    * @param string|null $direction
    * @return string
    */
-  function media_url($file, $size = null, $type = 'rc', $color = '255,255,255,1', $direction = null)
+  function media_url($file, $presetOrSize = null, $type = 'rc', $color = '255,255,255,1', $direction = null)
   {
     if ($file instanceof MediaUrlResolvable) {
       $file = $file->getPathAttribute();
@@ -836,6 +836,17 @@ if (!function_exists('media_url')) {
         $fallback = (is_object($file) && method_exists($file, '__toString')) ? (string) $file : null;
         $file = data_get($file, 'path', $fallback);
       }
+    }
+
+    $size = $presetOrSize;
+    $preset = ($presetOrSize instanceof MediaPreset) ? $presetOrSize : null;
+    $preset = !$preset ? MediaPreset::find($presetOrSize) : null;
+
+    if ($preset) {
+      $size = $preset->size ?? null;
+      $type = $preset->mode ?? $type;
+      $color = $preset->fill ?? $color;
+      $direction = $preset->direction ?? $direction;
     }
 
     if (!$size && !$type && empty($gb)) {
