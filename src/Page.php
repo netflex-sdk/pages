@@ -509,4 +509,40 @@ class Page extends QueryableModel implements Responsable
   {
     return NavigationData::get($this->id, $type, $root);
   }
+
+  /**
+   * Traverses the page graph and determines if the page is a subpage of another pzsage.
+   *
+   * @param Page $page
+   * @param Page|null $pointer
+   * @return bool
+   */
+  public function isSubPageOf(Page $page, ?Page $pointer = null)
+  {
+    if (!$pointer) {
+      $pointer = $this;
+    }
+
+    if (!$pointer->parent) {
+      return false;
+    }
+
+    if ($pointer->parent == $page) {
+      return true;
+    }
+
+    return $this->isSubPageOf($page, $pointer->parent);
+  }
+
+  /**
+   * Traverses the page graph and determines if the page is a subpage of another pzsage.
+   *
+   * @param Page $page
+   * @param Page|null $pointer
+   * @return bool
+   */
+  public function isParentPageOf(Page $page)
+  {
+    return $page->isSubPageOf($this);
+  }
 }
