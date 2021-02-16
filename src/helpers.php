@@ -313,7 +313,12 @@ if (!function_exists('blocks')) {
   function blocks($area)
   {
     if ($page = current_page()) {
-      return $page->getBlocks($area);
+      return $page->getBlocks($area)->map(function($block) {
+          return [
+              config("blocks.overrides.{$block[0]}", $block[0]),
+              $block[1],
+          ];
+      });;
     }
 
     return collect([]);
