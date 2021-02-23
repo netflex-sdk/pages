@@ -7,6 +7,7 @@ use Illuminate\Support\HtmlString;
 use Illuminate\View\Component;
 
 use Netflex\Pages\Contracts\MediaUrlResolvable;
+use Netflex\Pages\MediaPreset;
 
 class Image extends Component
 {
@@ -44,7 +45,8 @@ class Image extends Component
     $alt = null,
     $title = null,
     $class = null,
-    $style = null
+    $style = null,
+    $preset = null
   ) {
     $explicitWidth = $width !== null;
     $explicitHeight = $height !== null;
@@ -60,6 +62,15 @@ class Image extends Component
     $mode = $height && !$width ? self::MODE_PORTRAIT : $mode;
     $height = !$height && $width ? $width : $height;
     $width = !$width && $height ? $height : $width;
+
+    if ($preset) {
+      if ($preset = MediaPreset::find($preset)) {
+        $mode = $preset->mode ? $preset->mode : $mode;
+        $height = $preset->height ? $preset->height : $height;
+        $width = $preset->width ? $preset->width : $width;
+        $color = $preset->fill ?? $color;
+      }
+    }
 
     $this->settings = (object) [
       'area' => $area ?? null,
