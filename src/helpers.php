@@ -202,7 +202,7 @@ if (!function_exists('if_mode')) {
    * Determines if the app is in one or more modes
    *
    * @param string|string[] ...$modes
-   * @return void
+   * @return bool
    */
   function if_mode(...$modes)
   {
