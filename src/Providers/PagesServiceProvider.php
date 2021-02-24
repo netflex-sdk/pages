@@ -2,6 +2,7 @@
 
 namespace Netflex\Pages\Providers;
 
+use Illuminate\Support\Facades\App;
 use Netflex\Pages\Components\EditorButton;
 use Netflex\Pages\Components\Image;
 use Netflex\Pages\Components\Picture;
@@ -68,5 +69,19 @@ class PagesServiceProvider extends ServiceProvider
     Blade::directive('content', function ($expression) {
       return "<?php echo content($expression); ?>";
     });
+
+    Blade::if('production', function () {
+      return env('APP_ENV') === 'master';
+    });
+
+    Blade::if('development', function () {
+      return env('APP_ENV') !== 'master';
+    });
+
+    foreach (['edit', 'preview', 'live'] as $mode) {
+      Blade::directive($mode, function ($expression) use ($mode) {
+        return "<?php if(current_mode() === '$mode') { echo " . $expression . "; } ?>";
+      });
+    }
   }
 }
