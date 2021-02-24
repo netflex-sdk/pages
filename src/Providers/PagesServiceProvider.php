@@ -63,7 +63,7 @@ class PagesServiceProvider extends ServiceProvider
     });
 
     Blade::if('domain', function ($domain) {
-      return current_mode() === $domain;
+      return current_domain() === $domain;
     });
 
     Blade::directive('content', function ($expression) {
