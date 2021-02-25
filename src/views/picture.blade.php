@@ -9,4 +9,4 @@
   @endforeach
   <img class="{{ collect([$attributes->get('class'), $imageClass])->filter()->join(' ') }}" src="{{ $defaultSrc }}" srcset="{{ $defaultSrcSet }}" title="{{ $title }}" alt="{{ $alt }}" loading="{{ $loading }}">
 </picture>
-@endmode
+@endif
