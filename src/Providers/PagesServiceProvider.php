@@ -71,16 +71,16 @@ class PagesServiceProvider extends ServiceProvider
     });
 
     Blade::if('production', function () {
-      return env('APP_ENV') === 'master';
+      return in_production();
     });
 
     Blade::if('development', function () {
-      return env('APP_ENV') !== 'master';
+      return in_development();
     });
 
     foreach (['edit', 'preview', 'live'] as $mode) {
       Blade::directive($mode, function ($expression) use ($mode) {
-        return "<?php if(current_mode() === '$mode') { echo " . $expression . "; } ?>";
+        return "<?php if({$mode}_mode()) { echo " . $expression . "; } ?>";
       });
     }
   }

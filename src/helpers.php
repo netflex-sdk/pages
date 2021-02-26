@@ -313,11 +313,11 @@ if (!function_exists('blocks')) {
   function blocks($area)
   {
     if ($page = current_page()) {
-      return $page->getBlocks($area)->map(function($block) {
-          return [
-              config("blocks.overrides.{$block[0]}", $block[0]),
-              $block[1],
-          ];
+      return $page->getBlocks($area)->map(function ($block) {
+        return [
+          config("blocks.overrides.{$block[0]}", $block[0]),
+          $block[1],
+        ];
       });;
     }
 
@@ -907,5 +907,65 @@ if (!function_exists('media_url')) {
     $size = $type === 'o' ?  null : "$size/";
 
     return cdn_url("/media/$type/{$size}{$options}{$file}");
+  }
+}
+
+if (!function_exists('in_production')) {
+  /**
+   * Check if the application is running in a production environment
+   *
+   * @return bool 
+   */
+  function in_production()
+  {
+    return env('APP_ENV') === 'master';
+  }
+}
+
+if (!function_exists('in_development')) {
+  /**
+   * Check if the application is running in a development environment
+   *
+   * @return bool 
+   */
+  function in_development()
+  {
+    return env('APP_ENV') !== 'master';
+  }
+}
+
+if (!function_exists('edit_mode')) {
+  /**
+   * Check if the current mode is edit
+   *
+   * @return bool 
+   */
+  function edit_mode()
+  {
+    return current_mode() === 'edit';
+  }
+}
+
+if (!function_exists('preview_mode')) {
+  /**
+   * Check if the current mode is preview
+   *
+   * @return bool 
+   */
+  function preview_mode()
+  {
+    return current_mode() === 'preview';
+  }
+}
+
+if (!function_exists('live_mode')) {
+  /**
+   * Check if the current mode is live
+   *
+   * @return bool 
+   */
+  function live_mode()
+  {
+    return current_mode() === 'live';
   }
 }
