@@ -273,6 +273,9 @@ class RouteServiceProvider extends ServiceProvider
         Page::all()->filter(function ($page) {
           return $page->type === 'page' && $page->template && $page->published;
         })->each(function ($page) {
+          /** @var Page */
+          $page = $page;
+
           $controller = $page->template->controller ?? null;
           $pageController = Config::get('pages.controller', PageController::class);
           $class = trim($controller ? ("\\{$this->namespace}\\{$controller}") : "\\{$pageController}", '\\');
@@ -281,6 +284,11 @@ class RouteServiceProvider extends ServiceProvider
           $controllerInstance = null;
 
           try {
+            // Precompute domain bindings for page
+            $domain = Cache::rememberForever($page->id . ':domain', function () use ($page) {
+              return $page->domain ?? '';
+            });
+
             // We attempt to instantiate the target class
             $controllerInstance = app($class);
             $class = get_class($controllerInstance);
@@ -321,15 +329,9 @@ class RouteServiceProvider extends ServiceProvider
               $names = collect([Str::slug($page->name), $routeName])->filter();
               $name = ($names->count() > 1) ? $names->join('.') : null;
 
-              $route = Route::domain('');
-
-              if ($domain = $page->domain) {
-                $route = $route->domain($domain);
-              }
-
-              $route = $route->match($routeDefintion->methods, $url, $action);
-
-              $route = $route->name($name ?? $page->id);
+              $route = Route::domain($domain)
+                ->match($routeDefintion->methods, $url, $action)
+                ->name($name ?? $page->id);
 
               $this->app->bind(route_hash($route), function () use ($page) {
                 return $page;
