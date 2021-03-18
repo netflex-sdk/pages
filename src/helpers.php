@@ -462,7 +462,7 @@ if (!function_exists('map_content')) {
         return null;
       case 'image':
         if ($item = $content->shift()) {
-          return new ContentImage([
+          return ContentImage::cast([
             'id' => $item->id ?? null,
             'path' => $item->image ?? null,
             'file' => $item->file ?? null,
@@ -474,7 +474,7 @@ if (!function_exists('map_content')) {
         return null;
       case 'file':
         if ($item = $content->shift()) {
-          return new ContentFile([
+          return ContentFile::cast([
             'id' => $item->id ?? null,
             'path' => $item->file ?? null,
             'file' => $item->text ?? null,
