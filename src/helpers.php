@@ -969,3 +969,21 @@ if (!function_exists('live_mode')) {
     return current_mode() === 'live';
   }
 }
+
+if (!function_exists('page_route')) {
+  /**
+   * Generate the URL to a named route (context aware if in a page scope).
+   *
+   * @param array|string $name
+   * @param mixed $parameters
+   * @param bool $absolute
+   */
+  function page_route($name, $parameters = [], $absolute = true)
+  {
+    if ($page = current_page()) {
+      return $page->route($name, $parameters, $absolute);
+    }
+
+    return route($name, $parameters, $absolute);
+  }
+}
