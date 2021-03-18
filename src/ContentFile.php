@@ -27,6 +27,19 @@ class ContentFile implements MediaUrlResolvable, JsonSerializable, Arrayable, Js
         $this->attributes = $attributes ?? [];
     }
 
+    /**
+     * @param array|null $attributes 
+     * @return static|null 
+     */
+    public static function cast($attributes = [])
+    {
+        if ($attributes && is_array($attributes) && array_key_exists('path', $attributes)) {
+            return new static($attributes);
+        }
+
+        return null;
+    }
+
     public function getIdAttribute($id)
     {
         if ($id ?? $this->attributes['id'] ?? null) {
