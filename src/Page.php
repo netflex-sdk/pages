@@ -445,32 +445,6 @@ class Page extends QueryableModel implements Responsable
   }
 
   /**
-   * Create a new model instance that is existing.
-   *
-   * @param array $attributes
-   * @return static
-   */
-  public function newFromBuilder($attributes = [])
-  {
-    $model = parent::newFromBuilder($attributes);
-
-    if ($model->getKey() && Cache::has('pages')) {
-      $pages = static::all()->filter(function (self $page) use ($model) {
-        return $page->getKey() !== $model->getKey();
-      });
-
-      $pages->push($model);
-
-      Cache::forget('pages');
-      Cache::rememberForever('pages', function () use ($pages) {
-        return $pages;
-      });
-    }
-
-    return $model;
-  }
-
-  /**
    * Loads the given revision
    *
    * @param int $revisionId
