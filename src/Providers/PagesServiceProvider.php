@@ -16,6 +16,7 @@ use Netflex\Pages\Components\Component;
 use Netflex\Pages\Components\Nav;
 
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\View;
 
 use Illuminate\Support\ServiceProvider;
@@ -46,19 +47,25 @@ class PagesServiceProvider extends ServiceProvider
   {
     View::addNamespace('nf', __DIR__ . '/../views');
 
-    Blade::component(Breadcrumbs::class);
-    Blade::component(EditorButton::class);
-    Blade::component(Image::class);
-    Blade::component(Image::class, 'img');
-    Blade::component(Picture::class);
-    Blade::component(Blocks::class);
-    Blade::component(Inline::class);
-    Blade::component(EditorTools::class);
-    Blade::component(Seo::class);
-    Blade::component(BackgroundImage::class);
-    Blade::component(Nav::class);
-    Blade::component(StaticContent::class);
-    Blade::component(Component::class);
+    $prefix = Config::get('pages.prefix', '');
+
+    $components = Config::get('pages.components', [
+      EditorButton::class,
+      Image::class,
+      Picture::class,
+      Blocks::class,
+      Inline::class,
+      EditorTools::class,
+      Seo::class,
+      BackgroundImage::class,
+      Nav::class,
+      StaticContent::class,
+    ]);
+
+    foreach ($components as $alias => $component) {
+      Blade::component($component, (is_string($alias) ? $alias : null), $prefix);
+    }
+
 
     Blade::if('mode', function (...$modes) {
       return if_mode(...$modes);
