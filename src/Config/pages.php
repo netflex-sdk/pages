@@ -1,7 +1,5 @@
 <?php
 
-use Netflex\Pages\Controllers\PageController;
-
 return [
 
     /*
@@ -13,7 +11,7 @@ return [
     |
     */
     
-    'controller' => PageController::class,
+    'controller' => Netflex\Pages\Controllers\PageController::class,
 
     'prefix' => '', // If set, the components will be prefixed e.g instead of x-image, it will become x-:prefix-image
 
