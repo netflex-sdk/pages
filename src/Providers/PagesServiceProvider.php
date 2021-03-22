@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 
 use Illuminate\Support\ServiceProvider;
+use Netflex\Pages\Components\Breadcrumbs;
 
 class PagesServiceProvider extends ServiceProvider
 {
@@ -45,6 +46,7 @@ class PagesServiceProvider extends ServiceProvider
   {
     View::addNamespace('nf', __DIR__ . '/../views');
 
+    Blade::component(Breadcrumbs::class);
     Blade::component(EditorButton::class);
     Blade::component(Image::class);
     Blade::component(Image::class, 'img');
