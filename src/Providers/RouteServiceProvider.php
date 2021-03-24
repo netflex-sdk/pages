@@ -40,6 +40,8 @@ class RouteServiceProvider extends ServiceProvider
    */
   protected $namespace = 'App\Http\Controllers';
 
+  public const ROUTE_CACHE = 'sdk/cache/routes';
+
   /**
    * The path to the "home" route for your application.
    *
@@ -233,6 +235,10 @@ class RouteServiceProvider extends ServiceProvider
   {
     Route::get('.well-known/netflex/CacheStore', function (Request $request) {
       if ($key = $request->get('key')) {
+        if ($key === 'pages' && file_exists(storage_path(static::ROUTE_CACHE . '.php'))) {
+          unlink(storage_path(static::ROUTE_CACHE . '.php'));
+        }
+
         if (Cache::has($key)) {
           Cache::forget($key);
           return ['success' => true, 'message' => 'Key deleted'];
@@ -268,91 +274,95 @@ class RouteServiceProvider extends ServiceProvider
         })->name('Netflex Editor Proxy');
       });
 
-    Route::middleware('netflex')
-      ->group(function () {
-        Page::all()->filter(function ($page) {
-          return $page->type === 'page' && $page->template && $page->published;
-        })->each(function ($page) {
-          /** @var Page */
-          $page = $page;
+    if (!file_exists(storage_path(static::ROUTE_CACHE . '.php'))) {
+      $compiledRoutes = [];
 
-          $controller = $page->template->controller ?? null;
-          $pageController = Config::get('pages.controller', PageController::class);
-          $class = trim($controller ? ("\\{$this->namespace}\\{$controller}") : "\\{$pageController}", '\\');
-
-          /** @var Controller|null */
-          $controllerInstance = null;
-
-          try {
-            // Precompute domain bindings for page
-            $domain = Cache::rememberForever($page->id . ':domain', function () use ($page) {
-              return $page->domain ?? '';
-            });
-
-            // We attempt to instantiate the target class
-            $controllerInstance = app($class);
-            $class = get_class($controllerInstance);
-            $routeDefintions = $controllerInstance->getRoutes();
-
-            foreach ($routeDefintions as $routeDefintion) {
-              if (!isset($routeDefintion->url) || empty($routeDefintion->url)) {
-                throw new InvalidRouteDefintionException($class, $routeDefintion, InvalidRouteDefintionException::E_URL);
-              }
-
-              if (!isset($routeDefintion->action) || empty($routeDefintion->action)) {
-                throw new InvalidRouteDefintionException($class, $routeDefintion, InvalidRouteDefintionException::E_ACTION);
-              }
-
-              $methods = collect([$routeDefintion->methods ?? [], $routeDefintion->method ?? null])
-                ->flatten()
-                ->filter()
-                ->filter(function ($method) {
-                  return in_array($method, ['GET', 'PUT', 'POST', 'PATCH', 'DELETE', 'OPTIONS']);
-                })
-                ->toArray();
-
-              if (empty($methods)) {
-                throw new InvalidRouteDefintionException($class, $routeDefintion, InvalidRouteDefintionException::E_METHODS);
-              }
-
-              $routeDefintion->url = trim($routeDefintion->url, '/');
-              $url = trim("{$page->url}/{$routeDefintion->url}", '/');
-              $action = "$class@{$routeDefintion->action}";
-
-              $routeName = null;
-
-              if (isset($routeDefintion->name)) {
-                $routeName = Str::slug($routeDefintion->name);
-                $routeName = !$routeName ? ($routeDefintion->url ? Str::slug($routeDefintion->url) : 'index') : $routeName;
-              }
-
-              $names = collect([Str::slug($page->name), $routeName])->filter();
-              $name = ($names->count() > 1) ? $names->join('.') : null;
-
-              $route = Route::domain($domain)
-                ->match($routeDefintion->methods, $url, $action)
-                ->name($name ?? $page->id);
-
-              $this->app->bind(route_hash($route), function () use ($page) {
-                return $page;
-              });
-            }
-          } catch (Throwable $e) {
-            // The target controller class doesn't exist,
-            // we register a wildcard route for the page, so we can throw an error
-            // when attempting to route to the page
-            $route = Route::domain('');
-
-            if ($domain = $page->domain) {
-              $route = $route->domain($domain);
-            }
-
-            $route->any(rtrim($page->url, '/') . '/{any?}', function () use ($e) {
-              throw $e;
-            })->name($page->id);
-          }
-        });
+      $pages = Page::all()->filter(function ($page) {
+        return $page->type === 'page' && $page->template && $page->published;
       });
+
+      foreach ($pages as $page) {
+        /** @var Page */
+        $page = $page;
+  
+        $controller = $page->template->controller ?? null;
+        $pageController = Config::get('pages.controller', PageController::class);
+        $class = trim($controller ? ("\\{$this->namespace}\\{$controller}") : "\\{$pageController}", '\\');
+  
+        /** @var Controller|null */
+        $controllerInstance = null;
+  
+        try {
+          // Precompute domain bindings for page
+          $domain = Cache::rememberForever($page->id . ':domain', function () use ($page) {
+            return $page->domain ?? '';
+          });
+  
+          // We attempt to instantiate the target class
+          $controllerInstance = app($class);
+          $class = get_class($controllerInstance);
+          $routeDefintions = $controllerInstance->getRoutes();
+  
+          foreach ($routeDefintions as $i => $routeDefintion) {
+            if (!isset($routeDefintion->url) || empty($routeDefintion->url)) {
+              throw new InvalidRouteDefintionException($class, $routeDefintion, InvalidRouteDefintionException::E_URL);
+            }
+  
+            if (!isset($routeDefintion->action) || empty($routeDefintion->action)) {
+              throw new InvalidRouteDefintionException($class, $routeDefintion, InvalidRouteDefintionException::E_ACTION);
+            }
+  
+            $methods = collect([$routeDefintion->methods ?? [], $routeDefintion->method ?? null])
+              ->flatten()
+              ->filter()
+              ->filter(function ($method) {
+                return in_array($method, ['GET', 'PUT', 'POST', 'PATCH', 'DELETE', 'OPTIONS']);
+              })
+              ->toArray();
+  
+            if (empty($methods)) {
+              throw new InvalidRouteDefintionException($class, $routeDefintion, InvalidRouteDefintionException::E_METHODS);
+            }
+  
+            $routeDefintion->url = trim($routeDefintion->url, '/');
+            $url = trim("{$page->url}/{$routeDefintion->url}", '/');
+            $action = '\\\\' . str_replace('\\', '\\\\', $class) . "@{$routeDefintion->action}";
+  
+            $routeName = null;
+  
+            if (isset($routeDefintion->name)) {
+              $routeName = Str::slug($routeDefintion->name);
+              $routeName = !$routeName ? ($routeDefintion->url ? Str::slug($routeDefintion->url) : 'index') : $routeName;
+            }
+  
+            $names = collect([Str::slug($page->name), $routeName])->filter();
+            $name = ($names->count() > 1) ? $names->join('.') : null;
+  
+            $compiledRoutes[] = '\\Illuminate\Support\Facades\App::bind(route_hash(' . '\\Illuminate\\Support\\Facades\\' . ($domain ? ('Route::domain("' . $domain . '")->match(') : ('Route::match(')) . json_encode($routeDefintion->methods) . ',"' . $url . '","' . $action . '")->name("' . ($name ?? $page->id) . '")' . '),function(){return \\Netflex\\Pages\\Page::find(' . $page->id . ');});';
+          }
+        } catch (Throwable $e) {
+          // The target controller class doesn't exist,
+          // we register a wildcard route for the page, so we can throw an error
+          // when attempting to route to the page
+          $compiledRoutes[] = '\\Illuminate\\Support\\Facades\\' . ($page->domain ? 'Route::domain("")->any(' : 'Route::any(') . '"' . rtrim($page->url, '/') . '/{any?}",function() use ($e){throw $e;})->name("' . $page->id . '");';
+        }
+      }
+  
+      $routeSource = implode("\n", [
+        '<?php',
+        '',
+        '// Compiled routes generated by Netflex, do not edit manually unless you know what you are doing',
+        '',
+        ...$compiledRoutes,
+        ''
+      ]);
+
+      file_put_contents(storage_path(static::ROUTE_CACHE . '.php'), $routeSource);
+    }
+
+    Route::middleware('netflex')
+      ->namespace($this->namespace)
+      ->group(storage_path(static::ROUTE_CACHE . '.php'));
   }
 
   protected function mapRobots()
