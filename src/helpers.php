@@ -918,7 +918,7 @@ if (!function_exists('in_production')) {
    */
   function in_production()
   {
-    return env('APP_ENV') === 'master';
+    return App::isProduction();
   }
 }
 
@@ -930,7 +930,7 @@ if (!function_exists('in_development')) {
    */
   function in_development()
   {
-    return env('APP_ENV') !== 'master';
+    return App::isLocal();
   }
 }
 
