@@ -241,7 +241,7 @@ class Image extends Component
       ) : $src;
 
     if (!$src && current_mode() === 'edit') {
-      return "https://placehold.it/{$this->size()}";
+      return "https://via.placeholder.com/1{$this->size()}";
     }
 
     return $src;

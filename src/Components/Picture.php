@@ -161,7 +161,7 @@ class Picture extends Component
 
     if ($this->inline && current_mode() === 'edit') {
       $size = $preset->size === '0x0' ? '256x256' : $preset->size;
-      return 'https://placehold.it/' . $size;
+      return 'https://via.placeholder.com/1' . $size;
     }
   }
 
