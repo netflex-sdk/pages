@@ -6,7 +6,7 @@ use Throwable;
 use ReflectionClass;
 
 use API;
-
+use Exception;
 use Netflex\Pages\Page;
 use Netflex\Pages\Middleware\BindPage;
 use Netflex\Pages\Middleware\GroupAuthentication;
@@ -341,10 +341,12 @@ class RouteServiceProvider extends ServiceProvider
             $compiledRoutes[] = '\\Illuminate\Support\Facades\App::bind(route_hash(' . '\\Illuminate\\Support\\Facades\\' . ($domain ? ('Route::domain("' . $domain . '")->match(') : ('Route::match(')) . json_encode($routeDefintion->methods) . ',"' . $url . '","' . $action . '")->name("' . ($name ?? $page->id) . '")' . '),function(){return \\Netflex\\Pages\\Page::find(' . $page->id . ');});';
           }
         } catch (Throwable $e) {
+          $message = $e->getMessage();
+          $code = $e->getCode();
           // The target controller class doesn't exist,
           // we register a wildcard route for the page, so we can throw an error
           // when attempting to route to the page
-          $compiledRoutes[] = '\\Illuminate\\Support\\Facades\\' . ($page->domain ? 'Route::domain("")->any(' : 'Route::any(') . '"' . rtrim($page->url, '/') . '/{any?}",function() use ($e){throw $e;})->name("' . $page->id . '");';
+          $compiledRoutes[] = '\\Illuminate\\Support\\Facades\\' . ($page->domain ? 'Route::domain("")->any(' : 'Route::any(') . '"' . rtrim($page->url, '/') . '/{any?}",function() {throw new Exception(' . $message . ',' . $code . ');})->name("' . $page->id . '");';
         }
       }
   
