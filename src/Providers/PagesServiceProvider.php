@@ -26,7 +26,7 @@ class PagesServiceProvider extends ServiceProvider
   public function register()
   {
     $this->registerComponents();
-    $this->registerBladeDirectives();
+    $this->registerDirectives();
   }
 
   public function boot()
