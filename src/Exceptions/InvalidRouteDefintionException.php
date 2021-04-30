@@ -6,8 +6,9 @@ use Exception;
 use Facade\IgnitionContracts\ProvidesSolution;
 use Facade\IgnitionContracts\Solution;
 use Facade\IgnitionContracts\BaseSolution;
+use Netflex\Pages\Contracts\CompilesException;
 
-class InvalidRouteDefintionException extends Exception implements ProvidesSolution
+class InvalidRouteDefintionException extends Exception implements ProvidesSolution, CompilesException
 {
     /** @var string */
     protected $class;
@@ -75,5 +76,10 @@ class InvalidRouteDefintionException extends Exception implements ProvidesSoluti
         return $solution->setDocumentationLinks([
             'Netflex SDK documentation' => 'https://netflex-sdk.github.io/#/docs/routing?id=creating-the-custom-controller',
         ]);
+    }
+
+    public function compile()
+    {
+        return static::class . "('" . $this->class . "', json_decode('" . json_encode($this->routeDefinition) . "', true), '" . $this->error . "', '" . $this->key . "')";
     }
 }

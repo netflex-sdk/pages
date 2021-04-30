@@ -28,6 +28,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use Laravelium\Sitemap\Sitemap;
+use Netflex\Pages\Contracts\CompilesException;
+use Netflex\Pages\Exceptions\InvalidControllerException;
 use Netflex\Pages\Exceptions\InvalidRouteDefintionException;
 
 class RouteServiceProvider extends ServiceProvider
@@ -147,7 +149,7 @@ class RouteServiceProvider extends ServiceProvider
       current_page($page);
 
       $controller = $page->template->controller ?? null;
-      $pageController = PageController::class;
+      $pageController = Config::get('pages.controller', PageController::class) ?? PageController::class;
       $class = trim($controller ? ("\\{$this->namespace}\\{$controller}") : "\\{$pageController}", '\\');
 
       if (!$class) {
@@ -236,8 +238,8 @@ class RouteServiceProvider extends ServiceProvider
   {
     Route::get('.well-known/netflex/CacheStore', function (Request $request) {
       if ($key = $request->get('key')) {
-        if ($key === 'pages' && file_exists(storage_path(static::ROUTE_CACHE . '.php'))) {
-          unlink(storage_path(static::ROUTE_CACHE . '.php'));
+        if ($key === 'pages') {
+          clear_route_cache();
         }
 
         if (Cache::has($key)) {
@@ -275,6 +277,8 @@ class RouteServiceProvider extends ServiceProvider
         })->name('Netflex Editor Proxy');
       });
 
+    $deleteCompiledRoutes = false;
+
     if (!file_exists(storage_path(static::ROUTE_CACHE . '.php'))) {
       $compiledRoutes = [];
 
@@ -287,7 +291,7 @@ class RouteServiceProvider extends ServiceProvider
         $page = $page;
   
         $controller = $page->template->controller ?? null;
-        $pageController = Config::get('pages.controller', PageController::class);
+        $pageController = Config::get('pages.controller', PageController::class) ?? PageController::class;
         $class = trim($controller ? ("\\{$this->namespace}\\{$controller}") : "\\{$pageController}", '\\');
   
         /** @var Controller|null */
@@ -302,6 +306,11 @@ class RouteServiceProvider extends ServiceProvider
           // We attempt to instantiate the target class
           $controllerInstance = app($class);
           $class = get_class($controllerInstance);
+
+          if (!($controllerInstance instanceof Controller)) {
+            throw new InvalidControllerException($class);
+          }
+
           $routeDefintions = $controllerInstance->getRoutes();
   
           foreach ($routeDefintions as $i => $routeDefintion) {
@@ -340,15 +349,23 @@ class RouteServiceProvider extends ServiceProvider
             $names = collect([$pageRouteName, $routeName])->filter();
             $name = ($names->count() > 1) ? $names->join('.') : null;
   
-            $compiledRoutes[] = '\\Illuminate\Support\Facades\App::bind(route_hash(' . '\\Illuminate\\Support\\Facades\\' . ($domain ? ('Route::domain("' . $domain . '")->match(') : ('Route::match(')) . json_encode($routeDefintion->methods) . ',"' . $url . '","' . $action . '")->name("' . ($name ?? $page->id) . '")' . '),function(){return \\Netflex\\Pages\\Page::find(' . $page->id . ');});';
+            $compiledRoutes[] = '\\Illuminate\Support\Facades\App::bind(route_hash(' . '\\Illuminate\\Support\\Facades\\' . ($domain ? ('Route::domain("' . $domain . '")->match(') : ('Route::match(')) . json_encode($routeDefintion->methods) . ',"' . $url . '","' . $action . '")->name("' . ($name ?? $page->id) . '")' . '),function(){return \\' . Page::model() . '::find(' . $page->id . ');});';
           }
         } catch (Throwable $e) {
+          $deleteCompiledRoutes = true;
           $message = $e->getMessage();
           $code = $e->getCode();
+
           // The target controller class doesn't exist,
           // we register a wildcard route for the page, so we can throw an error
           // when attempting to route to the page
-          $compiledRoutes[] = '\\Illuminate\\Support\\Facades\\' . ($page->domain ? 'Route::domain("")->any(' : 'Route::any(') . '"' . rtrim($page->url, '/') . '/{any?}",function() {throw new Exception(' . $message . ',' . $code . ');})->name("' . $page->id . '");';
+          $exception = 'Exception("' . str_replace('"', "'", $message) . ($code ? (',' . $code) : null) . '")';
+
+          if ($e instanceof CompilesException) {
+            $exception = $e->compile();
+          }
+
+          $compiledRoutes[] = '\\Illuminate\\Support\\Facades\\' . ($page->domain ? 'Route::domain("")->any(' : 'Route::any(') . '"' . rtrim($page->url, '/') . '/{any?}",function() { clear_route_cache(); throw new ' . $exception . ';})->name("' . $page->id . '");';
         }
       }
   
@@ -367,6 +384,10 @@ class RouteServiceProvider extends ServiceProvider
     Route::middleware('netflex')
       ->namespace($this->namespace)
       ->group(storage_path(static::ROUTE_CACHE . '.php'));
+
+    if ($deleteCompiledRoutes) {
+      clear_route_cache();
+    }
   }
 
   protected function mapRobots()
