@@ -2,7 +2,6 @@
 
 namespace Netflex\Pages\Providers;
 
-use Illuminate\Support\Facades\App;
 use Netflex\Pages\Components\EditorButton;
 use Netflex\Pages\Components\Image;
 use Netflex\Pages\Components\Picture;
@@ -12,15 +11,12 @@ use Netflex\Pages\Components\EditorTools;
 use Netflex\Pages\Components\Seo;
 use Netflex\Pages\Components\StaticContent;
 use Netflex\Pages\Components\BackgroundImage;
-use Netflex\Pages\Components\Component;
 use Netflex\Pages\Components\Nav;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\View;
 
 use Illuminate\Support\ServiceProvider;
-use Netflex\Pages\Components\Breadcrumbs;
 
 class PagesServiceProvider extends ServiceProvider
 {
@@ -35,17 +31,29 @@ class PagesServiceProvider extends ServiceProvider
   public function boot()
   {
     $this->publishes([
-      __DIR__ . '/../Config/media.php' => $this->app->configPath('media.php')
+      __DIR__ . '/../../config/media.php' => $this->app->configPath('media.php')
     ], 'config');
 
+    $this->mergeConfigFrom(
+      __DIR__ . '/../../config/media.php', 'media'
+    );
+
     $this->publishes([
-      __DIR__ . '/../Config/pages.php' => $this->app->configPath('pages.php')
+      __DIR__ . '/../../config/pages.php' => $this->app->configPath('pages.php')
     ], 'config');
+
+    $this->mergeConfigFrom(
+      __DIR__ . '/../../config/pages.php', 'pages'
+    );
   }
 
   protected function registerBladeDirectives()
   {
-    View::addNamespace('nf', __DIR__ . '/../views');
+    $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'nf');
+
+    $this->publishes([
+      __DIR__ . '/../../resources/views' => base_path('resources/views/vendor/netflex/pages'),
+    ]);
 
     $prefix = Config::get('pages.prefix', '');
 
@@ -62,10 +70,13 @@ class PagesServiceProvider extends ServiceProvider
       StaticContent::class,
     ]);
 
-    foreach ($components as $alias => $component) {
-      Blade::component($component, (is_string($alias) ? $alias : null), $prefix);
+    if ($prefix) {
+      $this->loadViewComponentsAs($prefix, $components);
+    } else {
+      foreach ($components as $alias => $component) {
+        Blade::component($component, (is_string($alias) ? $alias : null));
+      }
     }
-
 
     Blade::if('mode', function (...$modes) {
       return if_mode(...$modes);
