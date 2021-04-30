@@ -24,6 +24,7 @@ use Netflex\Pages\NavigationData;
 use Netflex\Pages\Contracts\MediaUrlResolvable;
 use Netflex\Pages\Components\Picture;
 use Netflex\Pages\MediaPreset;
+use Netflex\Pages\Providers\RouteServiceProvider;
 
 const MODE_ORIGINAL = Picture::MODE_ORIGINAL;
 const MODE_FILL = Picture::MODE_FILL;
@@ -487,7 +488,7 @@ if (!function_exists('map_content')) {
       case 'nav':
         if ($item = $content->shift()) {
           return (object) [
-            'parent' => Page::find($item->text),
+            'parent' => Page::model()::find($item->text),
             'levels' => (int) $item->title
           ];
         }
@@ -985,5 +986,16 @@ if (!function_exists('page_route')) {
     }
 
     return route($name, $parameters, $absolute);
+  }
+}
+
+if (!function_exists('clear_route_cache')) {
+  function clear_route_cache()
+  {
+    $key = RouteServiceProvider::ROUTE_CACHE;
+    if (file_exists(storage_path($key . '.php'))) {
+      unlink(storage_path($key . '.php'));
+      return true;
+    }
   }
 }

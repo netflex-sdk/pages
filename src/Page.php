@@ -19,6 +19,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Traits\Macroable;
 
 /**
@@ -387,14 +388,15 @@ class Page extends QueryableModel implements Responsable
   public static function all()
   {
     if (!static::$allItems) {
-      static::$allItems = Cache::rememberForever('pages', function () {
-        return static::raw('*')
-          ->orderBy('sorting', 'asc')
-          ->get();
-      });
+      /** @var Collection */
+      static::$allItems = collect(Cache::rememberForever('pages', function () {
+        return API::get('builder/pages/content', true);
+      }))->sortBy('sorting');
     }
 
-    return static::$allItems;
+    return static::$allItems->map(function ($attributes){
+      return (new static)->newFromBuilder($attributes);
+    });
   }
 
   /**
@@ -407,10 +409,12 @@ class Page extends QueryableModel implements Responsable
    */
   public static function find($id)
   {
-    return static::all()->first(function (self $page) use ($id) {
-      return $page->getKey() === (int) $id;
-    });
+    return static::all()
+      ->first(function (Page $page) use ($id) {
+        return $page->getKey() === (int) $id;
+      });
   }
+
 
   /**
    * Resolves an instance
@@ -523,5 +527,30 @@ class Page extends QueryableModel implements Responsable
   public function isParentPageOf(Page $page)
   {
     return $page->isSubPageOf($this);
+  }
+
+  /**
+   * Resolves the registered Page model class
+   *
+   * @return static
+   */
+  public static function model()
+  {
+    /** @var Page */
+    return Config::get('pages.model', Page::class) ?? Page::class;
+  }
+
+  /**
+   * Gets the config array as a object
+   *
+   * @param array|null $config
+   * @return object
+   */
+  public function getConfigAttribute ($config = []) {
+    $config = collect($config ?? []);
+    
+    return (object) $config->mapWithKeys(function ($config, $key) {
+      return [$key => $config['value'] ?? null];
+    })->toArray();
   }
 }

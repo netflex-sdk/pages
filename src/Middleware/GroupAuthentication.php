@@ -22,7 +22,7 @@ class GroupAuthentication extends Middleware
    */
   public function handle($request, Closure $next, ...$guards)
   {
-    if ($page = Page::current()) {
+    if ($page = Page::model()::current()) {
       if ($page->public) {
         return $next($request);
       }
