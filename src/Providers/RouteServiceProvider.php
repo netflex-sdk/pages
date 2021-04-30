@@ -395,7 +395,7 @@ class RouteServiceProvider extends ServiceProvider
     Route::get('robots.txt', function () {
       $production = app()->env === 'master';
 
-      return response(view('nf::robots', ['production' => $production]), 200, ['Content-Type' => 'text/plain']);
+      return response(view('netflex-pages::robots', ['production' => $production]), 200, ['Content-Type' => 'text/plain']);
     })->name('robots.txt');
   }
 

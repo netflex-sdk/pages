@@ -132,6 +132,6 @@ class EditorButton extends Component
      */
     public function render()
     {
-        return view('nf::editor-button');
+        return view('netflex-pages::editor-button');
     }
 }

@@ -34,6 +34,6 @@ class Blocks extends Component
    */
   public function render()
   {
-    return view('nf::blocks');
+    return view('netflex-pages::blocks');
   }
 }

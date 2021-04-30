@@ -43,6 +43,6 @@ class BackgroundImage extends Component
    */
   public function render()
   {
-    return view('nf::background-image');
+    return view('netflex-pages::background-image');
   }
 }

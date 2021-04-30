@@ -45,16 +45,16 @@ class PagesServiceProvider extends ServiceProvider
     $this->mergeConfigFrom(
       __DIR__ . '/../../config/pages.php', 'pages'
     );
+
+    $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'netflex-pages');
+
+    $this->publishes([
+      __DIR__ . '/../../resources/views' => base_path('resources/views/vendor/netflex-pages'),
+    ], 'views');
   }
 
   protected function registerBladeDirectives()
   {
-    $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'nf');
-
-    $this->publishes([
-      __DIR__ . '/../../resources/views' => base_path('resources/views/vendor/netflex/pages'),
-    ]);
-
     $prefix = Config::get('pages.prefix', '');
 
     $components = Config::get('pages.components', [

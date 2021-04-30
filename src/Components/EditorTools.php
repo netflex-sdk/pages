@@ -22,6 +22,6 @@ class EditorTools extends Component
      */
     public function render()
     {
-        return view('nf::editor-tools');
+        return view('netflex-pages::editor-tools');
     }
 }

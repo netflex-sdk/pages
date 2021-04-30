@@ -122,6 +122,6 @@ class Breadcrumbs extends Component
      */
     public function render()
     {
-        return view('nf::breadcrumbs');
+        return view('netflex-pages::breadcrumbs');
     }
 }
