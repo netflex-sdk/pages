@@ -30,6 +30,6 @@ class StaticContent extends Component
      */
     public function render()
     {
-        return view('nf::static-content');
+        return view('netflex-pages::static-content');
     }
 }

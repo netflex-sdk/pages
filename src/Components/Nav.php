@@ -90,6 +90,6 @@ class Nav extends Component
    */
   public function render()
   {
-    return view('nf::nav');
+    return view('netflex-pages::nav');
   }
 }

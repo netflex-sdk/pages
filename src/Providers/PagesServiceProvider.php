@@ -25,6 +25,7 @@ class PagesServiceProvider extends ServiceProvider
    */
   public function register()
   {
+    $this->registerComponents();
     $this->registerBladeDirectives();
   }
 
@@ -35,7 +36,8 @@ class PagesServiceProvider extends ServiceProvider
     ], 'config');
 
     $this->mergeConfigFrom(
-      __DIR__ . '/../../config/media.php', 'media'
+      __DIR__ . '/../../config/media.php',
+      'media'
     );
 
     $this->publishes([
@@ -43,18 +45,19 @@ class PagesServiceProvider extends ServiceProvider
     ], 'config');
 
     $this->mergeConfigFrom(
-      __DIR__ . '/../../config/pages.php', 'pages'
+      __DIR__ . '/../../config/pages.php',
+      'pages'
     );
-  }
 
-  protected function registerBladeDirectives()
-  {
-    $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'nf');
+    $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'netflex-pages');
 
     $this->publishes([
-      __DIR__ . '/../../resources/views' => base_path('resources/views/vendor/netflex/pages'),
-    ]);
+      __DIR__ . '/../../resources/views' => base_path('resources/views/vendor/netflex-pages'),
+    ], 'views');
+  }
 
+  protected function registerComponents()
+  {
     $prefix = Config::get('pages.prefix', '');
 
     $components = Config::get('pages.components', [
@@ -77,7 +80,10 @@ class PagesServiceProvider extends ServiceProvider
         Blade::component($component, (is_string($alias) ? $alias : null));
       }
     }
+  }
 
+  protected function registerDirectives()
+  {
     Blade::if('mode', function (...$modes) {
       return if_mode(...$modes);
     });

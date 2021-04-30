@@ -66,6 +66,6 @@ class Seo extends Component
      */
     public function render()
     {
-        return view('nf::seo');
+        return view('netflex-pages::seo');
     }
 }

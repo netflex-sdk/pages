@@ -279,6 +279,6 @@ class Image extends Component
    */
   public function render()
   {
-    return view('nf::image');
+    return view('netflex-pages::image');
   }
 }

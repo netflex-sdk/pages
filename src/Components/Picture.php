@@ -251,6 +251,6 @@ class Picture extends Component
    */
   public function render()
   {
-    return view('nf::picture');
+    return view('netflex-pages::picture');
   }
 }
