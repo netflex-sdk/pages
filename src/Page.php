@@ -524,4 +524,15 @@ class Page extends QueryableModel implements Responsable
   {
     return $page->isSubPageOf($this);
   }
+
+  /**
+   * Resolves the registered Page model class
+   *
+   * @return static
+   */
+  public static function model()
+  {
+    /** @var Page */
+    return Config::get('pages.model', Page::class);
+  }
 }
