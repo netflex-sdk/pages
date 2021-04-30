@@ -1,5 +1,5 @@
 User-Agent: *
-@if (true)
+@if ($production)
 Allow: /
 
 @foreach(config('pages.bad-bots', []) as $bot)
