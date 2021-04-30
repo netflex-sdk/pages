@@ -373,20 +373,43 @@ class RouteServiceProvider extends ServiceProvider
       $production = app()->env === 'master';
 
       return response(view('nf::robots', ['production' => $production]), 200, ['Content-Type' => 'text/plain']);
-    })->name('Robots Exclusion Protocol');
+    })->name('robots.txt');
   }
 
   protected function mapSitemap()
   {
     Route::get('/sitemap.xml', function () {
-      $entries = $this->getSitemapEntries();
+      /** @var Sitemap */
+      $sitemap = App::make('sitemap');
 
-      return response(view('nf::sitemap-xml', ['entries' => $entries]), 200, ['Content-Type' => 'application/xml']);
-    })->name('Sitemap');
+      $now = Carbon::now()->toDateTimeString();
 
-    Route::get('/sitemap.xsl', function () {
-      return response(view('nf::sitemap-xsl'), 200, ['Content-Type' => 'text/xsl']);
-    })->name('Sitemap Stylsheet');
+      $sitemap->setCache('netflex.sitemap', 60);
+
+      if (!$sitemap->isCached()) {
+
+        foreach ($this->getSitemapPages() as $page) {
+          /** @var Page */
+          $page = $page;
+          $sitemap->add(url($page->url), $now, '1.0', 'daily');
+        }
+
+        foreach ($this->getSitemapEntries() as $entry) {
+          $sitemap->add(url($entry->url), $entry->updated->toDateTimeString(), '1.0', 'daily');
+        }
+
+      }
+
+      return $sitemap->render('xml', '/sitemap.xsl');
+    })->name('sitemap.xml');
+  }
+
+  protected function getSitemapPages()
+  {
+    return Page::model()::all()
+      ->filter(function (Page $page) {
+        return $page->type === Page::TYPE_PAGE && $page->published && $page->public && $page->visible;
+      });
   }
 
   protected function getSitemapEntries()
