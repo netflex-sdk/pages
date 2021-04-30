@@ -347,7 +347,7 @@ class RouteServiceProvider extends ServiceProvider
             }
   
             $names = collect([$pageRouteName, $routeName])->filter();
-            $name = ($names->count() > 1) ? $names->join('.') : null;
+            $name = ($names->count() > 1) ? $names->join('.') : $pageRouteName ?? null;
             
             $compiledRoutes[] = '\\Illuminate\Support\Facades\App::bind(route_hash(' . '\\Illuminate\\Support\\Facades\\' . ($domain ? ('Route::domain("' . $domain . '")->match(') : ('Route::match(')) . json_encode($routeDefintion->methods) . ',"' . $url . '","' . $action . '")->name("' . ($name ?? $page->id) . '")' . '),function(){return \\' . Page::class . '::model()::find(' . $page->id . ');});';
           }
