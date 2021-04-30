@@ -81,7 +81,7 @@ class NavigationData implements JsonSerializable
       }
     }
 
-    return Page::find($this->id);
+    return Page::model()::find($this->id);
   }
 
   /**
@@ -95,7 +95,7 @@ class NavigationData implements JsonSerializable
   public static function get($parent = null, $type = 'nav', $root = null)
   {
     try {
-      $pages = $parent ? Page::find($parent)->children : Page::where('published', true)
+      $pages = $parent ? Page::model()::find($parent)->children : Page::model()::where('published', true)
         ->where(function ($query) {
           return $query->where('parent_id', null)
             ->orWhere('parent_id', 0);

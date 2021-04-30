@@ -487,7 +487,7 @@ if (!function_exists('map_content')) {
       case 'nav':
         if ($item = $content->shift()) {
           return (object) [
-            'parent' => Page::find($item->text),
+            'parent' => Page::model()::find($item->text),
             'levels' => (int) $item->title
           ];
         }

@@ -25,8 +25,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Laravelium\Sitemap\Sitemap;
 use Netflex\Pages\Exceptions\InvalidRouteDefintionException;
 
 class RouteServiceProvider extends ServiceProvider
@@ -138,7 +138,7 @@ class RouteServiceProvider extends ServiceProvider
 
   protected function handlePage(Request $request, JwtPayload $payload)
   {
-    if ($page = Page::findOrFail($payload->page_id)) {
+    if ($page = Page::model()::findOrFail($payload->page_id)) {
       if ($payload->revision_id ?? false) {
         $page->loadRevision($payload->revision_id);
       }
@@ -277,7 +277,7 @@ class RouteServiceProvider extends ServiceProvider
     if (!file_exists(storage_path(static::ROUTE_CACHE . '.php'))) {
       $compiledRoutes = [];
 
-      $pages = Page::all()->filter(function ($page) {
+      $pages = Page::model()::all()->filter(function ($page) {
         return $page->type === 'page' && $page->template && $page->published;
       });
 
@@ -329,13 +329,14 @@ class RouteServiceProvider extends ServiceProvider
             $action = '\\\\' . str_replace('\\', '\\\\', $class) . "@{$routeDefintion->action}";
   
             $routeName = null;
+            $pageRouteName = $page->config->route_name ?? Str::slug($page->name);
   
             if (isset($routeDefintion->name)) {
               $routeName = Str::slug($routeDefintion->name);
               $routeName = !$routeName ? ($routeDefintion->url ? Str::slug($routeDefintion->url) : 'index') : $routeName;
             }
   
-            $names = collect([Str::slug($page->name), $routeName])->filter();
+            $names = collect([$pageRouteName, $routeName])->filter();
             $name = ($names->count() > 1) ? $names->join('.') : null;
   
             $compiledRoutes[] = '\\Illuminate\Support\Facades\App::bind(route_hash(' . '\\Illuminate\\Support\\Facades\\' . ($domain ? ('Route::domain("' . $domain . '")->match(') : ('Route::match(')) . json_encode($routeDefintion->methods) . ',"' . $url . '","' . $action . '")->name("' . ($name ?? $page->id) . '")' . '),function(){return \\Netflex\\Pages\\Page::find(' . $page->id . ');});';

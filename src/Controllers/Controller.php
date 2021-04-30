@@ -91,7 +91,7 @@ abstract class Controller extends BaseController
    */
   public function fallbackIndex()
   {
-    if ($page = Page::current()) {
+    if ($page = Page::model()::current()) {
       return $page->toResponse(app('request'));
     }
 
