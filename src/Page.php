@@ -537,7 +537,7 @@ class Page extends QueryableModel implements Responsable
   public static function model()
   {
     /** @var Page */
-    return Config::get('pages.model', Page::class);
+    return Config::get('pages.model', Page::class) ?? Page::class;
   }
 
   /**
