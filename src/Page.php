@@ -246,7 +246,7 @@ class Page extends QueryableModel implements Responsable
   public function getBlocks($area)
   {
     $blocks = $this->content->filter(function ($content) use ($area) {
-      return $content->area === $area;
+      return $content->published && $content->area === $area;
     })->map(function ($block) {
       if ($template = Template::retrieve((int) $block->text)) {
         return [$template->alias, $block->title ? $block->title : null];
