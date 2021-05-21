@@ -7,7 +7,7 @@ use Netflex\Foundation\GlobalContent;
 use Illuminate\View\ComponentAttributeBag;
 
 use Carbon\Carbon;
-
+use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\App;
@@ -53,6 +53,36 @@ const PAGE_EXTERNAL = Page::TYPE_EXTERNAL;
 const PAGE_INTERNAL = Page::TYPE_INTERNAL;
 const PAGE_FOLDER = Page::TYPE_FOLDER;
 const PAGE = Page::TYPE_PAGE;
+
+if (!function_exists('request_get_key')) {
+  /**
+   * Creates a unique key from a request
+   *
+   * @param Request $request
+   * @return string
+   */
+  function request_get_key(Request $request)
+  {
+    $parameters = http_build_query($request->all());
+    $headers = http_build_query($request->headers->all());
+
+    $parts = [
+      get_class($request),
+      $request->method(),
+      $request->url(),
+      $headers,
+      $parameters,
+    ];
+
+    if ($user = $request->user()) {
+      $parts[] = $user->id;
+    }
+
+    $parts = array_values(array_filter($parts));
+
+    return md5(implode('|', $parts));
+  }
+}
 
 if (!function_exists('render_component_tag')) {
   /**
