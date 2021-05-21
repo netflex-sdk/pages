@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
 
 use Illuminate\Support\ServiceProvider;
+use Netflex\Pages\Controllers\Controller;
 
 class PagesServiceProvider extends ServiceProvider
 {
@@ -54,6 +55,10 @@ class PagesServiceProvider extends ServiceProvider
     $this->publishes([
       __DIR__ . '/../../resources/views' => base_path('resources/views/vendor/netflex-pages'),
     ], 'views');
+
+    if ($this->app->bound('events')) {
+      Controller::setEventDispatcher($this->app['events']);
+    }
   }
 
   protected function registerComponents()

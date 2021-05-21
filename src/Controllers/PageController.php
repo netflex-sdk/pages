@@ -2,9 +2,9 @@
 
 namespace Netflex\Pages\Controllers;
 
-use Netflex\Pages\Controllers\Controller as BaseController;
+use Netflex\Pages\Controllers\Controller as Controller;
 
-class PageController extends BaseController
+class PageController extends Controller
 {
   //
 }
