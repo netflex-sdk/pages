@@ -7,8 +7,9 @@ User-agent: {{ $bot }}
 Disallow: /
 
 @endforeach
-
+@if(Route::has('sitemap.xml'))
 Sitemap: {{ route('sitemap.xml') }}
+@endif
 @else
 Disallow: /
 @endif
