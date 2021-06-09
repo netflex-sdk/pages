@@ -525,13 +525,19 @@ if (!function_exists('content')) {
     $settings = page_first_editable($alias);
 
     if (!$settings) {
-      $settings = ['alias' => blockhash_append($alias), 'type' => 'text'];
+      $settings = ['alias' => $alias, 'type' => 'text'];
     }
 
     if ($page = current_page()) {
       $content = $page->content->filter(function ($content) use ($settings) {
         return $content->area === $settings['alias'];
       });
+
+      $blockContent = $page->content->filter(function ($content) use ($settings) {
+        return $content->area === blockhash_append($settings['alias']);
+      });
+
+      $content = $blockContent->count() ? $blockContent : $content;
 
       $content = $content->filter(function ($item) {
         return $item->published;
@@ -546,6 +552,7 @@ if (!function_exists('content')) {
     }
   }
 }
+
 
 if (!function_exists('page_editable')) {
   /**
