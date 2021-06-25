@@ -156,10 +156,16 @@ class RouteServiceProvider extends ServiceProvider
         $page->toResponse($request);
       }
 
-      $controller = app($class);
+      /** @var PageController $controller  */
+      $controller = App::make($class);
 
-      if (method_exists($controller, 'index')) {
-        return $this->callWithInjectedDependencies($controller, 'index');
+      $route = collect($controller->getRoutes())
+        ->first(function ($route) {
+          return in_array($route->url, ['/', '']) || $route->action === 'index';
+        });
+
+      if ($route && method_exists($controller, $route->action)) {
+        return $this->callWithInjectedDependencies($controller, $route->action);
       }
 
       return $controller->fallbackIndex();
