@@ -240,7 +240,7 @@ class RouteServiceProvider extends ServiceProvider
     return [];
   }
 
-  protected function mapNetflexRoutes()
+  protected function mapNetflexWellKnownRoutes()
   {
     Route::get('.well-known/netflex/CacheStore', function (Request $request) {
       if ($key = $request->get('key')) {
@@ -282,6 +282,11 @@ class RouteServiceProvider extends ServiceProvider
           abort(400);
         })->name('Netflex Editor Proxy');
       });
+  }
+
+  protected function mapNetflexRoutes()
+  {
+    $this->mapNetflexWellKnownRoutes();
 
     $deleteCompiledRoutes = false;
 
@@ -295,20 +300,20 @@ class RouteServiceProvider extends ServiceProvider
       foreach ($pages as $page) {
         /** @var Page */
         $page = $page;
-  
+
         $controller = $page->template->controller ?? null;
         $pageController = Config::get('pages.controller', PageController::class) ?? PageController::class;
         $class = trim($controller ? ("\\{$this->namespace}\\{$controller}") : "\\{$pageController}", '\\');
-  
+
         /** @var Controller|null */
         $controllerInstance = null;
-  
+
         try {
           // Precompute domain bindings for page
           $domain = Cache::rememberForever($page->id . ':domain', function () use ($page) {
             return $page->domain ?? '';
           });
-  
+
           // We attempt to instantiate the target class
           $controllerInstance = app($class);
           $class = get_class($controllerInstance);
@@ -318,16 +323,16 @@ class RouteServiceProvider extends ServiceProvider
           }
 
           $routeDefintions = $controllerInstance->getRoutes();
-  
+
           foreach ($routeDefintions as $i => $routeDefintion) {
             if (!isset($routeDefintion->url) || empty($routeDefintion->url)) {
               throw new InvalidRouteDefintionException($class, $routeDefintion, InvalidRouteDefintionException::E_URL);
             }
-  
+
             if (!isset($routeDefintion->action) || empty($routeDefintion->action)) {
               throw new InvalidRouteDefintionException($class, $routeDefintion, InvalidRouteDefintionException::E_ACTION);
             }
-  
+
             $methods = collect([$routeDefintion->methods ?? [], $routeDefintion->method ?? null])
               ->flatten()
               ->filter()
@@ -335,26 +340,26 @@ class RouteServiceProvider extends ServiceProvider
                 return in_array($method, ['GET', 'PUT', 'POST', 'PATCH', 'DELETE', 'OPTIONS']);
               })
               ->toArray();
-  
+
             if (empty($methods)) {
               throw new InvalidRouteDefintionException($class, $routeDefintion, InvalidRouteDefintionException::E_METHODS);
             }
-  
+
             $routeDefintion->url = trim($routeDefintion->url, '/');
             $url = trim("{$page->url}/{$routeDefintion->url}", '/');
             $action = '\\\\' . str_replace('\\', '\\\\', $class) . "@{$routeDefintion->action}";
-  
+
             $routeName = null;
             $pageRouteName = $page->config->route_name ?? Str::slug($page->name);
-  
+
             if (isset($routeDefintion->name)) {
               $routeName = Str::slug($routeDefintion->name);
               $routeName = !$routeName ? ($routeDefintion->url ? Str::slug($routeDefintion->url) : 'index') : $routeName;
             }
-  
+
             $names = collect([$pageRouteName, $routeName])->filter();
             $name = ($names->count() > 1) ? $names->join('.') : $pageRouteName ?? null;
-            
+
             $compiledRoutes[] = '\\Illuminate\Support\Facades\App::bind(route_hash(' . '\\Illuminate\\Support\\Facades\\' . ($domain ? ('Route::domain("' . $domain . '")->match(') : ('Route::match(')) . json_encode($routeDefintion->methods) . ',"' . $url . '","' . $action . '")->name("' . ($name ?? $page->id) . '")' . '),function(){return \\' . Page::class . '::model()::find(' . $page->id . ');});';
           }
         } catch (Throwable $e) {
@@ -374,7 +379,7 @@ class RouteServiceProvider extends ServiceProvider
           $compiledRoutes[] = '\\Illuminate\\Support\\Facades\\' . ($page->domain ? 'Route::domain("")->any(' : 'Route::any(') . '"' . rtrim($page->url, '/') . '/{any?}",function() { clear_route_cache(); throw new ' . $exception . ';})->name("' . $page->id . '");';
         }
       }
-  
+
       $routeSource = implode("\n", [
         '<?php',
         '',
@@ -426,7 +431,6 @@ class RouteServiceProvider extends ServiceProvider
         foreach ($this->getSitemapEntries() as $entry) {
           $sitemap->add(url($entry->url), $entry->updated->toDateTimeString(), '1.0', 'daily');
         }
-
       }
 
       return $sitemap->render('xml', '/sitemap.xsl');
