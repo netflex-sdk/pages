@@ -70,6 +70,17 @@ class EditorButton extends Component
         $this->field = $field ?? null;
         $this->type = $type ?? null;
 
+        switch ($this->type) {
+            case 'editor_large':
+                $this->type = 'editor-large';
+                break;
+            case 'editor_small':
+                $this->type = 'editor-small';
+                break;
+            default:
+                break;
+        }
+
         if (!$this->field) {
           switch ($this->type) {
             case 'checkbox-group':
@@ -79,6 +90,8 @@ class EditorButton extends Component
             case 'select':
             case 'multiselect':
             case 'text':
+            case 'editor-large':
+            case 'editor-small':
               $this->field = 'text';
               break;
             case 'image':
