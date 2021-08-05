@@ -22,6 +22,9 @@ class EditorButton extends Component
     public $config;
     public $relationId;
 
+    /** Determines if this button should use the Netflex editor styles */
+    protected $styles = true;
+
     /**
      * Create a new component instance.
      *
@@ -46,18 +49,29 @@ class EditorButton extends Component
         $name = null,
         $label = null,
         $description = null,
-        $style = 'position: initial;',
+        $style = null,
         $icon = null,
         $position = null,
         $field = null,
         $model = null,
-        $options = null
+        $options = null,
+        $class = null
     ) {
+        $this->styles = (bool) (variable('netflexEditorStyles') ?? true);
         $this->page = current_page();
-        $class = ['netflex-content-settings-btn'];
-        if ($position) {
-            $class[] = "netflex-content-btn-pos-$position";
+
+        if ($this->styles) {
+            $style = $style ?? 'position: initial;';
+            $class = array_values(array_filter(['netflex-content-settings-btn', $class]));
+            if ($position) {
+                $class[] = "netflex-content-btn-pos-$position";
+            }
+        } else {
+            $style = $style ?? '';
+            $class = $class ?? 'btn btn-primary';
+            $class .= 'netflex-content-settings-btn netflex-styles-disabled';
         }
+
         $this->class = implode(' ', $class);
         $this->name = $name ?? $area;
         $this->label = $label ?? $name ?? $area;
