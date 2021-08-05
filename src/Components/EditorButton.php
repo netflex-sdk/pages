@@ -90,10 +90,12 @@ class EditorButton extends Component
             case 'select':
             case 'multiselect':
             case 'text':
+                $this->field = 'text';
+                break;
             case 'editor-large':
             case 'editor-small':
-              $this->field = 'text';
-              break;
+                $this->field = 'html';
+                break;
             case 'image':
               $this->field = 'image';
               break;
