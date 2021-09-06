@@ -69,7 +69,8 @@ class EditorButton extends Component
         } else {
             $style = $style ?? '';
             $class = $class ?? 'btn btn-primary';
-            $class .= 'netflex-content-settings-btn netflex-styles-disabled';
+            $class .= ' netflex-content-settings-btn netflex-styles-disabled';
+            $class = explode(' ', $class);
         }
 
         $this->class = implode(' ', $class);
