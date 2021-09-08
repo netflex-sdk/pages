@@ -122,7 +122,7 @@ class NavigationData implements JsonSerializable
           'target' => $target,
           'type' => $page->type,
           'title' => $page->nav_title ? $page->nav_title : $page->name,
-          'children' => navigation_data($page->id, $type, $root)
+          'children' => static::get($page->id, $type, $root)
         ]);
       };
 
