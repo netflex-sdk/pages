@@ -4,6 +4,7 @@ namespace Netflex\Pages\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\URL;
 use Netflex\Support\JWT;
 use Netflex\Foundation\Variable;
 use Netflex\Pages\JwtPayload;
@@ -21,7 +22,7 @@ class JwtProxy
      */
     public function handle($request, Closure $next)
     {
-        $this->authenticate($request);
+        $request = $this->authenticate($request);
 
         return $next($request);
     }
@@ -39,11 +40,17 @@ class JwtProxy
         if ($token = $request->get('token')) {
             if ($payload = JWT::decodeAndVerify($token, Variable::get('netflex_api'))) {
                 $request->offsetUnset('token');
+                
                 App::bind('JwtPayload', function () use ($payload) {
                     return new JwtPayload(json_decode(json_encode($payload), true));
                 });
 
-                return;
+                if ($request->header('X-Forwarded-Proto') === 'https')
+                {
+                    URL::forceScheme('https');
+                }
+
+                return $request;
             }
         }
 
