@@ -29,7 +29,7 @@
     "illuminate/view": "^8.0",
     "laravelium/sitemap": "^8.0",
     "netflex/foundation": "^3.0",
-    "netflex/query-builder": "^3.0",
+    "netflex/query-builder": "^3.15.0",
     "netflex/support": "^3.0"
   },
   "require-dev": {
