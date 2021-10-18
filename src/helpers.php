@@ -152,7 +152,7 @@ if (!function_exists('static_content')) {
    * @param string $block
    * @param string $area
    * @param string $column
-   * @return HtmlString
+   * @return HtmlString|string
    */
   function static_content($block, $area = null, $column = null)
   {
