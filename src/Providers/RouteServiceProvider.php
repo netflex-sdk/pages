@@ -259,7 +259,7 @@ class RouteServiceProvider extends ServiceProvider
       return ['success' => false, 'message' => 'Key is missing'];
     });
 
-    Route::middleware('jwt_proxy')
+    Route::middleware(['web', 'jwt_proxy'])
       ->group(function () {
         Route::any('.well-known/netflex', function (Request $request) {
           if ($payload = jwt_payload()) {
