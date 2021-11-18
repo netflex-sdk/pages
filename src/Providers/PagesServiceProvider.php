@@ -114,5 +114,9 @@ class PagesServiceProvider extends ServiceProvider
         return "<?php if({$mode}_mode()) { echo " . $expression . "; } ?>";
       });
     }
+
+    Blade::directive('blockhash', function () use ($mode) {
+      return echo "<?php echo \"<input type=\"hidden\" name=\"_blockhash\" value=\"" . blockhash() . "\">";
+    });
   }
 }
