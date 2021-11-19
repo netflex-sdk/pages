@@ -1,5 +1,7 @@
 # Netflex Pages
 
+[READ ONLY] Subtree split of the Netflex Pages component (see [netflex/framework](https://github.con/netflex-sdk/framework))
+
 Eloquent compatible model for working with Netflex Pages.
 
 <a href="https://packagist.org/packages/netflex/pages"><img src="https://img.shields.io/packagist/v/netflex/pages?label=stable" alt="Stable version"></a>
