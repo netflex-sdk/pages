@@ -218,6 +218,7 @@ class Picture extends Component
         $srcSet['sources'] = $srcSet['paths'];
         $srcSet['paths'] = new HtmlString(implode(' ,', $mergedSets));
       } else {
+        $srcSet['sources'] = ['1x' => 'https://via.placeholder.com/' . $preset->size];
         $srcSet['paths'] = 'https://via.placeholder.com/' . $preset->size;
       }
 
