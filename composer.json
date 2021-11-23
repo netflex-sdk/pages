@@ -1,0 +1,60 @@
+{
+  "name": "netflex/pages",
+  "description": "Netflex Pages library",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [],
+  "config": {
+    "platform": {
+      "php": "7.3"
+    },
+    "sort-packages": true
+  },
+  "autoload": {
+    "psr-4": {
+      "Netflex\\Pages\\": "src/"
+    },
+    "files": [
+      "src/helpers.php"
+    ]
+  },
+  "require": {
+    "php": "^7.3",
+    "apility/seotools": "^1.0",
+    "facade/ignition-contracts": "^1.0",
+    "illuminate/auth": "^8.0",
+    "illuminate/contracts": "^8.0",
+    "illuminate/routing": "^8.0",
+    "illuminate/support": "^8.0",
+    "illuminate/view": "^8.0",
+    "laravelium/sitemap": "^8.0",
+    "netflex/foundation": "^3.0",
+    "netflex/query-builder": "^3.15.0",
+    "netflex/support": "^3.0"
+  },
+  "require-dev": {
+    "illuminate/cache": "^8.0",
+    "illuminate/container": "^8.0",
+    "illuminate/events": "^8.0",
+    "illuminate/filesystem": "^8.0",
+    "illuminate/view": "^8.0",
+    "larapack/dd": "^1.1",
+    "vlucas/phpdotenv": "^3.6"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Netflex\\Pages\\Providers\\MixServiceProvider",
+        "Netflex\\Pages\\Providers\\PagesServiceProvider",
+        "Netflex\\Pages\\Providers\\RouteServiceProvider",
+        "Netflex\\Pages\\Providers\\SEOToolsServiceProvider"
+      ],
+      "aliases": {
+        "SEOMeta": "Apility\\SEOTools\\Facades\\SEOMeta",
+        "OpenGraph": "Apility\\SEOTools\\Facades\\OpenGraph",
+        "Twitter": "Apility\\SEOTools\\Facades\\TwitterCard",
+        "SEO": "Apility\\SEOTools\\Facades\\SEOTools"
+      }
+    }
+  }
+}
