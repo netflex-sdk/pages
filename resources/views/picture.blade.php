@@ -1,8 +1,5 @@
 @if($inline && current_mode() === 'edit')
 <picture {{ $attributes->merge(['class' => $pictureClass]) }}>
-  @foreach ($srcSets as $srcSet)
-    <source srcset="{{ $srcSet['paths'] }}" media="(max-width: {{ $srcSet['maxWidth'] }}px)">
-  @endforeach
   <img {{ $attributes->only('class')->merge(['class' => $imageClass . ' find-image']) }} src="{{ $defaultSrc }}" {{ $attributes->except('id')->merge($editorSettings()) }}>
 </picture>
 @else

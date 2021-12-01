@@ -204,24 +204,18 @@ class Picture extends Component
         'paths' => []
       ];
 
-      if ($this->src()) {
-        foreach ($preset->resolutions as $resolution) {
-          $srcSet['paths'][$resolution] = media_url($this->src(), $preset->size, $preset->mode, $preset->fill, $preset->direction) . '?src=' . $preset->maxWidth . 'w&res=' . $resolution;
-        }
-
-        $mergedSets = [];
-
-        foreach ($srcSet['paths'] as $resolution => $path) {
-          $mergedSets[] = $path . ' ' . $resolution;
-        }
-
-        $srcSet['sources'] = $srcSet['paths'];
-        $srcSet['paths'] = new HtmlString(implode(' ,', $mergedSets));
-      } else {
-        $srcSet['sources'] = ['1x' => 'https://via.placeholder.com/' . $preset->size];
-        $srcSet['paths'] = 'https://via.placeholder.com/' . $preset->size;
+      foreach ($preset->resolutions as $resolution) {
+        $srcSet['paths'][$resolution] = media_url($this->src(), $preset->size, $preset->mode, $preset->fill, $preset->direction) . '?src=' . $preset->maxWidth . 'w&res=' . $resolution;
       }
 
+      $mergedSets = [];
+
+      foreach ($srcSet['paths'] as $resolution => $path) {
+        $mergedSets[] = $path . ' ' . $resolution;
+      }
+
+      $srcSet['sources'] = $srcSet['paths'];
+      $srcSet['paths'] = new HtmlString(implode(' ,', $mergedSets));
       $srcSets[] = $srcSet;
     }
 
