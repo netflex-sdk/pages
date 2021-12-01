@@ -23,9 +23,9 @@
         "illuminate/support": "^8.0",
         "illuminate/view": "^8.0",
         "laravelium/sitemap": "^8.0",
-        "netflex/foundation": "^4.0.13",
-        "netflex/query-builder": "^4.0.13",
-        "netflex/support": "^4.0.13",
+        "netflex/foundation": "^4.1",
+        "netflex/query-builder": "^4.1",
+        "netflex/support": "^4.1",
         "php": "^7.4|^8.0"
     },
     "require-dev": {
@@ -38,10 +38,14 @@
         "vlucas/phpdotenv": "^5.2"
     },
     "extra": {
+        "branch-alias": {
+            "dev-master": "5.0.x-dev"
+        },
         "laravel": {
             "providers": [
                 "Netflex\\Pages\\Providers\\MixServiceProvider",
                 "Netflex\\Pages\\Providers\\PagesServiceProvider",
+                "Netflex\\Pages\\Providers\\RouteServiceProvider",
                 "Netflex\\Pages\\Providers\\SEOToolsServiceProvider"
             ],
             "aliases": {
