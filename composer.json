@@ -45,7 +45,6 @@
             "providers": [
                 "Netflex\\Pages\\Providers\\MixServiceProvider",
                 "Netflex\\Pages\\Providers\\PagesServiceProvider",
-                "Netflex\\Pages\\Providers\\RouteServiceProvider",
                 "Netflex\\Pages\\Providers\\SEOToolsServiceProvider"
             ],
             "aliases": {

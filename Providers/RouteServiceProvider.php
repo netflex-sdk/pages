@@ -132,8 +132,8 @@ class RouteServiceProvider extends ServiceProvider
     Collection::make(Redirect::all())
       ->each(function ($redirect) {
         Route::redirect(
-          $redirect->source_url,
-          $redirect->target_url,
+          trim($redirect->source_url),
+          trim($redirect->target_url),
           $redirect->type
         )->name($redirect->id);
       });
