@@ -15,6 +15,7 @@ use Netflex\Pages\Exceptions\InvalidPresetException;
 
 /**
  * @property-read string $mode
+ * @property-read string $direction
  * @property-read string $size
  * @property-read string|null $fill
  * @property-read string[] $resolutions
@@ -65,7 +66,8 @@ class MediaPreset implements JsonSerializable
    * @param string $name 
    * @return MediaPreset|null 
    */
-  public static function find($name) {
+  public static function find($name)
+  {
     $default = Config::get("media.presets.default", [
       'mode' => MODE_FIT,
       'resolutions' => ['1x', '2x', '3x'],
@@ -76,7 +78,7 @@ class MediaPreset implements JsonSerializable
       $preset['size'] = $preset['size'] ?? $default['size'] ?? null;
       $preset['mode'] = $preset['mode'] ?? $default['mode'] ?? MODE_ORIGINAL;
       $preset['fill'] = $preset['fill'] ?? $default['fill'] ?? null;
-      $preset['direction'] = $preset['direction'] ?? $default['direction'] ?? null;
+      $preset['direction'] = $preset['direction'] ?? $default['direction'] ?? DIR_CENTER;
       $preset['resolutions'] = $preset['resolutions'] ?? $default['resolutions'] ?? null;
       $preset['breakpoints'] = $preset['breakpoints'] ?? $default['breakpoints'] ?? null;
 
@@ -89,7 +91,8 @@ class MediaPreset implements JsonSerializable
    * @return MediaPreset 
    * @throws InvalidPresetException 
    */
-  public static function findOrFail($name) {
+  public static function findOrFail($name)
+  {
     if ($preset = static::find($name)) {
       return $preset;
     }
@@ -219,12 +222,18 @@ class MediaPreset implements JsonSerializable
     return (int) $maxWidth;
   }
 
+  public function toArray(): array
+  {
+    return $this->jsonSerialize();
+  }
+
   public function jsonSerialize()
   {
     return [
       'mode' => $this->mode,
       'size' => $this->size,
       'fill' => $this->fill,
+      'direction' => $this->direction,
       'maxWidth' => $this->maxWidth,
       'resolutions' => $this->resolutions
     ];
