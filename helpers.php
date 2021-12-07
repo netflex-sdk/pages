@@ -1,7 +1,5 @@
 <?php
 
-use JetBrains\PhpStorm\ArrayShape;
-
 use Netflex\Pages\Page;
 use Netflex\API\Facades\API;
 use Netflex\Foundation\Variable;
@@ -1008,12 +1006,3 @@ if (!function_exists('clear_route_cache')) {
     }
   }
 }
-
-if (!function_exists('preset')) {
-  function preset(
-    #[ArrayShape(['mode' => 'string|null', 'size' => 'string|array|int', 'fill' => 'string|null', 'direction' => 'string|null', 'maxWidth' => 'int|null', 'resolutions' => 'array|null'])]
-    array $preset
-  ): array {
-    return (new MediaPreset($preset))->toArray();
-  }
-};
