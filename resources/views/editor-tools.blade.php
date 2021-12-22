@@ -4,5 +4,5 @@
 @endmode
 <style>
 button, a, input[type="submit"] { pointer-events: none!important; }
-a.netflex-advanced-content-area, a.netflex-content-settings-btn { pointer-events: auto!important; }
+.find-image, .cke_button, .cke_button__link, .netflex-advanced-content-area, .netflex-content-settings-btn { pointer-events: auto!important; }
 </style>
