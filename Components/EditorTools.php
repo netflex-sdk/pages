@@ -6,13 +6,14 @@ use Illuminate\View\Component;
 
 class EditorTools extends Component
 {
-    public function editorTools () {
+    public function editorTools()
+    {
         return editor_tools();
     }
 
     public function shouldRender()
     {
-        return current_mode() === 'edit';
+        return current_mode() !== 'live';
     }
 
     /**
