@@ -6,6 +6,7 @@ use Netflex\SDK\Application;
 
 use Closure;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\App;
 
 class BindPage
@@ -22,18 +23,24 @@ class BindPage
     $route = route_hash($request->route());
 
     if (App::has($route)) {
+      $locale = null;
       current_page(App::get($route));
 
       if ($page = current_page()) {
         if ($page->lang) {
-          App::setLocale($page->lang);
+          $locale = $page->lang;
         } else {
           $master = $page->master;
-          if ($master->lang) {
-            App::setLocale($master->lang);
+          if ($master && $master->lang) {
+            $locale = $master->lang;
           }
         }
       }
+    }
+    
+    if ($locale) {
+        App::setLocale($locale);
+        Carbon::setLocale($locale);
     }
 
     return $next($request);
