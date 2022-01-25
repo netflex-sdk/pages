@@ -148,6 +148,22 @@ class RouteServiceProvider extends ServiceProvider
 
       current_page($page);
 
+      $locale = null;
+
+      if ($page->lang) {
+        $locale = $page->lang;
+      } else {
+        $master = $page->master;
+        if ($master && $master->lang) {
+          $locale = $master->lang;
+        }
+      }
+
+      if ($locale) {
+        App::setLocale($locale);
+        Carbon::setLocale($locale);
+      }
+
       $controller = $page->template->controller ?? null;
       $pageController = Config::get('pages.controller', PageController::class) ?? PageController::class;
       $class = trim($controller ? ("\\{$this->namespace}\\{$controller}") : "\\{$pageController}", '\\');
