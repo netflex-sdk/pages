@@ -20,10 +20,10 @@ class BindPage
    */
   public function handle($request, Closure $next)
   {
+    $locale = null;
     $route = route_hash($request->route());
 
     if (App::has($route)) {
-      $locale = null;
       current_page(App::get($route));
 
       if ($page = current_page()) {
@@ -37,10 +37,10 @@ class BindPage
         }
       }
     }
-    
+
     if ($locale) {
-        App::setLocale($locale);
-        Carbon::setLocale($locale);
+      App::setLocale($locale);
+      Carbon::setLocale($locale);
     }
 
     return $next($request);
