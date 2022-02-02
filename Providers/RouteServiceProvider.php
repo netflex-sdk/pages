@@ -174,11 +174,15 @@ class RouteServiceProvider extends ServiceProvider
 
       /** @var PageController $controller  */
       $controller = App::make($class);
+      $previousPage = current_page();
+      current_page($page);
 
       $route = collect($controller->getRoutes())
         ->first(function ($route) {
           return in_array($route->url, ['/', '']) || $route->action === 'index';
         });
+
+      current_page($previousPage);
 
       if ($route && method_exists($controller, $route->action)) {
         return $this->callWithInjectedDependencies($controller, $route->action);
@@ -338,7 +342,10 @@ class RouteServiceProvider extends ServiceProvider
             throw new InvalidControllerException($class);
           }
 
+          $previousPage = current_page();
+          current_page($page);
           $routeDefintions = $controllerInstance->getRoutes();
+          current_page($previousPage);
 
           foreach ($routeDefintions as $i => $routeDefintion) {
             if (!isset($routeDefintion->url) || empty($routeDefintion->url)) {
