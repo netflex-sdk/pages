@@ -45,6 +45,7 @@ use Illuminate\Support\Traits\Macroable;
  * @property string|null $lang
  * @property-read string|null $domain
  * @property-read Page|null $parent
+ * @property bool $children_inherits_permission
  */
 class Page extends QueryableModel implements Responsable
 {
@@ -239,6 +240,25 @@ class Page extends QueryableModel implements Responsable
     return !!API::delete('builder/pages/' . $key);
   }
 
+  public function getPublicAttribute($public)
+  {
+    if (!$public) {
+      return false;
+    }
+
+    $page = $this->parent;
+
+    if ($page) {
+      do {
+        if (!$page->public && $page->children_inherits_permission) {
+          return false;
+        }
+      } while ($page = $page->parent);
+    }
+
+    return true;
+  }
+
   /**
    * Retrieves the component names of the given block
    *
@@ -396,7 +416,7 @@ class Page extends QueryableModel implements Responsable
       }))->sortBy('sorting');
     }
 
-    return static::$allItems->map(function ($attributes){
+    return static::$allItems->map(function ($attributes) {
       return (new static)->newFromBuilder($attributes);
     });
   }
@@ -548,11 +568,38 @@ class Page extends QueryableModel implements Responsable
    * @param array|null $config
    * @return object
    */
-  public function getConfigAttribute ($config = []) {
+  public function getConfigAttribute($config = [])
+  {
     $config = collect($config ?? []);
-    
+
     return (object) $config->mapWithKeys(function ($config, $key) {
       return [$key => $config['value'] ?? null];
     })->toArray();
+  }
+
+  public function getChildrenInheritsPermissionAttribute($children_inherits_permission)
+  {
+    return (bool) $children_inherits_permission;
+  }
+
+  public function getAuthgroupsAttribute($authgroups)
+  {
+    if ($authgroups) {
+      $authgroups = array_map('intval', array_values(array_filter(explode(',', $authgroups))));
+    } else {
+      $authgroups = [];
+    }
+
+    $page = $this->parent;
+
+    if ($page) {
+      do {
+        if (!$page->public && $page->children_inherits_permission) {
+          return array_values(array_unique([...$authgroups, ...$page->authgroups]));
+        }
+      } while ($page = $page->parent);
+    }
+
+    return $authgroups;
   }
 }

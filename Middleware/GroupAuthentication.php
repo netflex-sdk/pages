@@ -10,6 +10,8 @@ use Illuminate\Auth\Middleware\Authenticate as Middleware;
 
 class GroupAuthentication extends Middleware
 {
+  const ALL_CUSTOMERS = 99999;
+
   /**
    * Handle an incoming request.
    *
@@ -35,6 +37,10 @@ class GroupAuthentication extends Middleware
 
       $authGroups = collect($page->authgroups);
       $userGroups = collect($request->user()->groups);
+
+      if ($authGroups->contains(static::ALL_CUSTOMERS)) {
+        return $next($request);
+      }
 
       $hasPermission = !!($authGroups->first(function ($authgroup) use ($userGroups) {
         return $userGroups->contains($authgroup);
