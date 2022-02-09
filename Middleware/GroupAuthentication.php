@@ -29,6 +29,8 @@ class GroupAuthentication extends Middleware
         return $next($request);
       }
 
+      redirect()->setIntendedUrl(url()->current());
+
       $this->authenticate($request, $guards);
 
       if (!$request->user()) {
