@@ -26,21 +26,23 @@ class BindPage
     if (App::has($route)) {
       current_page(App::get($route));
 
-      if ($page = current_page()) {
-        if ($page->lang) {
-          $locale = $page->lang;
-        } else {
-          $master = $page->master;
-          if ($master && $master->lang) {
-            $locale = $master->lang;
+      if (!config('app.localeHasBeenExplicitlySet', false)) {
+        if ($page = current_page()) {
+          if ($page->lang) {
+            $locale = $page->lang;
+          } else {
+            $master = $page->master;
+            if ($master && $master->lang) {
+              $locale = $master->lang;
+            }
           }
         }
-      }
-    }
 
-    if ($locale) {
-      App::setLocale($locale);
-      Carbon::setLocale($locale);
+        if ($locale) {
+          App::setLocale($locale);
+          Carbon::setLocale($locale);
+        }
+      }
     }
 
     return $next($request);
