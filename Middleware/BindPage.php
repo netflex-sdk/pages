@@ -26,7 +26,7 @@ class BindPage
     if (App::has($route)) {
       current_page(App::get($route));
 
-      if (!config('app.localeHasBeenExplicitlySet', false)) {
+      if (!locale_is_locked()) {
         if ($page = current_page()) {
           if ($page->lang) {
             $locale = $page->lang;
