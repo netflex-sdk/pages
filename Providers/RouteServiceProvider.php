@@ -5,7 +5,7 @@ namespace Netflex\Pages\Providers;
 use Throwable;
 use ReflectionClass;
 
-use API;
+use Netflex\API\Facades\API;
 use Carbon\Carbon;
 use Exception;
 use Netflex\Pages\Page;
