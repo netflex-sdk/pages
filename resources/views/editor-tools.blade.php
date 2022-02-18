@@ -6,7 +6,6 @@
 </style>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        alert('hei')
         document.querySelectorAll('form').forEach(function (form) {
             form.addEventListener('submit', function (e) {
                 e.preventDefault();
