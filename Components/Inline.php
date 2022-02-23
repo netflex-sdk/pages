@@ -11,26 +11,30 @@ class Inline extends Component
     public $tag;
     public $area;
     public $content;
+    public $default;
 
     /**
      * Create a new component instance.
      *
      * @return void
      */
-    public function __construct($area, $class = null, $style = null, $is = null) {
+    public function __construct($area, $class = null, $style = null, $is = null, $default = null)
+    {
         $this->area = blockhash_append($area);
         $this->class = $class;
         $this->style = $style;
         $this->tag = $is;
+        $this->default = $default;
 
         if (current_mode() === 'edit') {
-            $this->content = insert_content_if_not_exists($this->area, 'html');
+            $this->content = insert_content_if_not_exists($this->area, 'html', $default);
         } else {
             $this->content = content($area, null);
         }
     }
 
-    public function tag () {
+    public function tag()
+    {
         if (current_mode() === 'edit') {
             return $this->tag ?? 'div';
         }
@@ -38,12 +42,18 @@ class Inline extends Component
         return $this->tag;
     }
 
-    public function id () {
+    public function id()
+    {
         return $this->content->id ?? null;
     }
 
-    public function value () {
-        return $this->content ? ($this->content->html ?? null) : null;
+    public function value()
+    {
+        if ($value = ($this->content ? ($this->content->html ?? null) : null)) {
+            return $value;
+        }
+
+        return $this->default;
     }
 
     public function shouldRender()

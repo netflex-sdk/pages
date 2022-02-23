@@ -179,7 +179,7 @@ class RouteServiceProvider extends ServiceProvider
 
       $route = collect($controller->getRoutes())
         ->first(function ($route) {
-          return in_array($route->url, ['/', '']) || $route->action === 'index';
+          return (in_array($route->url, ['/', '']) || $route->action === 'index') && in_array('GET', $route->methods);
         });
 
       current_page($previousPage);

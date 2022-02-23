@@ -278,7 +278,7 @@ if (!function_exists('insert_content_if_not_exists')) {
    * @param array $content
    * @return object
    */
-  function insert_content_if_not_exists($alias, $type)
+  function insert_content_if_not_exists($alias, $type, $default = null)
   {
     if ($page = current_page()) {
       $content = $page->content->first(function ($content) use ($alias) {
@@ -289,14 +289,20 @@ if (!function_exists('insert_content_if_not_exists')) {
         return $content;
       }
 
-      $contentId = API::post('builder/content', [
+      $payload = [
         'relation' => 'page',
         'relation_id' => $page->id,
         'revision' => current_revision(),
         'published' => true,
         'area' => $alias,
         'type' => $type,
-      ])->content_id;
+      ];
+
+      if ($default && $type) {
+        $payload[$type] = $default;
+      }
+
+      $contentId = API::post('builder/content', $payload)->content_id;
 
       Cache::forget('page');
       Cache::forget('page/' . $page->id);
