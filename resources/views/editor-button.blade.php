@@ -14,6 +14,6 @@
     @if(isset($slot) && $slot && $slot->isNotEmpty())
         {{ $slot }}
     @else
-        {{ $icon ?? null }} {{ $label ?? null }}
+        {!! $icon ?? null !!} {{ $label ?? null }}
     @endif
 </a>
