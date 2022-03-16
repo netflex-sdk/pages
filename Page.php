@@ -186,7 +186,7 @@ class Page extends QueryableModel implements Responsable
   {
     $pageRouteName = $this->config->route_name ?? Str::slug($this->name);
 
-    return route(implode('.', [$pageRouteName, $name]), $parameters, $absolute);
+    return route(implode('.', [$pageRouteName, Str::slug($name)]), $parameters, $absolute);
   }
 
   /**
