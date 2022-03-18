@@ -267,15 +267,17 @@ class Page extends QueryableModel implements Responsable
    */
   public function getBlocks($area)
   {
-    $blocks = $this->content->filter(function ($content) use ($area) {
-      return $content->published && $content->area === $area;
-    })->map(function ($block) {
-      if ($template = Template::retrieve((int) $block->text)) {
-        return [$template->alias, $block->title ? $block->title : null];
-      };
-    });
+    return once(function () use ($area) {
+      $blocks = $this->content->filter(function ($content) use ($area) {
+        return $content->published && $content->area === $area;
+      })->map(function ($block) {
+        if ($template = Template::retrieve((int) $block->text)) {
+          return [$template->alias, $block->title ? $block->title : null];
+        };
+      });
 
-    return $blocks->filter();
+      return $blocks->filter();
+    });
   }
 
   /**
@@ -289,11 +291,13 @@ class Page extends QueryableModel implements Responsable
 
   public function getMasterAttribute()
   {
-    if (!$this->parent) {
-      return $this;
-    }
+    return once(function () {
+      if (!$this->parent) {
+        return $this;
+      }
 
-    return $this->parent->master ?? null;
+      return $this->parent->master ?? null;
+    });
   }
 
   /**
@@ -303,22 +307,28 @@ class Page extends QueryableModel implements Responsable
    */
   public function getDomainAttribute()
   {
-    $master = $this->master;
+    return once(function () {
+      $master = $this->master;
 
-    if ($master && $master !== $this) {
-      if ($master->type === static::TYPE_DOMAIN && preg_match('/^(?!:\/\/)(?=.{1,255}$)((.{1,63}\.){1,127}(?![0-9]*$)[a-z0-9-]+\.?)$/', $master->name) !== false) {
-        return $master->name;
+      if ($master && $master !== $this) {
+        if ($master->type === static::TYPE_DOMAIN && preg_match('/^(?!:\/\/)(?=.{1,255}$)((.{1,63}\.){1,127}(?![0-9]*$)[a-z0-9-]+\.?)$/', $master->name) !== false) {
+          return $master->name;
+        }
       }
-    }
+    });
   }
 
   public function getLangAttribute()
   {
     if (!$this->attributes['lang']) {
-      $parent = $this->parent;
-      while ($parent && !$parent->lang) {
-        $parent = $parent->parent;
-      }
+      $parent = once(function () {
+        $parent = $this->parent;
+        while ($parent && !$parent->lang) {
+          $parent = $parent->parent;
+        };
+
+        return $parent;
+      });
 
       if ($parent) {
         return $parent->lang;
@@ -336,9 +346,11 @@ class Page extends QueryableModel implements Responsable
    */
   public function getTemplateAttribute($template = null)
   {
-    if ($this->hasTemplate()) {
-      return Template::retrieve((int) $template);
-    }
+    return once(function () use ($template) {
+      if ($this->hasTemplate()) {
+        return Template::retrieve((int) $template);
+      }
+    });
   }
 
   /**
@@ -393,11 +405,13 @@ class Page extends QueryableModel implements Responsable
    */
   public function getChildrenAttribute()
   {
-    return static::all()
-      ->filter(function ($page) {
-        return (int) $page->parent_id === (int) $this->id;
-      })
-      ->values();
+    return once(function () {
+      return static::all()
+        ->filter(function ($page) {
+          return (int) $page->parent_id === (int) $this->id;
+        })
+        ->values();
+    });
   }
 
   /**
@@ -431,10 +445,12 @@ class Page extends QueryableModel implements Responsable
    */
   public static function find($id)
   {
-    return static::all()
-      ->first(function (Page $page) use ($id) {
-        return $page->getKey() === (int) $id;
-      });
+    return once(function () use ($id) {
+      return static::all()
+        ->first(function (Page $page) use ($id) {
+          return $page->getKey() === (int) $id;
+        });
+    });
   }
 
 
@@ -449,25 +465,27 @@ class Page extends QueryableModel implements Responsable
    */
   public static function resolve($resolveBy, $field = null)
   {
-    $resolveBy = Collection::make([$resolveBy])
-      ->flatten()
-      ->toArray();
+    return once(function ($resolveBy, $field) {
+      $resolveBy = Collection::make([$resolveBy])
+        ->flatten()
+        ->toArray();
 
-    foreach ($resolveBy as $value) {
-      $value = $value === '/' ? '/index' : $value;
-      $resolveBy[] = $value;
-      $resolveBy[] = "$value/";
-      $resolveBy[] = Str::replaceFirst('/', '', "$value/");
-    }
+      foreach ($resolveBy as $value) {
+        $value = $value === '/' ? '/index' : $value;
+        $resolveBy[] = $value;
+        $resolveBy[] = "$value/";
+        $resolveBy[] = Str::replaceFirst('/', '', "$value/");
+      }
 
-    $resolveBy = array_map('strtolower', array_unique($resolveBy));
+      $resolveBy = array_map('strtolower', array_unique($resolveBy));
 
-    $resolved = static::all()->filter(function (self $page) use ($resolveBy, $field) {
-      $key = strtolower($page->{$field ?? $page->resolvableField});
-      return in_array($key, $resolveBy);
+      $resolved = static::all()->filter(function (self $page) use ($resolveBy, $field) {
+        $key = strtolower($page->{$field ?? $page->resolvableField});
+        return in_array($key, $resolveBy);
+      });
+
+      return count($resolveBy) === 1 ? $resolved->first() : $resolved;
     });
-
-    return count($resolveBy) === 1 ? $resolved->first() : $resolved;
   }
 
   /**
@@ -512,7 +530,9 @@ class Page extends QueryableModel implements Responsable
    */
   public function navigationData($type = 'nav', $root = null)
   {
-    return NavigationData::get($this->id, $type, $root);
+    return once(function () use ($type, $root) {
+      return NavigationData::get($this->id, $type, $root);
+    });
   }
 
   /**
@@ -524,19 +544,21 @@ class Page extends QueryableModel implements Responsable
    */
   public function isSubPageOf(Page $page, ?Page $pointer = null)
   {
-    if (!$pointer) {
-      $pointer = $this;
-    }
+    return once(function () use ($page, $pointer) {
+      if (!$pointer) {
+        $pointer = $this;
+      }
 
-    if (!$pointer->parent) {
-      return false;
-    }
+      if (!$pointer->parent) {
+        return false;
+      }
 
-    if ($pointer->parent == $page) {
-      return true;
-    }
+      if ($pointer->parent == $page) {
+        return true;
+      }
 
-    return $this->isSubPageOf($page, $pointer->parent);
+      return $this->isSubPageOf($page, $pointer->parent);
+    });
   }
 
   /**
@@ -548,7 +570,9 @@ class Page extends QueryableModel implements Responsable
    */
   public function isParentPageOf(Page $page)
   {
-    return $page->isSubPageOf($this);
+    return once(function () use ($page) {
+      return $page->isSubPageOf($this);
+    });
   }
 
   /**
@@ -570,11 +594,13 @@ class Page extends QueryableModel implements Responsable
    */
   public function getConfigAttribute($config = [])
   {
-    $config = collect($config ?? []);
+    return once(function () use ($config) {
+      $config = collect($config ?? []);
 
-    return (object) $config->mapWithKeys(function ($config, $key) {
-      return [$key => $config['value'] ?? null];
-    })->toArray();
+      return (object) $config->mapWithKeys(function ($config, $key) {
+        return [$key => $config['value'] ?? null];
+      })->toArray();
+    });
   }
 
   public function getChildrenInheritsPermissionAttribute($children_inherits_permission)
@@ -584,22 +610,24 @@ class Page extends QueryableModel implements Responsable
 
   public function getAuthgroupsAttribute($authgroups)
   {
-    if ($authgroups) {
-      $authgroups = array_map('intval', array_values(array_filter(explode(',', $authgroups))));
-    } else {
-      $authgroups = [];
-    }
+    return once(function () use ($authgroups) {
+      if ($authgroups) {
+        $authgroups = array_map('intval', array_values(array_filter(explode(',', $authgroups))));
+      } else {
+        $authgroups = [];
+      }
 
-    $page = $this->parent;
+      $page = $this->parent;
 
-    if ($page) {
-      do {
-        if (!$page->public && $page->children_inherits_permission) {
-          return array_values(array_unique([...$authgroups, ...$page->authgroups]));
-        }
-      } while ($page = $page->parent);
-    }
+      if ($page) {
+        do {
+          if (!$page->public && $page->children_inherits_permission) {
+            return array_values(array_unique([...$authgroups, ...$page->authgroups]));
+          }
+        } while ($page = $page->parent);
+      }
 
-    return $authgroups;
+      return $authgroups;
+    });
   }
 }

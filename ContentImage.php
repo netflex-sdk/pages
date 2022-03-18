@@ -12,12 +12,14 @@ class ContentImage extends ContentFile
      */
     public function url($preset = 'default')
     {
-        if ($path = $this->getPathAttribute()) {
-            if ($preset) {
-                return media_url($this->getPathAttribute(), $preset);
-            }
+        return once(function () use ($preset) {
+            if ($path = $this->getPathAttribute()) {
+                if ($preset) {
+                    return media_url($this->getPathAttribute(), $preset);
+                }
 
-            return cdn_url($path);
-        }
+                return cdn_url($path);
+            }
+        });
     }
 }

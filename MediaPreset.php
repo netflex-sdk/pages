@@ -68,22 +68,24 @@ class MediaPreset implements JsonSerializable
    */
   public static function find($name)
   {
-    $default = Config::get("media.presets.default", [
-      'mode' => MODE_FIT,
-      'resolutions' => ['1x', '2x', '3x'],
-      'direction' => DIR_CENTER
-    ]);
+    return once(function () use ($name) {
+      $default = Config::get("media.presets.default", [
+        'mode' => MODE_FIT,
+        'resolutions' => ['1x', '2x', '3x'],
+        'direction' => DIR_CENTER
+      ]);
 
-    if ($preset = Config::get("media.presets.{$name}")) {
-      $preset['size'] = $preset['size'] ?? $default['size'] ?? null;
-      $preset['mode'] = $preset['mode'] ?? $default['mode'] ?? MODE_ORIGINAL;
-      $preset['fill'] = $preset['fill'] ?? $default['fill'] ?? null;
-      $preset['direction'] = $preset['direction'] ?? $default['direction'] ?? DIR_CENTER;
-      $preset['resolutions'] = $preset['resolutions'] ?? $default['resolutions'] ?? null;
-      $preset['breakpoints'] = $preset['breakpoints'] ?? $default['breakpoints'] ?? null;
+      if ($preset = Config::get("media.presets.{$name}")) {
+        $preset['size'] = $preset['size'] ?? $default['size'] ?? null;
+        $preset['mode'] = $preset['mode'] ?? $default['mode'] ?? MODE_ORIGINAL;
+        $preset['fill'] = $preset['fill'] ?? $default['fill'] ?? null;
+        $preset['direction'] = $preset['direction'] ?? $default['direction'] ?? DIR_CENTER;
+        $preset['resolutions'] = $preset['resolutions'] ?? $default['resolutions'] ?? null;
+        $preset['breakpoints'] = $preset['breakpoints'] ?? $default['breakpoints'] ?? null;
 
-      return new MediaPreset($preset);
-    }
+        return new MediaPreset($preset);
+      }
+    });
   }
 
   /**
@@ -111,22 +113,24 @@ class MediaPreset implements JsonSerializable
 
   public function getResolutionsAttribute($resolutions)
   {
-    $resolutions = $resolutions ?? ['1x', '2x', '3x'];
-    return collect($resolutions)
-      ->filter(function ($resolution) {
-        return is_string($resolution);
-      })
-      ->map(function ($resolution) {
-        return Str::lower($resolution);
-      })
-      ->filter(function ($resolution) {
-        return Str::endsWith($resolution, 'x');
-      })
-      ->sort(function ($a, $b) {
-        return intval($a) - intval($b);
-      })
-      ->values()
-      ->toArray();
+    return once(function () use ($resolutions) {
+      $resolutions = $resolutions ?? ['1x', '2x', '3x'];
+      return collect($resolutions)
+        ->filter(function ($resolution) {
+          return is_string($resolution);
+        })
+        ->map(function ($resolution) {
+          return Str::lower($resolution);
+        })
+        ->filter(function ($resolution) {
+          return Str::endsWith($resolution, 'x');
+        })
+        ->sort(function ($a, $b) {
+          return intval($a) - intval($b);
+        })
+        ->values()
+        ->toArray();
+    });
   }
 
   public function setMaxWidthAttribute($maxWidth)
@@ -141,38 +145,40 @@ class MediaPreset implements JsonSerializable
    */
   public function getBreakpointsAttribute($values = [])
   {
-    if ($values && is_array($values)) {
-      foreach ($values as $breakpoint => $value) {
-        if (is_string($value)) {
-          $values[$breakpoint] = $values[$value] ?? null;
+    return once(function () use ($values) {
+      if ($values && is_array($values)) {
+        foreach ($values as $breakpoint => $value) {
+          if (is_string($value)) {
+            $values[$breakpoint] = $values[$value] ?? null;
+          }
         }
+
+        $values = array_filter($values);
+
+        $values = array_map(function ($value) {
+          $value['mode'] = $value['mode'] ?? $this->mode;
+          $value['size'] = $value['size'] ?? $this->size;
+          $value['resolutions'] = $value['resolutions'] ?? $this->resolutions;
+          $value['fill'] = $value['fill'] ?? $this->fill;
+          return new static($value);
+        }, $values);
       }
 
-      $values = array_filter($values);
+      $values = $values ?? [];
 
-      $values = array_map(function ($value) {
-        $value['mode'] = $value['mode'] ?? $this->mode;
-        $value['size'] = $value['size'] ?? $this->size;
-        $value['resolutions'] = $value['resolutions'] ?? $this->resolutions;
-        $value['fill'] = $value['fill'] ?? $this->fill;
-        return new static($value);
-      }, $values);
-    }
+      $breakpoints = Config::get('media.breakpoints') ?? [];
 
-    $values = $values ?? [];
+      if (empty($breakpoints)) {
+        throw new BreakpointsMissingException;
+      }
 
-    $breakpoints = Config::get('media.breakpoints') ?? [];
-
-    if (empty($breakpoints)) {
-      throw new BreakpointsMissingException;
-    }
-
-    return collect($breakpoints)
-      ->mapWithKeys(function ($maxWidth, $breakpoint) use ($values) {
-        $value = $values[$breakpoint] ?? new static($this->attributes);
-        $value->maxWidth = $value->maxWidth ? $value->maxWidth : $maxWidth;
-        return [$breakpoint => $value];
-      });
+      return collect($breakpoints)
+        ->mapWithKeys(function ($maxWidth, $breakpoint) use ($values) {
+          $value = $values[$breakpoint] ?? new static($this->attributes);
+          $value->maxWidth = $value->maxWidth ? $value->maxWidth : $maxWidth;
+          return [$breakpoint => $value];
+        });
+    });
   }
 
   public function getFillAttribute($fill = null)
@@ -182,29 +188,31 @@ class MediaPreset implements JsonSerializable
 
   public function getSizeAttribute($size = null)
   {
-    $type = gettype($size);
-    switch ($type) {
-      case 'string':
-        if (Str::contains($size, 'x')) {
-          return $size;
-        }
-        return "{$size}x{$size}";
-      case 'integer':
-      case 'float':
-        $size = intval($size);
-        return "{$size}x{$size}";
-      case 'array':
-        $size = array_values(array_filter($size));
-        if (count($size) === 1) {
-          return "{$size[0]}x{$size[0]}";
-        }
-        @list($width, $height) = $size;
-        $width = $width ?? 0;
-        $height = $height ?? 0;
-        return "{$width}x{$height}";
-      default:
-        return '0x0';
-    }
+    return once(function () use ($size) {
+      $type = gettype($size);
+      switch ($type) {
+        case 'string':
+          if (Str::contains($size, 'x')) {
+            return $size;
+          }
+          return "{$size}x{$size}";
+        case 'integer':
+        case 'float':
+          $size = intval($size);
+          return "{$size}x{$size}";
+        case 'array':
+          $size = array_values(array_filter($size));
+          if (count($size) === 1) {
+            return "{$size[0]}x{$size[0]}";
+          }
+          @list($width, $height) = $size;
+          $width = $width ?? 0;
+          $height = $height ?? 0;
+          return "{$width}x{$height}";
+        default:
+          return '0x0';
+      }
+    });
   }
 
   public function getWidthAttribute()
