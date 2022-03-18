@@ -831,16 +831,14 @@ if (!function_exists('cdn_url')) {
    */
   function cdn_url($path = null)
   {
-    return once(function () use ($path) {
-      $schema = Variable::get('site_cdn_protocol');
-      $cdn = Variable::get('site_cdn_url');
+    $schema = Variable::get('site_cdn_protocol');
+    $cdn = Variable::get('site_cdn_url');
 
-      if ($path instanceof MediaUrlResolvable) {
-        $path = $path->getPathAttribute();
-      }
+    if ($path instanceof MediaUrlResolvable) {
+      $path = $path->getPathAttribute();
+    }
 
-      return trim((rtrim("$schema://$cdn", '/') . '/' . trim($path, '/')), '/');
-    });
+    return trim((rtrim("$schema://$cdn", '/') . '/' . trim($path, '/')), '/');
   }
 }
 
@@ -857,74 +855,72 @@ if (!function_exists('media_url')) {
    */
   function media_url($file, $presetOrSize = null, $type = 'rc', $color = '255,255,255,1', $direction = null)
   {
-    return once(function () use ($file, $presetOrSize, $type, $color, $direction) {
-      if ($file instanceof MediaUrlResolvable) {
-        $file = $file->getPathAttribute();
-      } else {
-        if (is_array($file) || is_object($file)) {
-          $fallback = (is_object($file) && method_exists($file, '__toString')) ? (string) $file : null;
-          $file = data_get($file, 'path', $fallback);
-        }
+    if ($file instanceof MediaUrlResolvable) {
+      $file = $file->getPathAttribute();
+    } else {
+      if (is_array($file) || is_object($file)) {
+        $fallback = (is_object($file) && method_exists($file, '__toString')) ? (string) $file : null;
+        $file = data_get($file, 'path', $fallback);
+      }
+    }
+
+    $size = $presetOrSize;
+    $preset = ($presetOrSize instanceof MediaPreset) ? $presetOrSize : null;
+    $preset = !$preset ? MediaPreset::find($presetOrSize) : null;
+
+    if ($preset) {
+      $size = $preset->size ?? null;
+      $type = $preset->mode ?? $type;
+      $color = $preset->fill ?? $color;
+      $direction = $preset->direction ?? $direction;
+    }
+
+    if (!$size && !$type && empty($gb)) {
+      return cdn_url($file);
+    }
+
+    $size = (is_string($size) && !(strpos($size, 'x') > 0)) ? "{$size}x{$size}" : $size;
+    $size = is_float($size) ? floor($size) : $size;
+    $size = is_int($size) ? "{$size}x{$size}" : $size;
+
+    $width = is_array($size) ? floor(($size[0] ?? 0)) : 0;
+    $height = is_array($size) ? floor(($size[1] ?? 0)) : 0;
+    $size = is_array($size) ? "{$width}x{$height}" : $size;
+
+    if ($direction && $type === 'rc') {
+      $type = 'rcf';
+    }
+
+    $options = null;
+
+    if ($type === 'fill') {
+      if (is_string($color)) {
+        $color = explode(',', $color);
       }
 
-      $size = $presetOrSize;
-      $preset = ($presetOrSize instanceof MediaPreset) ? $presetOrSize : null;
-      $preset = !$preset ? MediaPreset::find($presetOrSize) : null;
-
-      if ($preset) {
-        $size = $preset->size ?? null;
-        $type = $preset->mode ?? $type;
-        $color = $preset->fill ?? $color;
-        $direction = $preset->direction ?? $direction;
+      if (is_int($color) || is_float($color)) {
+        $color = floor($color % 256);
+        $color = "$color,$color,$color,1";
       }
 
-      if (!$size && !$type && empty($gb)) {
-        return cdn_url($file);
+      if (is_array($color)) {
+        $r = floor((intval($color[0] ?? 0)) % 256);
+        $g = floor((intval($color[1] ?? 0)) % 256);
+        $b = floor((intval($color[2] ?? 0)) % 256);
+        $a = floatval($color[3] ?? 1.0);
+        $color = "$r,$g,$b,$a";
       }
 
-      $size = (is_string($size) && !(strpos($size, 'x') > 0)) ? "{$size}x{$size}" : $size;
-      $size = is_float($size) ? floor($size) : $size;
-      $size = is_int($size) ? "{$size}x{$size}" : $size;
+      $options = $color . "/";
+    }
 
-      $width = is_array($size) ? floor(($size[0] ?? 0)) : 0;
-      $height = is_array($size) ? floor(($size[1] ?? 0)) : 0;
-      $size = is_array($size) ? "{$width}x{$height}" : $size;
+    if ($type === 'rcf') {
+      $options = $direction . '/';
+    }
 
-      if ($direction && $type === 'rc') {
-        $type = 'rcf';
-      }
+    $size = $type === 'o' ?  null : "$size/";
 
-      $options = null;
-
-      if ($type === 'fill') {
-        if (is_string($color)) {
-          $color = explode(',', $color);
-        }
-
-        if (is_int($color) || is_float($color)) {
-          $color = floor($color % 256);
-          $color = "$color,$color,$color,1";
-        }
-
-        if (is_array($color)) {
-          $r = floor((intval($color[0] ?? 0)) % 256);
-          $g = floor((intval($color[1] ?? 0)) % 256);
-          $b = floor((intval($color[2] ?? 0)) % 256);
-          $a = floatval($color[3] ?? 1.0);
-          $color = "$r,$g,$b,$a";
-        }
-
-        $options = $color . "/";
-      }
-
-      if ($type === 'rcf') {
-        $options = $direction . '/';
-      }
-
-      $size = $type === 'o' ?  null : "$size/";
-
-      return cdn_url("/media/$type/{$size}{$options}{$file}");
-    });
+    return cdn_url("/media/$type/{$size}{$options}{$file}");
   }
 }
 
