@@ -23,9 +23,9 @@
         "illuminate/support": "^8.0",
         "illuminate/view": "^8.0",
         "laravelium/sitemap": "^8.0",
-        "netflex/foundation": "^4.8",
-        "netflex/query-builder": "^4.8",
-        "netflex/support": "^4.8",
+        "netflex/foundation": "^4.9",
+        "netflex/query-builder": "^4.9",
+        "netflex/support": "^4.9",
         "php": "^7.4|^8.0"
     },
     "require-dev": {
@@ -39,7 +39,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "4.7.x-dev"
+            "dev-master": "4.9.x-dev"
         },
         "laravel": {
             "providers": [
