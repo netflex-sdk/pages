@@ -602,4 +602,25 @@ class Page extends QueryableModel implements Responsable
 
     return $authgroups;
   }
+
+  public function trail($root = null, $visited = [])
+  {
+    $visited[] = $this;
+
+    if ($root == $this->id) {
+      return $visited;
+    }
+
+    if ($parent = $this->parent) {
+      if ($parent->parent === null && $parent->visible_nav) {
+        return $this->parent->trail($root, $visited);
+      }
+
+      if ($parent->visible_subnav) {
+        return $this->parent->trail($root, $visited);
+      }
+    }
+
+    return array_reverse($visited);
+  }
 }
