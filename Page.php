@@ -607,17 +607,15 @@ class Page extends QueryableModel implements Responsable
   {
     $visited[] = $this;
 
-    if ($root == $this->id) {
-      return $visited;
-    }
+    if ($root != $this->id) {
+      if ($parent = $this->parent) {
+        if ($parent->parent === null && $parent->visible_nav) {
+          return $this->parent->trail($root, $visited);
+        }
 
-    if ($parent = $this->parent) {
-      if ($parent->parent === null && $parent->visible_nav) {
-        return $this->parent->trail($root, $visited);
-      }
-
-      if ($parent->visible_subnav) {
-        return $this->parent->trail($root, $visited);
+        if ($parent->visible_subnav) {
+          return $this->parent->trail($root, $visited);
+        }
       }
     }
 
