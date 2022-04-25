@@ -89,12 +89,19 @@ class RouteServiceProvider extends ServiceProvider
    */
   public function map()
   {
+
+
     $this->mapApiRoutes();
+
     $this->mapNetflexRoutes();
+
     $this->mapRedirects();
     $this->mapWebRoutes();
+
     $this->mapRobots();
+
     $this->mapSitemap();
+      //dd(collect(app('router')->getRoutes()->getRoutes())->pluck("uri")->toArray());
     //
   }
 
