@@ -23,9 +23,9 @@
         "illuminate/support": "^8.0",
         "illuminate/view": "^8.0",
         "laravelium/sitemap": "^8.0",
-        "netflex/foundation": "^4.10.7",
-        "netflex/query-builder": "^4.10.7",
-        "netflex/support": "^4.10.7",
+        "netflex/foundation": "^4.10.8",
+        "netflex/query-builder": "^4.10.8",
+        "netflex/support": "^4.10.8",
         "php": "^7.4|^8.0"
     },
     "require-dev": {
