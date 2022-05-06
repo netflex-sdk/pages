@@ -46,6 +46,7 @@ use Illuminate\Support\Traits\Macroable;
  * @property-read string|null $domain
  * @property-read Page|null $parent
  * @property bool $children_inherits_permission
+ * @property Collection $children
  */
 class Page extends QueryableModel implements Responsable
 {
@@ -504,10 +505,10 @@ class Page extends QueryableModel implements Responsable
 
   /**
    * Resolves navigation data for this page
-   * 
+   *
    * @param string $type
    * @param string|null $root
-   * 
+   *
    * @return Collection
    */
   public function navigationData($type = 'nav', $root = null)
