@@ -6,7 +6,7 @@ use Illuminate\View\Component;
 use Netflex\Pages\Page;
 use Apility\SEOTools\Facades\SEOMeta;
 
-class Breadcrumbs extends Component
+class Bs5Breadcrumbs extends Component
 {
     public static $items = [];
 
