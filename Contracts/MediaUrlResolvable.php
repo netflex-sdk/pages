@@ -15,5 +15,5 @@ interface MediaUrlResolvable
      * @param string|null $preset 
      * @return string|null
      */
-    public function url($preset);
+    public function url($preset = null);
 }
