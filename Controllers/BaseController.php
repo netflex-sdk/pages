@@ -44,7 +44,7 @@ abstract class BaseController extends Controller
             throw new InvalidRouteDefintionException(static::class, null, InvalidRouteDefintionException::E_INVALID);
         }
 
-        $hasIndexRoute = $routes->first(function ($route) {
+        $indexRoute = $routes->first(function ($route) {
             $methods = collect([$route['methods'] ?? [], $route['method'] ?? null])
                 ->flatten()
                 ->filter()
@@ -54,16 +54,17 @@ abstract class BaseController extends Controller
                 });
 
             return $route['url'] === '/' && $methods->contains('GET');
-        });
+        }) ?? [
+            'name' => 'index',
+            'url' => '/',
+            'methods' => ['GET'],
+            'action' => 'fallbackIndex'
+        ];
 
-        if (!$hasIndexRoute) {
-            $routes->push([
-                'name' => 'index',
-                'url' => '/',
-                'methods' => ['GET'],
-                'action' => 'fallbackIndex'
-            ]);
-        }
+        $routes = $routes->filter(fn ($route) => json_encode($route) !== json_encode($indexRoute));
+        $indexRoute['index'] = true;
+        $routes->prepend($indexRoute);
+        $routes = $routes->values();
 
         return $routes
             ->map(function ($route) {
@@ -80,7 +81,8 @@ abstract class BaseController extends Controller
                         'name' => $route['name'] ?? null,
                         'methods' => $methods->toArray(),
                         'action' => $route['action'],
-                        'url' => $route['url']
+                        'url' => $route['url'],
+                        'index' => $route['index'] ?? false
                     ];
                 }
             });
