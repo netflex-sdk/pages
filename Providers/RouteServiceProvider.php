@@ -146,6 +146,11 @@ class RouteServiceProvider extends ServiceProvider
       });
   }
 
+  public function beforeHandlePage(Page $page)
+  {
+    // Not implemented
+  }
+
   protected function handlePage(Request $request, JwtPayload $payload)
   {
     if ($page = Page::model()::findOrFail($payload->page_id)) {
@@ -170,6 +175,8 @@ class RouteServiceProvider extends ServiceProvider
         App::setLocale($locale);
         Carbon::setLocale($locale);
       }
+
+      $this->beforeHandlePage($page);
 
       $controller = $page->template->controller ?? null;
       $pageController = Config::get('pages.controller', PageController::class) ?? PageController::class;
