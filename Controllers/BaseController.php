@@ -30,7 +30,7 @@ abstract class BaseController extends Controller
         $routes = Collection::make($this->routes);
 
         $validRouteDefinitions = $routes->reduce(function ($valid, $route) {
-            $validKeys = ['url', 'method', 'methods', 'action', 'name'];
+            $validKeys = ['url', 'method', 'methods', 'action', 'name', 'index'];
             return $valid && is_array($route) && Collection::make(array_keys($route))->reduce(function ($valid, $key) use ($validKeys, $route) {
                 $validKey = in_array($key, $validKeys);
                 if (!$validKey) {
@@ -53,7 +53,7 @@ abstract class BaseController extends Controller
                     return strtoupper($method);
                 });
 
-            return $route['url'] === '/' && $methods->contains('GET');
+            return ($route['index'] ?? false) || $route['url'] === '/' && $methods->contains('GET');
         }) ?? [
             'name' => 'index',
             'url' => '/',
