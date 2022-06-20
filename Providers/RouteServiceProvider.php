@@ -422,7 +422,7 @@ class RouteServiceProvider extends ServiceProvider
 
           $compiledRoute = '\\Illuminate\\Support\\Facades\\' . ($page->domain ? 'Route::domain("")->any(' : 'Route::any(') . '"' . rtrim($page->url, '/') . '/{any?}",function() { clear_route_cache(); throw new ' . $exception . ';})->name("' . $page->id . '");';
 
-          if ($routeDefintion->index) {
+          if (!isset($routeDefintion) || $routeDefintion->index) {
             $compiledRoutes[] = $compiledRoute;
           } else {
             $compiledSubRoutes[] = $compiledRoute;
