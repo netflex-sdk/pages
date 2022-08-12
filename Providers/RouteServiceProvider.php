@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use Laravelium\Sitemap\Sitemap;
 use Netflex\Pages\Contracts\CompilesException;
+use Netflex\Pages\Events\CacheCleared;
 use Netflex\Pages\Exceptions\InvalidControllerException;
 use Netflex\Pages\Exceptions\InvalidRouteDefintionException;
 
@@ -284,6 +285,7 @@ class RouteServiceProvider extends ServiceProvider
 
         if (Cache::has($key)) {
           Cache::forget($key);
+          CacheCleared::dispatch($key);
           return ['success' => true, 'message' => 'Key deleted'];
         }
 
