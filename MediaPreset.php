@@ -154,6 +154,7 @@ class MediaPreset implements JsonSerializable
         $value['mode'] = $value['mode'] ?? $this->mode;
         $value['size'] = $value['size'] ?? $this->size;
         $value['resolutions'] = $value['resolutions'] ?? $this->resolutions;
+        $value['direction'] = $value['direction'] ?? $this->direction;
         $value['fill'] = $value['fill'] ?? $this->fill;
         return new static($value);
       }, $values);
