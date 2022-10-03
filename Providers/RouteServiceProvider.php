@@ -283,6 +283,10 @@ class RouteServiceProvider extends ServiceProvider
           clear_route_cache();
         }
 
+        if ($key === 'redirects') {
+          clear_route_cache();
+        }
+
         if (Cache::has($key)) {
           Cache::forget($key);
           CacheCleared::dispatch($key);
