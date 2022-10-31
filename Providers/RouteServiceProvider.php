@@ -223,11 +223,11 @@ class RouteServiceProvider extends ServiceProvider
       abort(400, 'previewController setting missing or misformed in structure config.');
     }
 
-    if(isset($payload->controller) && $payload->controller) {
-      list($controller, $action) = explode('@', $payload->controller);
-    } elseif(isset($structure->config->previewController)) {
+    if(isset($structure->config->previewController)) {
       list($controller, $action) = explode('@', $structure->config->previewController->value);
-    }
+    } elseif(isset($payload->controller) && $payload->controller) {
+      list($controller, $action) = explode('@', $payload->controller);
+    } 
 
     $controller = trim("\\{$this->namespace}\\{$controller}", '\\');
 
