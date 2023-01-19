@@ -2,6 +2,7 @@
 
 namespace Netflex\Pages\Providers;
 
+use Netflex\Pages\Controllers\ControllerNotImplementedController;
 use Throwable;
 use ReflectionClass;
 
@@ -152,6 +153,17 @@ class RouteServiceProvider extends ServiceProvider
     // Not implemented
   }
 
+  protected function resolveControllerClass (Page $page): string
+  {
+    $pageController = Config::get('pages.controller') ?? PageController::class;
+    $controllerNotImplementedController = ControllerNotImplementedController::class;
+
+    $controllerName = $page->template->controller ?? null;
+    $controller = $controllerName ? "\\{$this->namespace}\\{$controllerName}" : $pageController;
+
+    return trim(class_exists($controller) ? $controller : "\\{$controllerNotImplementedController}", '\\');
+  }
+
   protected function handlePage(Request $request, JwtPayload $payload)
   {
     if ($page = Page::model()::findOrFail($payload->page_id)) {
@@ -179,9 +191,7 @@ class RouteServiceProvider extends ServiceProvider
 
       $this->beforeHandlePage($page);
 
-      $controller = $page->template->controller ?? null;
-      $pageController = Config::get('pages.controller', PageController::class) ?? PageController::class;
-      $class = trim($controller ? ("\\{$this->namespace}\\{$controller}") : "\\{$pageController}", '\\');
+      $class = $this->resolveControllerClass($page);
 
       if (!$class) {
         $page->toResponse($request);
@@ -346,9 +356,7 @@ class RouteServiceProvider extends ServiceProvider
         /** @var Page */
         $page = $page;
 
-        $controller = $page->template->controller ?? null;
-        $pageController = Config::get('pages.controller', PageController::class) ?? PageController::class;
-        $class = trim($controller ? ("\\{$this->namespace}\\{$controller}") : "\\{$pageController}", '\\');
+        $class = $this->resolveControllerClass($page);
 
         /** @var Controller|null */
         $controllerInstance = null;
