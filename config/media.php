@@ -45,10 +45,13 @@ return [
     |   - resolutions
     |   - fill
     |   - size
+    |   - compressor
     |   - breakpoints
     |     - mode
     |     - resolutions
     |     - fill
+    |     - size
+    |     - compressor
     */
     'presets' => [
         'default' => MEDIA_PRESET_ORIGINAL

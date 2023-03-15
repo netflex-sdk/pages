@@ -19,7 +19,7 @@
 @if($tag() !== null)
     <{{ $tag() }} @yield('attributes') {{ $attributes }}>
 @endif
-    {!! $value ?? null !!}
+    {!! $value() ?? $slot !!}
 @if($tag() !== null)
     </{{ $tag() }}>
 @endif

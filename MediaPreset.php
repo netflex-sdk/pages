@@ -20,6 +20,7 @@ use Netflex\Pages\Exceptions\InvalidPresetException;
  * @property-read string|null $fill
  * @property-read string[] $resolutions
  * @property-read array $breakpoints
+ * @property-read string|null $compressor
  * @property-read int $maxWidth
  * @property-read int $width
  * @property-read int $height
@@ -62,34 +63,48 @@ class MediaPreset implements JsonSerializable
     Config::set("media.presets.$name", $preset);
   }
 
-  /**
-   * @param string $name 
-   * @return MediaPreset|null 
-   */
-  public static function find($name)
+  public static function getDefaultPreset()
   {
     $default = Config::get("media.presets.default", [
       'mode' => MODE_FIT,
       'resolutions' => ['1x', '2x', '3x'],
-      'direction' => DIR_CENTER
+      'direction' => DIR_CENTER,
     ]);
 
-    if ($preset = Config::get("media.presets.{$name}")) {
-      $preset['size'] = $preset['size'] ?? $default['size'] ?? null;
-      $preset['mode'] = $preset['mode'] ?? $default['mode'] ?? MODE_ORIGINAL;
-      $preset['fill'] = $preset['fill'] ?? $default['fill'] ?? null;
-      $preset['direction'] = $preset['direction'] ?? $default['direction'] ?? DIR_CENTER;
-      $preset['resolutions'] = $preset['resolutions'] ?? $default['resolutions'] ?? null;
-      $preset['breakpoints'] = $preset['breakpoints'] ?? $default['breakpoints'] ?? null;
-
-      return new MediaPreset($preset);
+    if (config('media.compressor')) {
+      $default['compressor'] ??= config('media.compressor');
     }
+
+    return new MediaPreset($default);
   }
 
   /**
-   * @param string $name 
-   * @return MediaPreset 
-   * @throws InvalidPresetException 
+   * @param string $name
+   * @return MediaPreset|null
+   */
+  public static function find($name): ?self
+  {
+    $default = static::getDefaultPreset();
+
+    if ($preset = Config::get("media.presets.{$name}")) {
+      $preset['size'] ??= $default->size ?? null;
+      $preset['mode'] ??= $default->mode ?? MODE_ORIGINAL;
+      $preset['fill'] ??= $default->fill ?? null;
+      $preset['direction'] ??= $default->direction ?? DIR_CENTER;
+      $preset['resolutions'] ??= $default->resolutions ?? null;
+      $preset['breakpoints'] ??= $default->breakpoints ?? null;
+      $preset['compressor'] ??= $default->compressor ?? null;
+
+      return new MediaPreset($preset);
+    }
+
+    return null;
+  }
+
+  /**
+   * @param string $name
+   * @return MediaPreset
+   * @throws InvalidPresetException
    */
   public static function findOrFail($name)
   {
@@ -154,9 +169,10 @@ class MediaPreset implements JsonSerializable
         $value['mode'] = $value['mode'] ?? $this->mode;
         $value['size'] = $value['size'] ?? $this->size;
         $value['resolutions'] = $value['resolutions'] ?? $this->resolutions;
+        $value['compressor'] = $value['compressor'] ?? $this->compressor;
         $value['direction'] = $value['direction'] ?? $this->direction;
         $value['fill'] = $value['fill'] ?? $this->fill;
-        return new static($value);
+        $value;
       }, $values);
     }
 
@@ -170,9 +186,9 @@ class MediaPreset implements JsonSerializable
 
     return collect($breakpoints)
       ->mapWithKeys(function ($maxWidth, $breakpoint) use ($values) {
-        $value = $values[$breakpoint] ?? new static($this->attributes);
-        $value->maxWidth = $value->maxWidth ? $value->maxWidth : $maxWidth;
-        return [$breakpoint => $value];
+        $value = $values[$breakpoint] ?? $this->attributes;
+        $value['maxWidth'] ??= $maxWidth;
+        return [$breakpoint => new static($value)];
       });
   }
 
@@ -236,7 +252,8 @@ class MediaPreset implements JsonSerializable
       'fill' => $this->fill,
       'direction' => $this->direction,
       'maxWidth' => $this->maxWidth,
-      'resolutions' => $this->resolutions
+      'resolutions' => $this->resolutions,
+      'compressor' => $this->compressor,
     ];
   }
 }

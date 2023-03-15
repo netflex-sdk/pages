@@ -5,6 +5,7 @@ namespace Netflex\Pages\Traits;
 use Netflex\Pages\Page;
 
 use Illuminate\Support\Collection;
+use Netflex\Newsletters\NewsletterPage;
 
 trait CastsDefaultFields
 {
@@ -64,6 +65,10 @@ trait CastsDefaultFields
    */
   public function getTypeAttribute()
   {
+    if (($this->attributes['type'] ?? null) === 'newsletter') {
+      return NewsletterPage::TYPE_NEWSLETTER;
+    }
+
     if (!isset($this->attributes['template'])) {
       return Page::TYPE_PAGE;
     }

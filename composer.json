@@ -15,7 +15,7 @@
         ]
     },
     "require": {
-        "apility/seotools": "^1.0",
+        "apility/seotools": "^2.0",
         "facade/ignition-contracts": "^1.0",
         "illuminate/auth": "^8.0",
         "illuminate/contracts": "^8.0",
@@ -23,9 +23,9 @@
         "illuminate/support": "^8.0",
         "illuminate/view": "^8.0",
         "laravelium/sitemap": "^8.0",
-        "netflex/foundation": "^4.20.2",
-        "netflex/query-builder": "^4.20.2",
-        "netflex/support": "^4.20.2",
+        "netflex/foundation": "^4.28.2",
+        "netflex/query-builder": "^4.28.2",
+        "netflex/support": "^4.28.2",
         "php": "^7.4|^8.0"
     },
     "require-dev": {
@@ -39,7 +39,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "4.16.x-dev"
+            "dev-master": "4.25.x-dev"
         },
         "laravel": {
             "providers": [

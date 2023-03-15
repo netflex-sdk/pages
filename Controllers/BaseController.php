@@ -30,7 +30,7 @@ abstract class BaseController extends Controller
         $routes = Collection::make($this->routes);
 
         $validRouteDefinitions = $routes->reduce(function ($valid, $route) {
-            $validKeys = ['url', 'method', 'methods', 'action', 'name', 'index'];
+            $validKeys = ['url', 'method', 'methods', 'action', 'name', 'index', 'where'];
             return $valid && is_array($route) && Collection::make(array_keys($route))->reduce(function ($valid, $key) use ($validKeys, $route) {
                 $validKey = in_array($key, $validKeys);
                 if (!$validKey) {
@@ -58,7 +58,8 @@ abstract class BaseController extends Controller
             'name' => 'index',
             'url' => '/',
             'methods' => ['GET'],
-            'action' => 'fallbackIndex'
+            'action' => 'fallbackIndex',
+            'where' => [],
         ];
 
         $routes = $routes->filter(fn ($route) => json_encode($route) !== json_encode($indexRoute));
@@ -82,7 +83,8 @@ abstract class BaseController extends Controller
                         'methods' => $methods->toArray(),
                         'action' => $route['action'],
                         'url' => $route['url'],
-                        'index' => $route['index'] ?? false
+                        'index' => $route['index'] ?? false,
+                        'where' => $route['where'] ?? [],
                     ];
                 }
             });

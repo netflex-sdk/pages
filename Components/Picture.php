@@ -156,7 +156,7 @@ class Picture extends Component
     $preset = $this->preset();
 
     if ($src = $this->src()) {
-      return media_url($src, $preset->size, $preset->mode, $preset->fill, $preset->direction);
+      return media_url($src, $preset);
     }
 
     if ($this->inline && current_mode() === 'edit') {
@@ -172,7 +172,7 @@ class Picture extends Component
     $preset = $this->preset();
 
     foreach ($preset->resolutions as $resolution) {
-      $resolutionPaths[$resolution] = media_url($this->src(), $preset->size, $preset->mode, $preset->fill, $preset->direction) . '?res=' . $resolution;
+      $resolutionPaths[$resolution] = media_url($this->src(), $preset, null, null, null, ['res' => $resolution]);
     }
 
     return $resolutionPaths;
@@ -206,7 +206,10 @@ class Picture extends Component
 
       if ($this->src()) {
         foreach ($preset->resolutions as $resolution) {
-          $srcSet['paths'][$resolution] = media_url($this->src(), $preset->size, $preset->mode, $preset->fill, $preset->direction) . '?src=' . $preset->maxWidth . 'w&res=' . $resolution;
+          $srcSet['paths'][$resolution] = media_url($this->src(), $preset, null, null, null, [
+            'src' => "{$preset->maxWidth}w",
+            'res' => $resolution,
+          ]);
         }
 
         $mergedSets = [];
