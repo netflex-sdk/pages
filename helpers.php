@@ -343,7 +343,7 @@ if (!function_exists('map_content')) {
    * @param string $field
    * @return mixed
    */
-  function map_content($content, $settings, $field = 'auto')
+  function map_content($content, $settings, $field = 'auto', $options = [])
   {
     $content = collect($content);
 
@@ -527,8 +527,9 @@ if (!function_exists('content')) {
   /**
    * @param string $alias
    * @param string $field = 'auto'
+   * @param array $options = []
    */
-  function content($alias, $field = 'auto')
+  function content($alias, $field = 'auto', $options = [])
   {
     $settings = page_first_editable($alias);
 
@@ -551,12 +552,16 @@ if (!function_exists('content')) {
         return $item->published;
       });
 
+      /* if ($alias === 'events') {
+        dd($content);
+      } */
+
       if ($field !== 'auto') {
         $settings['type'] = $field;
-        return map_content($content, $settings, $field);
+        return map_content($content, $settings, $field, $options);
       }
 
-      return map_content($content, $settings);
+      return map_content($content, $settings, 'auto', $options);
     }
   }
 }
@@ -896,8 +901,7 @@ if (!function_exists('media_url')) {
     $color = '255,255,255,1',
     $direction = null,
     array $query = []
-  )
-  {
+  ) {
     if ($file instanceof MediaUrlResolvable) {
       $file = $file->getPathAttribute();
     } else {

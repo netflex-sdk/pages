@@ -172,7 +172,7 @@ class MediaPreset implements JsonSerializable
         $value['compressor'] = $value['compressor'] ?? $this->compressor;
         $value['direction'] = $value['direction'] ?? $this->direction;
         $value['fill'] = $value['fill'] ?? $this->fill;
-        $value;
+        return  $value;
       }, $values);
     }
 
