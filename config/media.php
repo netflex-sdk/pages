@@ -13,7 +13,10 @@ return [
     'options' => [
         'image' => [
             'setWidthAndHeightAttributes' => false,
-        ]
+        ],
+        'breakpoints' => [
+            'media_query_max_width_subtract' => 0,
+        ],
     ],
 
     /*
