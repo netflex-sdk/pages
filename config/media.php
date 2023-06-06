@@ -2,6 +2,14 @@
 
 return [
 
+    'cdn' => [
+        'default' => 'default',
+
+        'domains' => [
+            'default' => null, // NULL value = Use the sites default domain
+        ],
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Global settings

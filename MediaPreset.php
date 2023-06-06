@@ -7,13 +7,14 @@ use JsonSerializable;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Traits\Macroable;
-
+use Netflex\Foundation\Variable;
 use Netflex\Support\Accessors;
 use Netflex\Pages\Components\Picture;
 use Netflex\Pages\Exceptions\BreakpointsMissingException;
 use Netflex\Pages\Exceptions\InvalidPresetException;
 
 /**
+ * @property string $cdn
  * @property-read string $mode
  * @property-read string $direction
  * @property-read string $size
@@ -34,6 +35,7 @@ class MediaPreset implements JsonSerializable
    * @var array
    */
   const ORIGINAL = [
+    'cdn' => 'default',
     'mode' => Picture::MODE_ORIGINAL,
     'resolutions' => ['1x', '2x']
   ];
@@ -63,9 +65,51 @@ class MediaPreset implements JsonSerializable
     Config::set("media.presets.$name", $preset);
   }
 
+  protected static function cdnDomains(): array
+  {
+    return collect(Config::get('media.cdn.domains', []))
+      ->mapWithKeys(function ($domain, $cdn) {
+        return [$cdn => $domain ?? Variable::get('site_cdn_url')];
+      })
+      ->all();
+  }
+
+  protected static function defaultCdnAlias(): string
+  {
+    return Config::get('media.cdn.default', 'default') ?? 'default';
+  }
+
+  public static function defaultCdn(): string
+  {
+    return static::getCdn(static::defaultCdnAlias());
+  }
+
+  protected static function getCdn($alias): string
+  {
+    if ($cdn = static::resolveCdn($alias)) {
+      return $cdn;
+    }
+
+    return Variable::get('site_cdn_url');
+  }
+
+  public static function resolveCdn($alias): ?string
+  {
+    if ($alias === 'default') {
+      $alias = static::defaultCdnAlias();
+    }
+
+    if ($cdn = static::cdnDomains()[$alias] ?? null) {
+      return $cdn;
+    }
+
+    return null;
+  }
+
   public static function getDefaultPreset()
   {
     $default = Config::get("media.presets.default", [
+      'cdn' => static::defaultCdn(),
       'mode' => MODE_FIT,
       'resolutions' => ['1x', '2x', '3x'],
       'direction' => DIR_CENTER,
@@ -87,6 +131,7 @@ class MediaPreset implements JsonSerializable
     $default = static::getDefaultPreset();
 
     if ($preset = Config::get("media.presets.{$name}")) {
+      $preset['cdn'] ??= $default->cdn ?? null;
       $preset['size'] ??= $default->size ?? null;
       $preset['mode'] ??= $default->mode ?? MODE_ORIGINAL;
       $preset['fill'] ??= $default->fill ?? null;
@@ -113,6 +158,11 @@ class MediaPreset implements JsonSerializable
     }
 
     throw new InvalidPresetException($name);
+  }
+
+  public function getCdnAttribute(?string $cdn): string
+  {
+    return static::getCdn($cdn);
   }
 
   public function getModeAttribute($mode = null)
@@ -166,6 +216,7 @@ class MediaPreset implements JsonSerializable
       $values = array_filter($values);
 
       $values = array_map(function ($value) {
+        $value['cdn'] = $value['cdn'] ?? $this->cdn;
         $value['mode'] = $value['mode'] ?? $this->mode;
         $value['size'] = $value['size'] ?? $this->size;
         $value['resolutions'] = $value['resolutions'] ?? $this->resolutions;
