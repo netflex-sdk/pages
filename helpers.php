@@ -406,6 +406,7 @@ if (!function_exists('map_content')) {
               'id' => $item->id,
               'title' => $item->title,
               'description' => $item->description,
+              'link' => $item->name,
               'path' => $item->image,
               'file' => (int) $item->file
             ])
