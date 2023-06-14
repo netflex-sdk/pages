@@ -201,6 +201,7 @@ class Picture extends Component
       $srcSet = [
         'breakpoint' => $breakpoint,
         'maxWidth' => $preset->maxWidth,
+        'mqMaxWidth' => $preset->maxWidth - Config::get('media.options.breakpoints.media_query_max_width_subtract', 0),
         'paths' => []
       ];
 

@@ -406,6 +406,7 @@ if (!function_exists('map_content')) {
               'id' => $item->id,
               'title' => $item->title,
               'description' => $item->description,
+              'link' => $item->name,
               'path' => $item->image,
               'file' => (int) $item->file
             ])
@@ -867,12 +868,13 @@ if (!function_exists('cdn_url')) {
    * Generates a CDN url with optional path appended
    *
    * @param MediaUrlResolvable|string|null $path
+   * @param string|null $cdn
    * @return string
    */
-  function cdn_url($path = null)
+  function cdn_url($path = null, $cdn = null)
   {
     $schema = Variable::get('site_cdn_protocol');
-    $cdn = Variable::get('site_cdn_url');
+    $cdn = $cdn ?? MediaPreset::defaultCdn() ?? Variable::get('site_cdn_url');
 
     if ($path instanceof MediaUrlResolvable) {
       $path = $path->getPathAttribute();
@@ -900,7 +902,8 @@ if (!function_exists('media_url')) {
     $type = 'rc',
     $color = '255,255,255,1',
     $direction = null,
-    array $query = []
+    array $query = [],
+    $cdn = null
   ) {
     if ($file instanceof MediaUrlResolvable) {
       $file = $file->getPathAttribute();
@@ -917,6 +920,7 @@ if (!function_exists('media_url')) {
       : MediaPreset::find($presetOrSize);
 
     if ($preset) {
+      $cdn = $preset->cdn ?? $cdn;
       $size = $preset->size ?? null;
       $type = $preset->mode ?? $type;
       $color = $preset->fill ?? $color;
@@ -924,7 +928,7 @@ if (!function_exists('media_url')) {
     }
 
     if (!$size && !$type && empty($gb)) {
-      return cdn_url($file);
+      return cdn_url($file, $cdn);
     }
 
     $size = (is_string($size) && !(strpos($size, 'x') > 0)) ? "{$size}x{$size}" : $size;
@@ -976,7 +980,7 @@ if (!function_exists('media_url')) {
 
     $queryString = count($query) > 0 ? ('?' . http_build_query($query)) : '';
 
-    return cdn_url("/media/{$type}/{$size}{$options}{$file}{$queryString}");
+    return cdn_url("/media/{$type}/{$size}{$options}{$file}{$queryString}", $cdn);
   }
 }
 

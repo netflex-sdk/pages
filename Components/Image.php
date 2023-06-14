@@ -11,6 +11,8 @@ use Netflex\Pages\MediaPreset;
 
 class Image extends Component
 {
+  protected ?object $settings;
+
   const MODE_ORIGINAL = 'o';
   const MODE_FILL = 'fill';
   const MODE_EXACT = 'e';
@@ -46,7 +48,8 @@ class Image extends Component
     $title = null,
     $class = null,
     $style = null,
-    $preset = null
+    $preset = null,
+    $cdn = null
   ) {
     $explicitWidth = $width !== null;
     $explicitHeight = $height !== null;
@@ -65,6 +68,7 @@ class Image extends Component
 
     if ($preset) {
       if ($preset = MediaPreset::find($preset)) {
+        $cdn = $preset->cdn ?? $cdn;
         $mode = $preset->mode ? $preset->mode : $mode;
         $height = $preset->height ? $preset->height : $height;
         $width = $preset->width ? $preset->width : $width;
@@ -73,6 +77,7 @@ class Image extends Component
     }
 
     $this->settings = (object) [
+      'cdn' => $cdn ?? null,
       'area' => $area ?? null,
       'size' => $size ?? (($width && $height) ? "{$width}x{$height}" : null),
       'explicitWidth' => $explicitWidth,
@@ -116,7 +121,8 @@ class Image extends Component
     }
   }
 
-  public function width () {
+  public function width()
+  {
     if ($this->settings->explicitWidth) {
       @list($width) = explode('x', $this->size());
       if ($width ?? null) {
@@ -127,7 +133,8 @@ class Image extends Component
     return null;
   }
 
-  public function height () {
+  public function height()
+  {
     if ($this->settings->explicitHeight) {
       @list($_, $height) = explode('x', $this->size());
       if ($height ?? null) {
@@ -237,7 +244,9 @@ class Image extends Component
         $this->size(),
         $this->mode(),
         $this->color(),
-        $this->direction()
+        $this->direction(),
+        [],
+        $this->settings->cdn
       ) : $src;
 
     if (!$src && current_mode() === 'edit') {

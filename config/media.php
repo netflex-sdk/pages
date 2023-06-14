@@ -2,6 +2,14 @@
 
 return [
 
+    'cdn' => [
+        'default' => 'default',
+
+        'domains' => [
+            'default' => null, // NULL value = Use the sites default domain
+        ],
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Global settings
@@ -13,7 +21,10 @@ return [
     'options' => [
         'image' => [
             'setWidthAndHeightAttributes' => false,
-        ]
+        ],
+        'breakpoints' => [
+            'media_query_max_width_subtract' => 0,
+        ],
     ],
 
     /*
