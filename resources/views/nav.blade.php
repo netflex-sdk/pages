@@ -1,14 +1,12 @@
 @if ($levels || $levels === null)
   <ul role="menu" {{ $attributes }}>
     @foreach ($children as $child)
-      <li
-        class="{{ $liClass }}"
-        role="menuitem"
-      >
+      <li class="{{ $liClass }}">
         <a
           class="{{ $aClassList($child) }}"
           target="{{ $child->target }}"
           href="{{ $child->url }}"
+          role="menuitem"
           title="{{ $showTitle ? $child->title : '' }}"
         >
           {{ $child->title }}

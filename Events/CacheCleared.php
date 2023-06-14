@@ -14,7 +14,7 @@ class CacheCleared
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public ?string $key;
+    protected ?string $key;
 
     /**
      * Create a new event instance.
