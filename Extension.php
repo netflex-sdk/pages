@@ -15,10 +15,17 @@ use Netflex\Pages\Exceptions\NotImplementedException;
 abstract class Extension implements Renderable, Responsable
 {
   use Macroable;
-  
+
   protected $view;
   protected $name;
   protected $data = [];
+
+  public function __construct(array $data)
+  {
+    $this->data = $data;
+    $this->view = $data['view'] ?? null;
+    $this->name = $data['name'] ?? null;
+  }
 
   public function handle(Request $request)
   {

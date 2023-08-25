@@ -13,7 +13,6 @@ use Illuminate\Support\Traits\Macroable;
  * @property-read int|null $page_id
  * @property-read int|null $revision_id
  * @property-read string|null $edit_tools
- * @property-read string|null $edit_tools
  * @property-read string $domain
  * @property-read int $uid
  * @property-read int $iat
@@ -35,5 +34,9 @@ class JwtPayload
 
     public function getModeAttribute ($mode = null) {
         return $mode ?? 'live';
+    }
+
+    public function getAttributes(): array {
+      return $this->attributes;
     }
 }

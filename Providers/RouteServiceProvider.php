@@ -259,8 +259,9 @@ class RouteServiceProvider extends ServiceProvider
 
   protected function handleExtension(Request $request, $payload)
   {
+    /** @var JwtPayload $payload */
     if ($alias = $payload->view) {
-      if ($extension = resolve_extension($alias, json_decode(json_encode($payload), true))) {
+      if ($extension = resolve_extension($alias, json_decode(json_encode($payload->getAttributes()), true))) {
         return $extension->handle($request);
       }
     }
