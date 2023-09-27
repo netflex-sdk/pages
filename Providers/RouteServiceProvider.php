@@ -288,6 +288,19 @@ class RouteServiceProvider extends ServiceProvider
         return $this->renderPage($page, $request);
       }
     }
+
+    /** Ugly hack to work around newsletter indexing issues */
+    API::put('elasticsearch/newsletter/' . $payload->newsletter_id);
+    $newsletter = new Newsletter;
+    $newsletter->id = $payload->newsletter_id;
+    $reflection = new ReflectionClass($newsletter);
+    $method = $reflection->getMethod('getCacheIdentifier');
+    $method->setAccessible(true);
+    $cacheKey = $method->invoke($newsletter, $payload->newsletter_id);
+    Cache::forget($cacheKey);
+    /** End of ugly hack */
+
+    return 'Newsletter not indexed, please try again in a few minutes.';
   }
 
   protected function callWithInjectedDependencies($controller, $method = 'index', $arguments = [])
