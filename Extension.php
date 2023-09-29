@@ -9,6 +9,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Str;
 
 use Netflex\Pages\Exceptions\NotImplementedException;
 
@@ -22,8 +23,12 @@ abstract class Extension implements Renderable, Responsable
 
   public function __construct(array $data)
   {
+    if (isset($data['view']) && !Str::startsWith($data['view'], 'extensions.')) {
+      $data['view'] = 'extensions.' . $data['view'];
+    }
+
     $this->data = $data;
-    $this->view = $data['view'] ?? null;
+    $this->view = $data['view'] ?? $this->view ?? null;
     $this->name = $data['name'] ?? null;
   }
 
