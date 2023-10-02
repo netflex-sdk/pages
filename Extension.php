@@ -12,7 +12,6 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Str;
 
 use Netflex\Pages\Exceptions\NotImplementedException;
-
 abstract class Extension implements Renderable, Responsable
 {
   use Macroable;
@@ -28,7 +27,7 @@ abstract class Extension implements Renderable, Responsable
     }
 
     $this->data = $data;
-    $this->view = $data['view'] ?? $this->view ?? null;
+    $this->view = $this->view ?? $data['view'] ?? null;
     $this->name = $data['name'] ?? null;
   }
 
