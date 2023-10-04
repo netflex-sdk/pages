@@ -271,7 +271,7 @@ class RouteServiceProvider extends ServiceProvider
 
   protected function handleNewsletter(Request $request, JwtPayload $payload)
   {
-    if ($newsletter = Newsletter::find($payload->newsletter_id)) {
+    if ($newsletter = Newsletter::where('id', $payload->newsletter_id)->first()) {
       if ($page = $newsletter->page) {
 
         $page = $page->loadRevision($page->revision);
