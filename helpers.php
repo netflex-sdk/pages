@@ -789,9 +789,7 @@ if (!function_exists('current_page')) {
       throw new TypeError('Argument 1 passed to ' . $frame['function'] . '() must be an instance of Netflex\Pages\AbstractPage, ' . $type . ' given on line ' . $frame['line']);
     }
 
-    App::bind('__current_page__', function () use ($value) {
-      return $value;
-    });
+    App::bind('__current_page__', fn() => $value);
 
     return $value;
   }

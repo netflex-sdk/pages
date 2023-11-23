@@ -2,14 +2,10 @@
 
 namespace Netflex\Pages;
 
-use Exception;
-use JsonSerializable;
-
-use Netflex\Query\Builder;
-use Netflex\Support\Accessors;
-
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
+use JsonSerializable;
+use Netflex\Support\Accessors;
 
 /**
  * @property int $id
@@ -87,7 +83,7 @@ class NavigationData implements JsonSerializable
 
   /**
    * Resolves navigation data
-   * 
+   *
    * @param int|null $parent = null
    * @param string $type = 'nav'
    * @param string|null $root = null
@@ -95,34 +91,33 @@ class NavigationData implements JsonSerializable
    */
   public static function get($parent = null, string $type = 'nav', ?string $root = null)
   {
-    return Page::model()::all()
-      ->where('published', true)
-      ->where('parent_id', $parent)
-      ->where('visible_' . $type)
-      ->map(function (Page $page) use ($root, $type) {
-        $target = $page->nav_target;
-        $url = $page->url;
+    return once(function () use ($parent, $type, $root) {
+      return Page::model()::all()->where('published', true)
+        ->where('parent_id', $parent)
+        ->where('visible_' . $type)->map(function (Page $page) use ($root, $type) {
+          $target = $page->nav_target;
+          $url = $page->url;
 
-        switch ($page->type) {
-          case Page::TYPE_EXTERNAL:
-            $target = $target ?? '_blank';
-            break;
-          case Page::TYPE_FOLDER:
-            break;
-          default:
-            $url = $root . $url;
-            break;
-        }
+          switch ($page->type) {
+            case Page::TYPE_EXTERNAL:
+              $target = $target ?? '_blank';
+              break;
+            case Page::TYPE_FOLDER:
+              break;
+            default:
+              $url = $root . $url;
+              break;
+          }
 
-        return new static([
-          'id' => $page->id,
-          'url' => $url,
-          'target' => $target,
-          'type' => $page->type,
-          'title' => $page->nav_title ? $page->nav_title : $page->name,
-          'children' => static::get($page->id, $type, $root)
-        ]);
-      })
-      ->values();
+          return new static([
+            'id' => $page->id,
+            'url' => $url,
+            'target' => $target,
+            'type' => $page->type,
+            'title' => $page->nav_title ? $page->nav_title : $page->name,
+            'children' => static::get($page->id, $type, $root)
+          ]);
+        })->values();
+    });
   }
 }

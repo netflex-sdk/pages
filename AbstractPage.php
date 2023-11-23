@@ -2,26 +2,21 @@
 
 namespace Netflex\Pages;
 
-use Throwable;
-
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\LazyCollection;
+use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
 use Netflex\API\Facades\API;
-
-use Netflex\Query\Builder;
-use Netflex\Query\QueryableModel;
-
 use Netflex\Foundation\Template;
-
 use Netflex\Pages\Traits\CastsDefaultFields;
 use Netflex\Pages\Traits\HidesDefaultFields;
-
-use Illuminate\Support\Str;
-use Illuminate\Support\LazyCollection;
-use Illuminate\Support\Collection;
-use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Traits\Macroable;
+use Netflex\Query\Builder;
+use Netflex\Query\QueryableModel;
+use Throwable;
 
 /**
  * @property int $id
@@ -209,9 +204,9 @@ abstract class AbstractPage extends QueryableModel implements Responsable
   /**
    * Inserts a new record, and returns its id
    *
-   * @property int|null $relationId
-   * @property array $attributes
    * @return mixed
+   * @property array $attributes
+   * @property int|null $relationId
    */
   protected function performInsertRequest(?int $relationId = null, array $attributes = [])
   {
@@ -275,7 +270,7 @@ abstract class AbstractPage extends QueryableModel implements Responsable
     $blocks = $this->content->filter(function ($content) use ($area) {
       return $content->published && $content->area === $area;
     })->map(function ($block) {
-      if ($template = Template::retrieve((int) $block->text)) {
+      if ($template = Template::retrieve((int)$block->text)) {
         return [$template->alias, $block->title ? $block->title : null];
       };
     });
@@ -288,7 +283,7 @@ abstract class AbstractPage extends QueryableModel implements Responsable
    */
   public function hasTemplate()
   {
-    return (bool) ($this->attributes['template'] ?? null)
+    return (bool)($this->attributes['template'] ?? null)
       && is_numeric($this->attributes['template']);
   }
 
@@ -342,7 +337,7 @@ abstract class AbstractPage extends QueryableModel implements Responsable
   public function getTemplateAttribute($template = null)
   {
     if ($this->hasTemplate()) {
-      return Template::retrieve((int) $template);
+      return Template::retrieve((int)$template);
     }
   }
 
@@ -362,7 +357,7 @@ abstract class AbstractPage extends QueryableModel implements Responsable
   /**
    * Create an HTTP response that represents the object.
    *
-   * @param  \Illuminate\Http\Request $request
+   * @param \Illuminate\Http\Request $request
    * @return \Symfony\Component\HttpFoundation\Response
    */
   public function toResponse($request)
@@ -388,7 +383,7 @@ abstract class AbstractPage extends QueryableModel implements Responsable
    */
   public function getParentAttribute()
   {
-    return static::find((int) $this->parent_id);
+    return static::find((int)$this->parent_id);
   }
 
   /**
@@ -400,9 +395,27 @@ abstract class AbstractPage extends QueryableModel implements Responsable
   {
     return static::all()
       ->filter(function ($page) {
-        return (int) $page->parent_id === (int) $this->id;
+        return (int)$page->parent_id === (int)$this->id;
       })
       ->values();
+  }
+
+  private static function getPages(): Collection
+  {
+    if (!static::$allItems) {
+      /** @var Collection */
+      $data = Cache::rememberForever('pages', function () {
+        return collect(API::get('builder/pages/content', true))
+          ->sortBy('sorting')
+          ->keyBy('id');
+      });
+
+      static::$allItems = $data->map(function ($attributes) {
+        return (new static)->newFromBuilder($attributes);
+      });
+    }
+
+    return static::$allItems;
   }
 
   /**
@@ -414,16 +427,8 @@ abstract class AbstractPage extends QueryableModel implements Responsable
    */
   public static function all()
   {
-    if (!static::$allItems) {
-      /** @var Collection */
-      static::$allItems = collect(Cache::rememberForever('pages', function () {
-        return API::get('builder/pages/content', true);
-      }))->sortBy('sorting');
-    }
 
-    return static::$allItems->map(function ($attributes) {
-      return (new static)->newFromBuilder($attributes);
-    });
+    return static::getPages()->values();
   }
 
   /**
@@ -436,10 +441,7 @@ abstract class AbstractPage extends QueryableModel implements Responsable
    */
   public static function find($id)
   {
-    return static::all()
-      ->first(function (Page $page) use ($id) {
-        return $page->getKey() === (int) $id;
-      });
+    return static::getPages()[$id] ?? null;
   }
 
 
@@ -577,14 +579,14 @@ abstract class AbstractPage extends QueryableModel implements Responsable
   {
     $config = collect($config ?? []);
 
-    return (object) $config->mapWithKeys(function ($config, $key) {
+    return (object)$config->mapWithKeys(function ($config, $key) {
       return [$key => $config['value'] ?? null];
     })->toArray();
   }
 
   public function getChildrenInheritsPermissionAttribute($children_inherits_permission)
   {
-    return (bool) $children_inherits_permission;
+    return (bool)$children_inherits_permission;
   }
 
   public function getAuthgroupsAttribute($authgroups)
