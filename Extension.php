@@ -20,7 +20,7 @@ abstract class Extension implements Renderable, Responsable
   protected $name;
   protected $data = [];
 
-  public function __construct(array $data)
+  public function __construct(array $data = [])
   {
     if (isset($data['view']) && !Str::startsWith($data['view'], 'extensions.')) {
       $data['view'] = 'extensions.' . $data['view'];
