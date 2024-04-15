@@ -983,6 +983,10 @@ if (!function_exists('media_url')) {
       $query['ext'] = $ext;
     }
 
+    if (request()->has('recompress')) {
+      $query['recompress'] = request()->get('recompress') ? '1' : '0';
+    }
+
     $queryString = count($query) > 0 ? ('?' . http_build_query($query)) : '';
 
     return cdn_url("/media/{$type}/{$size}{$options}{$file}{$queryString}", $cdn);
