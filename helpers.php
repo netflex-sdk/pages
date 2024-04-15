@@ -789,7 +789,7 @@ if (!function_exists('current_page')) {
       throw new TypeError('Argument 1 passed to ' . $frame['function'] . '() must be an instance of Netflex\Pages\AbstractPage, ' . $type . ' given on line ' . $frame['line']);
     }
 
-    App::bind('__current_page__', fn() => $value);
+    App::bind('__current_page__', fn () => $value);
 
     return $value;
   }
@@ -901,7 +901,8 @@ if (!function_exists('media_url')) {
     $color = '255,255,255,1',
     $direction = null,
     array $query = [],
-    $cdn = null
+    $cdn = null,
+    $ext = null
   ) {
     if ($file instanceof MediaUrlResolvable) {
       $file = $file->getPathAttribute();
@@ -916,6 +917,8 @@ if (!function_exists('media_url')) {
     $preset = ($presetOrSize instanceof MediaPreset)
       ? $presetOrSize
       : MediaPreset::find($presetOrSize);
+
+    $ext = $ext ?? $preset->ext ?? null;
 
     if ($preset) {
       $cdn = $preset->cdn ?? $cdn;
@@ -974,6 +977,10 @@ if (!function_exists('media_url')) {
 
     if ($defaultPreset->compressor) {
       $query['compressor'] = $defaultPreset->compressor;
+    }
+
+    if ($ext !== null) {
+      $query['ext'] = $ext;
     }
 
     $queryString = count($query) > 0 ? ('?' . http_build_query($query)) : '';
