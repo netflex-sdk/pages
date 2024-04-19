@@ -283,7 +283,7 @@ if (!function_exists('insert_content_if_not_exists')) {
   function insert_content_if_not_exists($alias, $type, $default = null)
   {
     if ($page = current_page()) {
-      $content = ($page->contentKeyedByArea[$alias] ?? collect([]))->first();;
+      $content = ($page->contentKeyedByArea[$alias] ?? collect([]))->first();
 
       if ($content) {
         return $content;
