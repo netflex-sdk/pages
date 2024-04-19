@@ -283,9 +283,8 @@ if (!function_exists('insert_content_if_not_exists')) {
   function insert_content_if_not_exists($alias, $type, $default = null)
   {
     if ($page = current_page()) {
-      $content = $page->content->first(function ($content) use ($alias) {
-        return $content->area === $alias;
-      });
+      $content = $page->contentKeyedByArea[$alias] ?? collect([]);
+      $content = $content - first();
 
       if ($content) {
         return $content;
@@ -539,13 +538,8 @@ if (!function_exists('content')) {
     }
 
     if ($page = current_page()) {
-      $content = $page->content->filter(function ($content) use ($settings) {
-        return $content->area === $settings['alias'];
-      });
-
-      $blockContent = $page->content->filter(function ($content) use ($settings) {
-        return $content->area === blockhash_append($settings['alias']);
-      });
+      $content = $page->contentKeyedByArea[$settings['alias']] ?? collect([]);
+      $blockContent = $page->contentKeyedByArea[blockhash_append($settings['alias'])] ?? collect([]);
 
       $content = $blockContent->count() ? $blockContent : $content;
 
