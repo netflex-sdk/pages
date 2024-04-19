@@ -16,7 +16,6 @@ use Netflex\Pages\Exceptions\InvalidPresetException;
 /**
  * @property string $cdn
  * @property-read string $mode
- * @property-read string|null $ext
  * @property-read string $direction
  * @property-read string $size
  * @property-read string|null $fill
@@ -112,7 +111,6 @@ class MediaPreset implements JsonSerializable
     $default = Config::get("media.presets.default", [
       'cdn' => static::defaultCdn(),
       'mode' => MODE_FIT,
-      'ext' => null,
       'resolutions' => ['1x', '2x', '3x'],
       'direction' => DIR_CENTER,
     ]);
@@ -136,7 +134,6 @@ class MediaPreset implements JsonSerializable
       $preset['cdn'] ??= $default->cdn ?? null;
       $preset['size'] ??= $default->size ?? null;
       $preset['mode'] ??= $default->mode ?? MODE_ORIGINAL;
-      $preset['ext'] ??= $default->ext ?? null;
       $preset['fill'] ??= $default->fill ?? null;
       $preset['direction'] ??= $default->direction ?? DIR_CENTER;
       $preset['resolutions'] ??= $default->resolutions ?? null;
@@ -221,7 +218,6 @@ class MediaPreset implements JsonSerializable
       $values = array_map(function ($value) {
         $value['cdn'] = $value['cdn'] ?? $this->cdn;
         $value['mode'] = $value['mode'] ?? $this->mode;
-        $value['ext'] = $value['ext'] ?? $this->ext;
         $value['size'] = $value['size'] ?? $this->size;
         $value['resolutions'] = $value['resolutions'] ?? $this->resolutions;
         $value['compressor'] = $value['compressor'] ?? $this->compressor;
@@ -304,7 +300,6 @@ class MediaPreset implements JsonSerializable
   {
     return [
       'mode' => $this->mode,
-      'ext' => $this->ext,
       'size' => $this->size,
       'fill' => $this->fill,
       'direction' => $this->direction,

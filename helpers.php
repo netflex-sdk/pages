@@ -283,8 +283,7 @@ if (!function_exists('insert_content_if_not_exists')) {
   function insert_content_if_not_exists($alias, $type, $default = null)
   {
     if ($page = current_page()) {
-      $content = $page->contentKeyedByArea[$alias] ?? collect([]);
-      $content = $content - first();
+      $content = ($page->contentKeyedByArea[$alias] ?? collect([]))->first();;
 
       if ($content) {
         return $content;
@@ -895,8 +894,7 @@ if (!function_exists('media_url')) {
     $color = '255,255,255,1',
     $direction = null,
     array $query = [],
-    $cdn = null,
-    $ext = null
+    $cdn = null
   ) {
     if ($file instanceof MediaUrlResolvable) {
       $file = $file->getPathAttribute();
@@ -911,8 +909,6 @@ if (!function_exists('media_url')) {
     $preset = ($presetOrSize instanceof MediaPreset)
       ? $presetOrSize
       : MediaPreset::find($presetOrSize);
-
-    $ext = $ext ?? $preset->ext ?? null;
 
     if ($preset) {
       $cdn = $preset->cdn ?? $cdn;
@@ -971,14 +967,6 @@ if (!function_exists('media_url')) {
 
     if ($defaultPreset->compressor) {
       $query['compressor'] = $defaultPreset->compressor;
-    }
-
-    if ($ext !== null) {
-      $query['ext'] = $ext;
-    }
-
-    if (request()->has('recompress')) {
-      $query['recompress'] = request()->get('recompress') ? '1' : '0';
     }
 
     $queryString = count($query) > 0 ? ('?' . http_build_query($query)) : '';
