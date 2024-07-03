@@ -48,21 +48,6 @@ trait CastsDefaultFields
     });
   }
 
-  /**
-   * @param array $content
-   * @return Collection
-   */
-  public function getContentKeyedByAreaAttribute($content = [])
-  {
-    return once(function () use ($content) {
-      return Collection::make($content)
-        ->map(function ($content) {
-          return (object) $content;
-        })
-        ->keyBy('area');
-    });
-  }
-
   public function getKeywordsAttribute($keywords)
   {
     $keywords = !is_array($keywords) ? explode(',', $keywords) : $keywords;

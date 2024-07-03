@@ -2,39 +2,39 @@
 
 namespace Netflex\Pages\Providers;
 
-use Throwable;
-use ReflectionClass;
-
-use Netflex\API\Facades\API;
 use Carbon\Carbon;
 use Exception;
-use Netflex\Pages\Page;
-use Netflex\Pages\Middleware\BindPage;
-use Netflex\Pages\Middleware\GroupAuthentication;
-use Netflex\Pages\Controllers\PageController;
-use Netflex\Pages\Controllers\Controller;
-use Netflex\Pages\Middleware\JwtProxy;
-use Netflex\Foundation\Redirect;
-use Netflex\Pages\JwtPayload;
-use Netflex\Pages\PreviewRequest;
-use Netflex\Pages\Controllers\ControllerNotImplementedController;
-
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Laravelium\Sitemap\Sitemap;
+use Netflex\API\Facades\API;
+use Netflex\Foundation\Redirect;
 use Netflex\Newsletters\Newsletter;
+use Netflex\Notifications\Automation\AutomationEmail;
 use Netflex\Pages\AbstractPage;
 use Netflex\Pages\Contracts\CompilesException;
+use Netflex\Pages\Controllers\Controller;
+use Netflex\Pages\Controllers\ControllerNotImplementedController;
+use Netflex\Pages\Controllers\PageController;
 use Netflex\Pages\Events\CacheCleared;
 use Netflex\Pages\Exceptions\InvalidControllerException;
 use Netflex\Pages\Exceptions\InvalidRouteDefintionException;
+use Netflex\Pages\JwtPayload;
+use Netflex\Pages\Middleware\BindPage;
+use Netflex\Pages\Middleware\GroupAuthentication;
+use Netflex\Pages\Middleware\JwtProxy;
+use Netflex\Pages\Page;
+use Netflex\Pages\PreviewRequest;
+use ReflectionClass;
+use Throwable;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -105,8 +105,7 @@ class RouteServiceProvider extends ServiceProvider
     $this->mapRobots();
 
     $this->mapSitemap();
-    //dd(collect(app('router')->getRoutes()->getRoutes())->pluck("uri")->toArray());
-    //
+
   }
 
   /**
@@ -205,7 +204,7 @@ class RouteServiceProvider extends ServiceProvider
       $page->toResponse($request);
     }
 
-    /** @var PageController $controller  */
+    /** @var PageController $controller */
     $controller = App::make($class);
     $previousPage = current_page();
     current_page($page);
@@ -272,10 +271,18 @@ class RouteServiceProvider extends ServiceProvider
   protected function handleNewsletter(Request $request, JwtPayload $payload)
   {
     if ($newsletter = Newsletter::where('id', $payload->newsletter_id)->first()) {
+
+      $automationMail = null;
+      $newsletter->automation != "1" || $automationMail = AutomationEmail::find($newsletter->id);
+
       if ($page = $newsletter->page) {
 
         $page = $page->loadRevision($page->revision);
         current_newsletter($newsletter);
+
+        if ($automationMail) {
+          $this->extendEditorToolsToIncludeTags($automationMail);
+        }
 
         if ($payload->mode === 'preview') {
           return $newsletter->renderPreview($payload->preview_type ?? 'html');
@@ -538,7 +545,7 @@ class RouteServiceProvider extends ServiceProvider
       ]);
 
       $routeCache = $routeSource;
-      Cache::rememberForever(static::ROUTE_CACHE, fn () => $routeCache);
+      Cache::rememberForever(static::ROUTE_CACHE, fn() => $routeCache);
     }
 
     Route::middleware('netflex')
@@ -606,5 +613,47 @@ class RouteServiceProvider extends ServiceProvider
   protected function getSitemapEntries()
   {
     return [];
+  }
+
+  /**
+   * @param $automationMail
+   * @return void
+   */
+  public function extendEditorToolsToIncludeTags($automationMail): void
+  {
+    $this->app->extend('__editor_tools__', function ($string) use ($automationMail) {
+
+      $tags = [];
+
+      foreach (config("automation_emails.tags.mails.$automationMail->id.include", []) as $section) {
+        foreach (Arr::dot(config("automation_emails.tags.includes.$section", [])) as $key => $value) {
+          data_set($tags, $key, $value);
+        }
+      }
+
+      foreach (Arr::dot(config("automation_emails.tags.mails.$automationMail->id.attributes", [])) as $key => $value) {
+        data_set($tags, $key, $value);
+      }
+
+      return $this->insertBefore($string ?? '', '<div id="netflex-advanced-content-widget-header">', [
+        '<!-- PRE: Addons -->',
+        (string)view('pages::newsletter-tags', compact('tags')),
+        '<!-- POST: Addons -->'
+      ]);
+    });
+  }
+
+  private function insertBefore(string $whole, string $before, $to_insert): string
+  {
+    $to_insert = is_array($to_insert) ? implode("", $to_insert) : (string)$to_insert;
+    $parts = explode($before, $whole);
+
+    return ($parts[0] ?? '') . $to_insert . $before . ($parts[1] ?? '');
+  }
+
+  private function insertAfter(string $whole, string $after, string $to_insert): string
+  {
+    $parts = explode($after, $whole);
+    return ($parts[0] ?? '') . $after . $to_insert . ($parts[1] ?? '');
   }
 }

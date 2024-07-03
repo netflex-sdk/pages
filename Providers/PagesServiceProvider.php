@@ -2,21 +2,19 @@
 
 namespace Netflex\Pages\Providers;
 
-use Netflex\Pages\Components\EditorButton;
-use Netflex\Pages\Components\Image;
-use Netflex\Pages\Components\Picture;
-use Netflex\Pages\Components\Blocks;
-use Netflex\Pages\Components\Inline;
-use Netflex\Pages\Components\EditorTools;
-use Netflex\Pages\Components\Seo;
-use Netflex\Pages\Components\StaticContent;
-use Netflex\Pages\Components\BackgroundImage;
-use Netflex\Pages\Components\Nav;
-
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
-
 use Illuminate\Support\ServiceProvider;
+use Netflex\Pages\Components\BackgroundImage;
+use Netflex\Pages\Components\Blocks;
+use Netflex\Pages\Components\EditorButton;
+use Netflex\Pages\Components\EditorTools;
+use Netflex\Pages\Components\Image;
+use Netflex\Pages\Components\Inline;
+use Netflex\Pages\Components\Nav;
+use Netflex\Pages\Components\Picture;
+use Netflex\Pages\Components\Seo;
+use Netflex\Pages\Components\StaticContent;
 use Netflex\Pages\Controllers\Controller;
 
 class PagesServiceProvider extends ServiceProvider
@@ -50,6 +48,14 @@ class PagesServiceProvider extends ServiceProvider
       'pages'
     );
 
+    $this->mergeConfigFrom(
+      __DIR__ . '/../config/automation_emails/tags.php',
+      'automation_emails.tags'
+    );
+    $this->publishes([
+      __DIR__ . '/../config/automation_emails/tags.php' => $this->app->configPath('automation_emails/tags.php')
+    ], 'automation-mail-configs');
+
     $this->loadViewsFrom(__DIR__ . '/../resources/views', 'netflex-pages');
 
     $this->publishes([
@@ -77,6 +83,8 @@ class PagesServiceProvider extends ServiceProvider
       Nav::class,
       StaticContent::class,
     ]);
+
+    $this->loadViewsFrom(__DIR__ . '/../resources/views', 'pages');
 
     if ($prefix) {
       $this->loadViewComponentsAs($prefix, $components);

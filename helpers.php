@@ -283,7 +283,9 @@ if (!function_exists('insert_content_if_not_exists')) {
   function insert_content_if_not_exists($alias, $type, $default = null)
   {
     if ($page = current_page()) {
-      $content = ($page->contentKeyedByArea[$alias] ?? collect([]))->first();
+      $content = $page->content->first(function ($content) use ($alias) {
+        return $content->area === $alias;
+      });
 
       if ($content) {
         return $content;
@@ -537,8 +539,13 @@ if (!function_exists('content')) {
     }
 
     if ($page = current_page()) {
-      $content = $page->contentKeyedByArea[$settings['alias']] ?? collect([]);
-      $blockContent = $page->contentKeyedByArea[blockhash_append($settings['alias'])] ?? collect([]);
+      $content = $page->content->filter(function ($content) use ($settings) {
+        return $content->area === $settings['alias'];
+      });
+
+      $blockContent = $page->content->filter(function ($content) use ($settings) {
+        return $content->area === blockhash_append($settings['alias']);
+      });
 
       $content = $blockContent->count() ? $blockContent : $content;
 
@@ -782,7 +789,7 @@ if (!function_exists('current_page')) {
       throw new TypeError('Argument 1 passed to ' . $frame['function'] . '() must be an instance of Netflex\Pages\AbstractPage, ' . $type . ' given on line ' . $frame['line']);
     }
 
-    App::bind('__current_page__', fn () => $value);
+    App::bind('__current_page__', fn() => $value);
 
     return $value;
   }
