@@ -10,6 +10,10 @@
   @foreach ($srcSets as $srcSet)
     <source srcset="{{ $srcSet['paths'] }}" media="(max-width: {{ $srcSet['mqMaxWidth'] }}px)">
   @endforeach
-  <img class="{{ collect([$attributes->get('class'), $imageClass])->filter()->join(' ') }}" src="{{ $defaultSrc }}" srcset="{{ $defaultSrcSet }}" title="{{ $title }}" alt="{{ $alt }}" loading="{{ $loading }}">
+  @if($useExplicitWidthAndHeight)
+    <img width="{{ $preset()->width }}" height="{{ $preset()->height }}" class="{{ collect([$attributes->get('class'), $imageClass])->filter()->join(' ') }}" src="{{ $defaultSrc }}" srcset="{{ $defaultSrcSet }}" title="{{ $title }}" alt="{{ $alt }}" loading="{{ $loading }}">
+  @else
+    <img class="{{ collect([$attributes->get('class'), $imageClass])->filter()->join(' ') }}" src="{{ $defaultSrc }}" srcset="{{ $defaultSrcSet }}" title="{{ $title }}" alt="{{ $alt }}" loading="{{ $loading }}">
+  @endif
 </picture>
 @endif

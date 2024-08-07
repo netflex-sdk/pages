@@ -48,6 +48,7 @@ class Picture extends Component
   public $inline;
   public $direction;
   public $loading;
+  public $useExplicitWidthAndHeight;
 
   /**
    * Create a new component instance.
@@ -72,6 +73,8 @@ class Picture extends Component
 
     $width = $width ?? $height ?? null;
     $height = $height ?? $width ?? null;
+
+    $this->useExplicitWidthAndHeight = Config::get('media.options.image.setWidthAndHeightAttributes', false);
 
     $this->size = $this->size ? $this->size : null;
     $this->size = !$this->size && $width && $height ? ((int) $width . 'x' . (int) $height) : $this->size;
@@ -129,7 +132,7 @@ class Picture extends Component
    * @return MediaPreset
    * @throws InvalidPresetException
    */
-  protected function preset()
+  public function preset()
   {
     $default = Config::get("media.presets.default", [
       'mode' => static::MODE_FIT,
