@@ -25,6 +25,7 @@ use Netflex\Pages\Controllers\Controller;
 use Netflex\Pages\Controllers\ControllerNotImplementedController;
 use Netflex\Pages\Controllers\PageController;
 use Netflex\Pages\Events\CacheCleared;
+use Netflex\Pages\Events\CacheStoreClearRequest;
 use Netflex\Pages\Exceptions\InvalidControllerException;
 use Netflex\Pages\Exceptions\InvalidRouteDefintionException;
 use Netflex\Pages\JwtPayload;
@@ -352,6 +353,12 @@ class RouteServiceProvider extends ServiceProvider
       }
 
       $keys = array_unique($keys);
+
+      foreach ($keys as $key) {
+        if ($key) {
+          CacheStoreClearRequest::dispatch($key, $request);
+        }
+      }
 
       $success = false;
 
