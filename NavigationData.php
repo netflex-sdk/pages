@@ -30,6 +30,7 @@ class NavigationData implements JsonSerializable
     $this->attributes = $attributes;
   }
 
+  #[\ReturnTypeWillChange]
   public function jsonSerialize()
   {
     return $this->__debugInfo();
