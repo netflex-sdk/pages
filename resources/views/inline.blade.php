@@ -5,6 +5,11 @@
         data-content-type="html"
         data-content-id="{{ $id ?? null }}"
         contenteditable="true"
+        @if($value())
+          data-hascontent="true"
+        @else
+          data-hascontent="false"
+        @endif
     @endif
 
     @isset($class)
