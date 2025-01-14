@@ -72,7 +72,9 @@ if (!function_exists('placeholder_image_url')) {
       return cdn_url("placeholder/{$size}.jpg");
     }
 
-    return "https://via.placeholder.com/{$size}";
+    $bucket = Variable::get('aws_s3_bucket');
+
+    return "https://{$bucket}.cdn.netflexapp.com/placeholder/{$size}.jpg";
   }
 }
 
