@@ -164,7 +164,7 @@ class Picture extends Component
 
     if ($this->inline && current_mode() === 'edit') {
       $size = $preset->size === '0x0' ? '256x256' : $preset->size;
-      return 'https://via.placeholder.com/' . $size;
+      return placeholder_image_url($size);
     }
   }
 
@@ -225,8 +225,8 @@ class Picture extends Component
         $srcSet['sources'] = $srcSet['paths'];
         $srcSet['paths'] = new HtmlString(implode(' ,', $mergedSets));
       } else {
-        $srcSet['sources'] = ['1x' => 'https://via.placeholder.com/' . $preset->size];
-        $srcSet['paths'] = 'https://via.placeholder.com/' . $preset->size;
+        $srcSet['sources'] = ['1x' => placeholder_image_url($preset->size)];
+        $srcSet['paths'] = placeholder_image_url($preset->size);
       }
 
       $srcSets[] = $srcSet;
