@@ -70,7 +70,6 @@ class ContentFile implements MediaUrlResolvable, JsonSerializable, Arrayable, Js
         }
     }
 
-    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->toArray();
