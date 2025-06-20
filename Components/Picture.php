@@ -197,6 +197,7 @@ class Picture extends Component
   {
     $srcSets = [];
 
+    $src = $this->src();
     foreach ($this->preset()->breakpoints as $breakpoint => $preset) {
       /** @var MediaPreset */
       $preset = $preset;
@@ -208,9 +209,10 @@ class Picture extends Component
         'paths' => []
       ];
 
-      if ($this->src()) {
+
+      if ($src) {
         foreach ($preset->resolutions as $resolution) {
-          $srcSet['paths'][$resolution] = media_url($this->src(), $preset, null, null, null, [
+          $srcSet['paths'][$resolution] = media_url($src, $preset, null, null, null, [
             'src' => "{$preset->maxWidth}w",
             'res' => $resolution,
           ]);
