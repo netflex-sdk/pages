@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
-use Laravelium\Sitemap\Sitemap;
+use Ultrono\Sitemap\Sitemap;
 use Netflex\API\Facades\API;
 use Netflex\Foundation\Redirect;
 use Netflex\Newsletters\Newsletter;

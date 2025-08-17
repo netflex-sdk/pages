@@ -1099,3 +1099,17 @@ if (!function_exists('clear_route_cache')) {
     return Cache::forget(RouteServiceProvider::ROUTE_CACHE);
   }
 }
+
+if (!function_exists('lock_locale')) {
+  function lock_locale()
+  {
+    Config::set('app.localeHasBeenExplicitlySet', true);
+  }
+}
+
+if (!function_exists('locale_is_locked')) {
+  function locale_is_locked()
+  {
+    return config('app.localeHasBeenExplicitlySet', false);
+  }
+}
