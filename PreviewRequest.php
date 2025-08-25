@@ -4,7 +4,6 @@ namespace Netflex\Pages;
 
 use Illuminate\Support\Traits\Macroable;
 
-use Netflex\Pages\JwtPayload;
 use Netflex\Support\Accessors;
 
 /**
@@ -33,7 +32,7 @@ class PreviewRequest
   /**
    * Undocumented function
    *
-   * @return \App\User|null
+   * @return null
    */
   public function user()
   {

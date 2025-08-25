@@ -2,8 +2,6 @@
 
 namespace Netflex\Pages\Middleware;
 
-use Netflex\SDK\Application;
-
 use Closure;
 
 use Carbon\Carbon;

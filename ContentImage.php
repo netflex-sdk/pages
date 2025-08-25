@@ -2,13 +2,11 @@
 
 namespace Netflex\Pages;
 
-use Netflex\Support\Accessors;
-
 class ContentImage extends ContentFile
 {
     /**
-     * @param string|null $preset 
-     * @return string|null 
+     * @param string|null $preset
+     * @return string|null
      */
     public function url($preset = 'default')
     {

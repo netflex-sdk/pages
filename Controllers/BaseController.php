@@ -13,6 +13,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Support\Collection;
+use Symfony\Component\HttpFoundation\Response;
 
 abstract class BaseController extends Controller
 {
@@ -92,6 +93,7 @@ abstract class BaseController extends Controller
 
     /**
      * @return Response
+     * @throws PageNotBoundException
      */
     public function fallbackIndex()
     {
