@@ -582,11 +582,9 @@ class RouteServiceProvider extends ServiceProvider
   protected function mapRobots()
   {
     Route::get('robots.txt', function () {
-      return response(
-        view('netflex-pages::robots'),
-        200,
-        ['Content-Type' => 'text/plain'],
-      );
+      $production = app()->env === 'master';
+
+      return response(view('netflex-pages::robots', ['production' => $production]), 200, ['Content-Type' => 'text/plain']);
     })->name('robots.txt');
   }
 
