@@ -30,11 +30,6 @@ class ControllerNotImplementedController extends Controller
     $namespaceProp->setAccessible(true);
     $namespace = $namespaceProp->getValue($routeServiceProvider);
 
-    // We want to provide a stacktrace while in debug, but just a generic 404 when in production.
-    if (app()->environment() !== 'master') {
-      throw new ControllerNotImplementedException($namespace, $page->template->controller);
-    } else {
-      abort(404);
-    }
+    throw new ControllerNotImplementedException($namespace, $page->template->controller);
   }
 }
