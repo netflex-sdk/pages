@@ -432,7 +432,9 @@ class RouteServiceProvider extends ServiceProvider
       $compiledRoutes = [];
       $compiledSubRoutes = [];
 
-      $pages = $this->getNetflexRoutesPages();
+      $pages = Page::model()::all()->filter(function ($page) {
+        return $page->type === 'page' && $page->template && $page->published;
+      });
 
       foreach ($pages as $page) {
         /** @var Page $page */
@@ -569,14 +571,6 @@ class RouteServiceProvider extends ServiceProvider
     if ($deleteCompiledRoutes) {
       clear_route_cache();
     }
-  }
-
-  protected function getNetflexRoutesPages(): Collection
-  {
-    return Page::model()::all()
-      ->filter(function (Page $page) {
-        return $page->type === 'page' && $page->template && $page->published;
-      });
   }
 
   protected function mapRobots()

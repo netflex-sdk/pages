@@ -250,7 +250,7 @@ class Image extends Component
       ) : $src;
 
     if (!$src && current_mode() === 'edit') {
-      return placeholder_image_url($this->size(), $this->settings->cdn);
+      return "https://via.placeholder.com/{$this->size()}";
     }
 
     return $src;

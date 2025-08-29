@@ -164,7 +164,7 @@ class Picture extends Component
 
     if ($this->inline && current_mode() === 'edit') {
       $size = $preset->size === '0x0' ? '256x256' : $preset->size;
-      return placeholder_image_url($size);
+      return 'https://via.placeholder.com/' . $size;
     }
   }
 
@@ -197,7 +197,6 @@ class Picture extends Component
   {
     $srcSets = [];
 
-    $src = $this->src();
     foreach ($this->preset()->breakpoints as $breakpoint => $preset) {
       /** @var MediaPreset */
       $preset = $preset;
@@ -209,10 +208,9 @@ class Picture extends Component
         'paths' => []
       ];
 
-
-      if ($src) {
+      if ($this->src()) {
         foreach ($preset->resolutions as $resolution) {
-          $srcSet['paths'][$resolution] = media_url($src, $preset, null, null, null, [
+          $srcSet['paths'][$resolution] = media_url($this->src(), $preset, null, null, null, [
             'src' => "{$preset->maxWidth}w",
             'res' => $resolution,
           ]);
@@ -227,8 +225,8 @@ class Picture extends Component
         $srcSet['sources'] = $srcSet['paths'];
         $srcSet['paths'] = new HtmlString(implode(' ,', $mergedSets));
       } else {
-        $srcSet['sources'] = ['1x' => placeholder_image_url($preset->size)];
-        $srcSet['paths'] = placeholder_image_url($preset->size);
+        $srcSet['sources'] = ['1x' => 'https://via.placeholder.com/' . $preset->size];
+        $srcSet['paths'] = 'https://via.placeholder.com/' . $preset->size;
       }
 
       $srcSets[] = $srcSet;
