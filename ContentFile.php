@@ -2,6 +2,7 @@
 
 namespace Netflex\Pages;
 
+use ArrayAccess;
 use JsonSerializable;
 
 use Netflex\Support\Accessors;
@@ -27,8 +28,8 @@ class ContentFile implements MediaUrlResolvable, JsonSerializable, Arrayable, Js
     }
 
     /**
-     * @param array|null $attributes
-     * @return static|null
+     * @param array|null $attributes 
+     * @return static|null 
      */
     public static function cast($attributes = [])
     {
@@ -60,7 +61,7 @@ class ContentFile implements MediaUrlResolvable, JsonSerializable, Arrayable, Js
 
     /**
      * @param null $preset Not used
-     * @return string|null
+     * @return string|null 
      */
     public function url ($preset = null)
     {
@@ -69,7 +70,6 @@ class ContentFile implements MediaUrlResolvable, JsonSerializable, Arrayable, Js
         }
     }
 
-    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->toArray();

@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
-use Ultrono\Sitemap\Sitemap;
+use Laravelium\Sitemap\Sitemap;
 use Netflex\API\Facades\API;
 use Netflex\Foundation\Redirect;
 use Netflex\Newsletters\Newsletter;
@@ -582,11 +582,9 @@ class RouteServiceProvider extends ServiceProvider
   protected function mapRobots()
   {
     Route::get('robots.txt', function () {
-      return response(
-        view('netflex-pages::robots'),
-        200,
-        ['Content-Type' => 'text/plain'],
-      );
+      $production = app()->env === 'master';
+
+      return response(view('netflex-pages::robots', ['production' => $production]), 200, ['Content-Type' => 'text/plain']);
     })->name('robots.txt');
   }
 

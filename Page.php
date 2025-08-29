@@ -2,6 +2,8 @@
 
 namespace Netflex\Pages;
 
+use Netflex\Pages\AbstractPage;
+
 class Page extends AbstractPage
 {
   protected static function makeQueryBuilder($appends = [])

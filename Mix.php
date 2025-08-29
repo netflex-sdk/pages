@@ -2,6 +2,8 @@
 
 namespace Netflex\Pages;
 
+use Illuminate\Support\Str;
+use Illuminate\Support\HtmlString;
 use Illuminate\Foundation\Mix as ServiceProvider;
 
 class Mix extends ServiceProvider
