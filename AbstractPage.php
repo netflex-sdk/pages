@@ -422,12 +422,9 @@ abstract class AbstractPage extends QueryableModel implements Responsable
    * Retrieves all instances
    *
    * @return Collection|LazyCollection
-   * @throws NotQueryableException If object not queryable
-   * @throws QueryException On invalid query
    */
   public static function all()
   {
-
     return static::getPages()->values();
   }
 
@@ -436,8 +433,6 @@ abstract class AbstractPage extends QueryableModel implements Responsable
    *
    * @param int|string $id
    * @return static|null
-   * @throws NotQueryableException If object not queryable
-   * @throws QueryException On invalid query
    */
   public static function find($id)
   {
@@ -451,8 +446,6 @@ abstract class AbstractPage extends QueryableModel implements Responsable
    * @param mixed $resolveBy
    * @param string|null $field
    * @return static|Collection|null
-   * @throws NotQueryableException If object not queryable
-   * @throws QueryException On invalid query
    */
   public static function resolve($resolveBy, $field = null)
   {

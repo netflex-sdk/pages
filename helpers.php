@@ -56,6 +56,28 @@ const PAGE_INTERNAL = Page::TYPE_INTERNAL;
 const PAGE_FOLDER = Page::TYPE_FOLDER;
 const PAGE = Page::TYPE_PAGE;
 
+if (!function_exists('placeholder_image_url')) {
+  /**
+   * Generates a placeholder image url
+   *
+   * @param string $size
+   * @param string|null $cdn
+   * @return string
+   */
+  function placeholder_image_url($size, $cdn = null)
+  {
+    $cdn = $cdn ?? Variable::get('site_cdn_url');
+
+    if (Str::contains($cdn, '.cdn.netflexapp.com')) {
+      return cdn_url("media/placeholder/{$size}.jpg");
+    }
+
+    $bucket = Variable::get('aws_s3_bucket');
+
+    return "https://{$bucket}.cdn.netflexapp.com/media/placeholder/{$size}.jpg";
+  }
+}
+
 if (!function_exists('render_component_tag')) {
   /**
    * Renders a component tag, using its class if available
@@ -789,7 +811,7 @@ if (!function_exists('current_page')) {
       throw new TypeError('Argument 1 passed to ' . $frame['function'] . '() must be an instance of Netflex\Pages\AbstractPage, ' . $type . ' given on line ' . $frame['line']);
     }
 
-    App::bind('__current_page__', fn () => $value);
+    App::bind('__current_page__', fn() => $value);
 
     return $value;
   }
@@ -1075,5 +1097,19 @@ if (!function_exists('clear_route_cache')) {
   function clear_route_cache()
   {
     return Cache::forget(RouteServiceProvider::ROUTE_CACHE);
+  }
+}
+
+if (!function_exists('lock_locale')) {
+  function lock_locale()
+  {
+    Config::set('app.localeHasBeenExplicitlySet', true);
+  }
+}
+
+if (!function_exists('locale_is_locked')) {
+  function locale_is_locked()
+  {
+    return config('app.localeHasBeenExplicitlySet', false);
   }
 }

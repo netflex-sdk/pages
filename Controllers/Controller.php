@@ -2,7 +2,6 @@
 
 namespace Netflex\Pages\Controllers;
 
-use Netflex\Pages\Controllers\BaseController;
 use Netflex\Support\Concerns\HasEvents;
 
 abstract class Controller extends BaseController
