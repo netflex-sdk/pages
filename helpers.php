@@ -419,6 +419,11 @@ if (!function_exists('map_content')) {
           })->values();
 
         return $entries;
+      case 'multiple_text_fields':
+        return Collection::make($content)
+          ->pluck('text')
+          ->filter()
+          ->values();
       case 'gallery':
         return $content->mapWithKeys(function ($item) {
           $hash = $item->text;
@@ -469,10 +474,13 @@ if (!function_exists('map_content')) {
       case 'checkbox-group':
       case 'multiselect':
       case 'tags':
-        return Collection::make($content)
-          ->pluck('text')
-          ->filter()
-          ->values();
+        if ($item = $content->shift()) {
+          return Collection::make(explode(',', $item->text ?? ''))
+            ->filter()
+            ->values();
+        }
+
+        return Collection::make();
       case 'integer':
         if ($item = $content->shift()) {
           return (int) $item->text ?? '';
@@ -571,6 +579,10 @@ if (!function_exists('content')) {
       $content = $content->filter(function ($item) {
         return $item->published;
       });
+
+      /* if ($alias === 'events') {
+        dd($content);
+      } */
 
       if ($field !== 'auto') {
         $settings['type'] = $field;
