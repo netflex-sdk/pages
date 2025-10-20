@@ -469,13 +469,10 @@ if (!function_exists('map_content')) {
       case 'checkbox-group':
       case 'multiselect':
       case 'tags':
-        if ($item = $content->shift()) {
-          return Collection::make(explode(',', $item->text ?? ''))
-            ->filter()
-            ->values();
-        }
-
-        return Collection::make();
+        return Collection::make($content)
+          ->pluck('text')
+          ->filter()
+          ->values();
       case 'integer':
         if ($item = $content->shift()) {
           return (int) $item->text ?? '';
@@ -574,10 +571,6 @@ if (!function_exists('content')) {
       $content = $content->filter(function ($item) {
         return $item->published;
       });
-
-      /* if ($alias === 'events') {
-        dd($content);
-      } */
 
       if ($field !== 'auto') {
         $settings['type'] = $field;
