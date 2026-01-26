@@ -100,6 +100,10 @@ class MediaPreset implements JsonSerializable
       $alias = static::defaultCdnAlias();
     }
 
+    if ($alias === null) {
+      return null;
+    }
+
     if ($cdn = static::cdnDomains()[$alias] ?? null) {
       return $cdn;
     }
