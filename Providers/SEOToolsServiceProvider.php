@@ -4,19 +4,19 @@ namespace Netflex\Pages\Providers;
 
 use Netflex\Foundation\Variable;
 
-use Apility\SEOTools\SEOTools;
-use Apility\SEOTools\SEOMeta;
-use Apility\SEOTools\OpenGraph;
-use Apility\SEOTools\TwitterCards;
-use Apility\SEOTools\JsonLd;
-use Apility\SEOTools\JsonLdMulti;
-use Apility\SEOTools\Contracts\SEOTools as SEOToolsContract;
-use Apility\SEOTools\Contracts\MetaTags as MetaTagsContract;
-use Apility\SEOTools\Contracts\TwitterCards as TwitterCardsContract;
-use Apility\SEOTools\Contracts\OpenGraph as OpenGraphContract;
-use Apility\SEOTools\Contracts\JsonLd as JsonLdContract;
-use Apility\SEOTools\Contracts\JsonLdMulti as JsonLdMultiContract;
-use Apility\SEOTools\Providers\SEOToolsServiceProvider as ServiceProvider;
+use Apriil\SEOTools\SEOTools;
+use Apriil\SEOTools\SEOMeta;
+use Apriil\SEOTools\OpenGraph;
+use Apriil\SEOTools\TwitterCards;
+use Apriil\SEOTools\JsonLd;
+use Apriil\SEOTools\JsonLdMulti;
+use Apriil\SEOTools\Contracts\SEOTools as SEOToolsContract;
+use Apriil\SEOTools\Contracts\MetaTags as MetaTagsContract;
+use Apriil\SEOTools\Contracts\TwitterCards as TwitterCardsContract;
+use Apriil\SEOTools\Contracts\OpenGraph as OpenGraphContract;
+use Apriil\SEOTools\Contracts\JsonLd as JsonLdContract;
+use Apriil\SEOTools\Contracts\JsonLdMulti as JsonLdMultiContract;
+use Apriil\SEOTools\Providers\SEOToolsServiceProvider as ServiceProvider;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Config\Repository as ConfigRepository;

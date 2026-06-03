@@ -4,7 +4,7 @@ namespace Netflex\Pages\Components;
 
 use Illuminate\View\Component;
 use Netflex\Pages\Page;
-use Apility\SEOTools\Facades\SEOMeta;
+use Apriil\SEOTools\Facades\SEOMeta;
 
 class Bs5Breadcrumbs extends Component
 {

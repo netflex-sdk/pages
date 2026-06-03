@@ -15,29 +15,29 @@
         ]
     },
     "require": {
-        "apility/seotools": "^2.0",
+        "apriil/seotools": "^1.0",
         "facade/ignition-contracts": "^1.0",
-        "illuminate/auth": "^12.0",
-        "illuminate/contracts": "^12.0",
-        "illuminate/routing": "^12.0",
-        "illuminate/support": "^12.0",
-        "illuminate/view": "^12.0",
-        "netflex/foundation": "^6.0",
-        "netflex/query-builder": "^6.0",
-        "netflex/support": "^6.0",
+        "illuminate/auth": "^13.0",
+        "illuminate/contracts": "^13.0",
+        "illuminate/routing": "^13.0",
+        "illuminate/support": "^13.0",
+        "illuminate/view": "^13.0",
+        "netflex/foundation": "^7.0",
+        "netflex/query-builder": "^7.0",
+        "netflex/support": "^7.0",
         "php": "^8.4",
         "ultrono/laravel-sitemap": "^9.5"
     },
     "require-dev": {
-        "illuminate/cache": "^12.0",
-        "illuminate/container": "^12.0",
-        "illuminate/events": "^12.0",
-        "illuminate/filesystem": "^12.0",
+        "illuminate/cache": "^13.0",
+        "illuminate/container": "^13.0",
+        "illuminate/events": "^13.0",
+        "illuminate/filesystem": "^13.0",
         "vlucas/phpdotenv": "^5.2"
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "6.0.x-dev"
+            "dev-master": "7.0.x-dev"
         },
         "laravel": {
             "providers": [
@@ -46,10 +46,10 @@
                 "Netflex\\Pages\\Providers\\SEOToolsServiceProvider"
             ],
             "aliases": {
-                "SEOMeta": "Apility\\SEOTools\\Facades\\SEOMeta",
-                "OpenGraph": "Apility\\SEOTools\\Facades\\OpenGraph",
-                "Twitter": "Apility\\SEOTools\\Facades\\TwitterCard",
-                "SEO": "Apility\\SEOTools\\Facades\\SEOTools"
+                "SEOMeta": "Apriil\\SEOTools\\Facades\\SEOMeta",
+                "OpenGraph": "Apriil\\SEOTools\\Facades\\OpenGraph",
+                "Twitter": "Apriil\\SEOTools\\Facades\\TwitterCard",
+                "SEO": "Apriil\\SEOTools\\Facades\\SEOTools"
             }
         }
     }
